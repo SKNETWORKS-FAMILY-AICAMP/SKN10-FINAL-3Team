@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>문서 상세 내용</title>
+  {% load static %}
+  <style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+    th {
+        background-color: #f2f2f2;
+    }
+    .back-button {
+        margin: 20px 0;
+        padding: 8px 16px;
+    }
+  </style>
+</head>
+<body>
+  <button class="back-button" onclick="history.back()">뒤로 가기</button>
+  <table id="detailTable">
+    <tr>
+      <th>No.</th>
+      <th>사건번호</th>
+      <th>선고일</th>
+    </tr>
+  </table>
+  <script src="{% static 'js/detail_script.js' %}"></script>
+</body>
+</html>

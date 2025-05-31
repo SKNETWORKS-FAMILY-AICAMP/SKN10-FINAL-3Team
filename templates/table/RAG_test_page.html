@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>문서 목록 조회 페이지</title>
+  {% load static %}
+  <style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+    th {
+        background-color: #f2f2f2;
+    }
+    form {
+        margin: 20px 0;
+    }
+    input[type="text"] {
+        padding: 8px;
+        width: 300px;
+    }
+    button {
+        padding: 8px 16px;
+    }
+</style>
+</head>
+<body>
+  <form id="searchForm">
+    <input type="text" id="searchInput" placeholder="검색어를 입력하세요" />
+    <button type="submit">검색</button>
+  </form>
+  <table id="documentTable">
+    <tr>
+      <th>No.</th>
+      <th>사건번호</th>
+      <th>선고일</th>
+    </tr>
+  </table>
+  <script src="{% static 'js/RAG_test_script.js' %}"></script>
+</body>
+</html>
