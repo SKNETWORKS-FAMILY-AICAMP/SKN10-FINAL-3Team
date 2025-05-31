@@ -10,7 +10,7 @@ services:
         environment:
             MYSQL_ROOT_PASSWORD: root
             MYSQL_DATABASE: final_db
-            MYSQL_USER: f1234
-            MYSQL_PASSWORD: 
+            MYSQL_USER: final_user
+            MYSQL_PASSWORD: f1234
         ports:
             - '3306:3306'
