@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,7 +27,9 @@ SECRET_KEY = 'django-insecure-08s#z%+=0&lqtol)4s79vwoqr@3(qe&kec!d_sri!0hw77101!
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
+# 기본 사용자 모델 설정 (사용자 인증 시 사용되는 모델)
+AUTH_USER_MODEL = "user.User"
+LOGOUT_REDIRECT_URL = '/'
 
 # Application definition
 
@@ -38,12 +41,15 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # 앱 추가
+    "rest_framework", 
+    "corsheaders",
     'api',
     'authentication',
     'user'
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware", # CORS 미들웨어 추가
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -110,12 +116,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
-
+LANGUAGE_CODE = 'ko-kr'
+TIME_ZONE = 'Asia/Seoul'
 USE_I18N = True
-
 USE_TZ = True
 
 
@@ -123,6 +126,25 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = '/static/'
+STATIC_PATH = os.path.join(BASE_DIR, 'static')
+STATICFILES_DIRS = (STATIC_PATH,)
+
+# 모든 도메인의 요청을 허용하고 쿠키 포함 허용
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
+
+# Django REST Framework의 예외 핸들러 설정
+REST_FRAMEWORK = {
+    'EXCEPTION_HANDLER': 'authentication.exceptions.status_code_handler',  # 예외 발생 시 호출될 핸들러
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',  # 기본적으로 인증된 사용자만 접근 허용
+    ],
+}
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
