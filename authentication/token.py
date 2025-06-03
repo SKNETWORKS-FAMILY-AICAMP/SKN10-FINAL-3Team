@@ -1,9 +1,9 @@
 import jwt 
 import datetime 
 import enum 
+import pdb
 
 from rest_framework.exceptions import AuthenticationFailed
-
 # 토큰 설정 Enum 클래스
 # - access token: 2분 (단기 사용)
 # - refresh token: 2일 (장기 사용)
@@ -26,6 +26,7 @@ def __create_token(id: int, key: JWT_KEY) -> str:
 
 # 액세스 토큰 생성 함수
 def create_access_token(id):
+    print(f"Creating access token for user ID: {id}")  # 디버깅용
     return __create_token(id, JWT_KEY.RANDOM_OF_ACCESS_KEY)
 
 # 리프레시 토큰 생성 함수

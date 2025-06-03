@@ -2,17 +2,17 @@ from rest_framework.authentication import get_authorization_header
 from rest_framework.views import APIView 
 from rest_framework.response import Response 
 from rest_framework.exceptions import AuthenticationFailed , APIException
-
 from rest_framework.permissions import IsAuthenticated
-from authentication.permissions import IsStampUser, IsPartner
 
-from user.models import User
+from user.models import CustomUser
 from user.serializer import UserSerializer
 from authentication.token import create_access_token, create_refresh_token, decode_access_token, decode_refresh_token
 
 # 회원가입 뷰
 class Register(APIView):
     def post(self, request):
+        print(f"request : {request}")  # 요청 객체 출력 (디버깅 용도)
+        print(f"request.data : {request.data}")  # 요청 데이터 출력 (디버깅 용도)
         # 사용자 데이터 직렬화 및 유효성 검사
         serializer = UserSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -26,8 +26,7 @@ class LoginView(APIView):
         password = request.data['password']
 
         # 사용자 이메일로 조회
-        name = request.data['name']
-        user = User.objects.filter(email=username).first()
+        user = CustomUser.objects.filter(email=username).first()
         if user is None:
             raise APIException('User not found')  # 사용자가 존재하지 않음
         elif not user.check_password(password):
@@ -41,39 +40,23 @@ class LoginView(APIView):
         response.set_cookie(key='refreshToken', value=refresh_token, httponly=True)  # 쿠키에 리프레시 토큰 저장
         response.data = {
             'token': access_token,  # 액세스 토큰 반환
-            'role': user.role,  # 👈 권한 정보 포함
-            'name': user.name
+            'user': user.name
         }
-
         return response
 
 # 인증된 사용자만 접근 가능한 API 뷰
 class HelloWorldView(APIView):
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request):
-        auth = get_authorization_header(request).split()
-        if auth and len(auth) == 2:
-            token = auth[1].decode('utf-8')
-            _ = decode_access_token(token)  # 토큰 유효성 검사
-
-            content = {
-                "message": "Hello World"
+        print(f"User: {request.user}")
+        print(f"Is Authenticated: {request.user.is_authenticated}")
+        print(f"Is Active: {request.user.is_active}")
+        content = {
+                "message": "Hello World",
             }
-            return Response(content)
-
-        raise AuthenticationFailed('unauthenticated')  # 인증되지 않은 사용자
-
-# 파트너만 접근 허용
-# class PartnerOnlyView(APIView):
-#     permission_classes = [IsAuthenticated, IsPartner]
-
-#     def get(self, request):
-#         return Response({"msg": f"{request.user.name}님은 사건 배정이 가능한 파트너입니다."})
-
-# class StampUserOnlyView(APIView):
-#     permission_classes = [IsAuthenticated, IsStampUser]
-
-#     def get(self, request):
-#         return Response({"msg": f"{request.user.name}님은 팀 단위 업무를 수행할 수 있습니다."})
+        
+        return Response(content)
 
 # 액세스 토큰 재발급 뷰
 class RefreshView(APIView):

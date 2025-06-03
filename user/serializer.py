@@ -1,12 +1,18 @@
 from rest_framework.serializers import ModelSerializer
-from .models import User
+from .models import CustomUser
 
 # 사용자 직렬화 클래스: 사용자 데이터를 JSON으로 변환하거나 역변환
 class UserSerializer(ModelSerializer):
     class Meta:
-        model = User  # 사용할 모델 지정
-        fields = ['id', 'name', 'email', 'gender', 'password', 'role']  # JSON으로 표현할 필드 목록
+        model = CustomUser  # 사용할 모델 지정
+        fields = ['name', 'email', 'phone', 'password', 'bio', 'exp_career', 'exp_activity', 'education_high', 'education_univ', 'education_grad']  # JSON으로 표현할 필드 목록
         extra_kwargs = {
+            'bio': {'required': False, 'allow_null': True},
+            'exp_career': {'required': False, 'allow_null': True},
+            'exp_activity': {'required': False, 'allow_null': True},
+            'education_high': {'required': False, 'allow_null': True},
+            'education_univ': {'required': False, 'allow_null': True},
+            'education_grad': {'required': False, 'allow_null': True},
             'password': {'write_only': True}  # 비밀번호는 쓰기 전용 필드로 설정하여 응답에 포함되지 않도록 함
         }
 
