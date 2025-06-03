@@ -10,6 +10,10 @@ from user.models import CustomUser
 from user.serializer import UserSerializer
 from authentication.token import create_access_token, create_refresh_token, decode_refresh_token
 
+# 로그인 페이지 뷰
+def login_page(request):
+    return render(request, 'user/login.html')
+
 # 회원가입 뷰
 class Register(APIView):
     def post(self, request):
