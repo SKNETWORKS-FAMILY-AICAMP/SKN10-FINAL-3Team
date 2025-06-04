@@ -13,6 +13,9 @@ from authentication.token import create_access_token, create_refresh_token, deco
 # 로그인 페이지 뷰
 def login_page(request):
     return render(request, 'user/login.html')
+# 메인 페이지 뷰
+def main_page(request):
+    return render(request, 'user/mainpage.html')
 
 # 회원가입 뷰
 class Register(APIView):

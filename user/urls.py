@@ -1,5 +1,6 @@
+# user/urls.py
 from django.urls import path
-from .views import Register, LoginView, HelloWorldView, RefreshView, Logoutview, login_page
+from .views import Register, LoginView, HelloWorldView, RefreshView, Logoutview, login_page, main_page
 
 # API 엔드포인트 URL 구성
 urlpatterns = [
@@ -11,5 +12,5 @@ urlpatterns = [
     path('logout/', Logoutview.as_view(), name='logout'),      # 로그아웃 요청 처리
     
     path('login-page/', login_page, name='login-page'),
-
+    path('main-page/', main_page, name='main-page')
 ]

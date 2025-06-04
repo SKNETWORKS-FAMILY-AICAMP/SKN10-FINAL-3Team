@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from user.models import CustomUser
 from user.serializer import UserSerializer
-from authentication.token import create_access_token, create_refresh_token, decode_access_token, decode_refresh_token
+from authentication.token import create_access_token, create_refresh_token, decode_refresh_token
 
 # 회원가입 뷰
 class Register(APIView):
@@ -35,7 +35,7 @@ class LoginView(APIView):
         # 토큰 생성 및 응답
         access_token = create_access_token(user.id)
         refresh_token = create_refresh_token(user.id)
-
+        
         response = Response()
         response.set_cookie(key='refreshToken', value=refresh_token, httponly=True)  # 쿠키에 리프레시 토큰 저장
         response.data = {

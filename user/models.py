@@ -1,33 +1,42 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.contrib.auth.models import AbstractUser, BaseUserManager
 
 class CustomUserManager(BaseUserManager):
-    def create_user(self, name, email, password=None, **extra_fields):
+    def create_user(self, name, email, phone, password=None, **extra_fields):
         if not name:
             raise ValueError("이름은 필수입니다.")
         if not email:
             raise ValueError("이메일은 필수입니다.")
+        if not phone:
+            raise ValueError("전화번호는 필수입니다.")
         if not password:
             raise ValueError("비밀번호는 필수입니다.")
 
         email = self.normalize_email(email)
-        user = self.model(name=name, email=email, **extra_fields)
+        user = self.model(name=name, email=email, phone=phone, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, name, email, password=None, **extra_fields):
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
+    def create_superuser(self, name, email, phone, password=None, **extra_fields):
+        user = self.create_user(
+            name=name,
+            email=email,
+            phone=phone,
+            password=password,
+            **extra_fields
+        )
+        user.is_staff = True
+        user.is_superuser = True
+        user.save(using=self._db)
+        return user
 
-        return self.create_user(name, email, password, **extra_fields)
-
-class CustomUser(AbstractBaseUser, PermissionsMixin):
+class CustomUser(AbstractUser):
+    username = None  # 사용자 이름 필드 제거
     # 필수 정보
     name = models.CharField(max_length=20)
     email = models.EmailField(max_length=255, unique=True)
-    phone = models.CharField(max_length=20)
-    password = models.CharField(max_length=255)
+    phone = models.CharField(max_length=20, unique=True)
 
     # 선택 입력
     bio = models.TextField(blank=True, null=True)              # 자기소개
@@ -37,25 +46,14 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     education_univ = models.CharField(max_length=255, blank=True, null=True)   # 대학 학력
     education_grad = models.CharField(max_length=255, blank=True, null=True)   # 대학원 학력
 
-    # 참조 외래키 (on_delete 방식은 적절히 수정 가능)
-    # department = models.ForeignKey('code.Organization', on_delete=models.SET_NULL, null=True, related_name='users')  # 소속부서
-    # role = models.ForeignKey('code.Role', on_delete=models.SET_NULL, null=True, related_name='users')               # 역할
-    # category = models.ForeignKey('code.Category', on_delete=models.SET_NULL, null=True, related_name='users')       # 전문분야
-
-    # Django 기본 권한 필드
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
-
     # 생성/수정 시간
     created_dt = models.DateTimeField(auto_now_add=True)
     updated_dt = models.DateTimeField(auto_now=True)
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['name']
+    REQUIRED_FIELDS = ['name', 'phone']
 
     objects = CustomUserManager()
 
     class Meta:
         db_table = 'custom_user'
-        verbose_name = '사용자'
-        verbose_name_plural = '사용자'
