@@ -8,6 +8,7 @@ database/
 # 마이그레이션 파일
 **/migrations/*.pyc
 **/migrations/__pycache__/
+**/migrations/*initial.py
 
 # __pycache__ 및 .pyc 파일
 __pycache__/
