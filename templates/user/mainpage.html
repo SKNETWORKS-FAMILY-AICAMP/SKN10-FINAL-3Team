@@ -1,575 +1,172 @@
 <!DOCTYPE html>
 <html lang="ko">
-
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>변호사 대시보드 | LAW FIRM</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'law-darkblue': '#1e40af',
-                        'law-blue': '#2563eb',
-                        'law-lightblue': '#3b82f6',
-                    },
-                    boxShadow: {
-                        'card': '0 4px 20px rgba(0, 0, 0, 0.08)',
-                        'floating': '0 10px 25px -5px rgba(0, 0, 0, 0.1)',
-                    }
-                }
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              'law-darkblue': '#1e40af',
+              'law-blue': '#2563eb',
+              'law-lightblue': '#3b82f6'
+            },
+            boxShadow: {
+              'card': '0 4px 20px rgba(0, 0, 0, 0.08)',
+              'floating': '0 10px 25px -5px rgba(0, 0, 0, 0.1)'
             }
+          }
         }
+      }
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet" />
     <style>
-        body {
-            font-family: 'Noto Sans KR', sans-serif;
-            background-color: #f8fafc;
-        }
-
-        .main-content {
-            transition: all 0.3s ease;
-        }
-
-        .card {
-            transition: all 0.3s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-        }
-
-        .stats-card {
-            background: linear-gradient(45deg, #1d4ed8 0%, #3b82f6 100%);
-        }
-
-        .data-row:hover {
-            background-color: #eff6ff;
-        }
-
-        @keyframes pulse {
-
-            0%,
-            100% {
-                opacity: 1;
-            }
-
-            50% {
-                opacity: 0.7;
-            }
-        }
-
-        .loading {
-            animation: pulse 1.5s infinite;
-        }
+      body {
+        font-family: 'Noto Sans KR', sans-serif;
+        background-color: #f8fafc;
+      }
     </style>
-</head>
-
-<body class="flex h-screen overflow-hidden">
-
-
-    <!-- 메인 콘텐츠 영역 -->
+  </head>
+  <body class="flex h-screen overflow-hidden">
     <div class="main-content flex flex-col flex-1 overflow-hidden">
-        <!-- 헤더 -->
-        <header class="bg-law-darkblue border-b border-gray-200 shadow-sm px-6 py-2 flex items-center justify-between">
-            <div class="flex items-center space-x-6">
-                <span class="text-2xl font-bold text-white">LAW FIRM</span>
-                <span class="text-base text-blue-100 font-medium">변호사 대시보드</span>
+      <!-- 헤더 -->
+      <header class="bg-law-darkblue border-b border-gray-200 shadow-sm px-6 py-2 flex items-center justify-between">
+        <div class="flex items-center space-x-6">
+          <span class="text-2xl font-bold text-white">LAW FIRM</span>
+          <span class="text-base text-blue-100 font-medium">변호사 대시보드</span>
+        </div>
+        <div class="flex items-center space-x-6">
+          <button class="text-blue-100 hover:text-white">
+            <i class="fas fa-question-circle text-lg"></i>
+          </button>
+          <button class="text-blue-100 hover:text-white">
+            <i class="fas fa-cog text-lg"></i>
+          </button>
+          <button class="relative text-blue-100 hover:text-white">
+            <i class="fas fa-bell text-xl"></i>
+            <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+          </button>
+          <button class="flex items-center space-x-2 bg-blue-600 rounded-full px-3 py-1 text-white hover:bg-blue-700 transition">
+            <span class="w-8 h-8 rounded-full bg-blue-200 flex items-center justify-center text-blue-800 font-bold">김</span>
+            <span class="font-medium">김영희 변호사</span>
+            <i class="fas fa-chevron-down text-blue-100"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- 본문 -->
+      <div class="flex-1 overflow-y-auto px-16 py-12 bg-gray-50"> <!-- py-6 → py-12 -->
+        <!-- 검색창 -->
+        <div class="flex justify-center items-start gap-4 mb-12"> <!-- mb-6 → mb-12 -->
+          <!-- 업로드 버튼 -->
+          <button class="w-10 h-10 flex items-center justify-center rounded-full bg-blue-500 hover:bg-blue-600 text-white shadow-md">
+            <i class="fas fa-upload text-sm"></i>
+          </button>
+          <div class="w-full max-w-3xl">
+            <div class="relative w-full">
+              <input
+                type="text"
+                placeholder="Search Text"
+                class="w-full pl-12 pr-72 py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm transition duration-200"
+              />
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-blue-500 text-sm">
+                <i class="fas fa-search text-xs"></i>
+              </span>
+              <div class="absolute right-16 top-1/2 -translate-y-1/2 flex items-center space-x-2 bg-sky-100 text-sky-700 text-sm rounded-full h-9 px-3 shadow-inner">
+                <span class="font-semibold">플러그인</span>
+                <select class="text-sm bg-white rounded-full h-6 px-3 focus:outline-none border border-gray-300">
+                  <option>분석 및 요약</option>
+                  <option>판례 검색</option>
+                </select>
+              </div>
+              <button class="absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full bg-white border border-blue-500 text-blue-500 hover:bg-blue-50 transition z-10">
+                <i class="fas fa-paper-plane"></i>
+              </button>
             </div>
-            <div class="flex items-center space-x-6">
-                <button class="text-blue-100 hover:text-white">
-                    <i class="fas fa-question-circle text-lg"></i>
-                </button>
-                <button class="text-blue-100 hover:text-white">
-                    <i class="fas fa-cog text-lg"></i>
-                </button>
-                <button class="relative text-blue-100 hover:text-white">
-                    <i class="fas fa-bell text-xl"></i>
-                    <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
-                </button>
-                <button
-                    class="flex items-center space-x-2 bg-blue-600 rounded-full px-3 py-1 text-white hover:bg-blue-700 transition">
-                    <span
-                        class="w-8 h-8 rounded-full bg-blue-200 flex items-center justify-center text-blue-800 font-bold" id="user-initial">김변호</span>
-                    <span class="font-medium" id="user-name">김영희 변호사</span>
-                    <i class="fas fa-chevron-down text-blue-100"></i>
-                </button>
-            </div>
-        </header>
-
-        <!-- 대시보드 컨텐츠 -->
-        <div class="flex-1 overflow-y-auto p-6 bg-gray-50">
-            <!-- 검색창(중앙정렬) -->
-            <div class="flex justify-center mb-8">
-                <div class="relative w-full max-w-xl">
-                    <input type="text" placeholder="사건, 문서, 고객 검색..."
-                        class="w-full pl-4 pr-10 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    <button class="absolute right-3 top-3 text-gray-400 hover:text-blue-600">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- 제목 & 위젯 -->
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-                <div>
-                    <h2 class="text-2xl font-bold text-gray-800">대시보드</h2>
-                    <p class="text-gray-600">오늘의 활동 및 주요 업무를 확인하세요</p>
-                </div>
-                <div class="mt-4 md:mt-0">
-                    <div class="bg-white rounded-lg p-3 flex items-center">
-                        <div class="mr-3">
-                            <div class="text-xs text-gray-500">오늘은</div>
-                            <div class="font-bold text-gray-800">2023년 10월 25일 수요일</div>
-                        </div>
-                        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700">
-                            <i class="fas fa-calendar"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 통계 카드들 -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
-                <div class="stats-card rounded-xl text-white shadow-lg p-5 card">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <div class="text-sm font-medium opacity-80">전체 사건</div>
-                            <div class="text-3xl font-bold mt-1">48</div>
-                        </div>
-                        <div class="w-12 h-12 rounded-full bg-blue-300 bg-opacity-40 flex items-center justify-center">
-                            <i class="fas fa-folder-open text-xl"></i>
-                        </div>
-                    </div>
-                    <div class="mt-4 flex items-center text-sm">
-                        <span class="bg-green-200 text-green-800 px-2 py-1 rounded">+3 신규</span>
-                        <span class="ml-2 opacity-75">지난 7일간</span>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-xl shadow-md p-5 card">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <div class="text-sm font-medium text-gray-500">진행중인 사건</div>
-                            <div class="text-3xl font-bold mt-1 text-blue-700">19</div>
-                        </div>
-                        <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-700">
-                            <i class="fas fa-tasks text-xl"></i>
-                        </div>
-                    </div>
-                    <div class="mt-4">
-                        <div class="flex justify-between text-sm text-gray-500">
-                            <span>최근 처리율</span>
-                            <span>82%</span>
-                        </div>
-                        <div class="mt-1 h-2 bg-gray-200 rounded-full">
-                            <div class="h-full rounded-full bg-green-500" style="width: 82%"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-xl shadow-md p-5 card">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <div class="text-sm font-medium text-gray-500">오늘의 일정</div>
-                            <div class="text-3xl font-bold mt-1 text-indigo-700">4</div>
-                        </div>
-                        <div
-                            class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-700">
-                            <i class="fas fa-calendar-alt text-xl"></i>
-                        </div>
-                    </div>
-                    <div class="mt-4">
-                        <div class="flex items-center text-sm">
-                            <span class="text-gray-600">다음 일정:</span>
-                            <span class="font-medium ml-1">11:30 법원 출두</span>
-                        </div>
-                        <div class="mt-1 text-xs text-red-600">
-                            <i class="fas fa-exclamation-triangle mr-1"></i>
-                            1건 경고 (기한 임박)
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-xl shadow-md p-5 card">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <div class="text-sm font-medium text-gray-500">내 문서함</div>
-                            <div class="text-3xl font-bold mt-1 text-gray-800">173</div>
-                        </div>
-                        <div
-                            class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-700">
-                            <i class="fas fa-file-alt text-xl"></i>
-                        </div>
-                    </div>
-                    <div class="mt-4 flex">
-                        <div class="pr-4 border-r border-gray-200">
-                            <div class="text-sm text-gray-500">서류</div>
-                            <div class="font-medium">89</div>
-                        </div>
-                        <div class="px-4 border-r border-gray-200">
-                            <div class="text-sm text-gray-500">계약서</div>
-                            <div class="font-medium">42</div>
-                        </div>
-                        <div class="pl-4">
-                            <div class="text-sm text-gray-500">기타</div>
-                            <div class="font-medium">42</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 주요 섹션: 최근 사건 및 일정 -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- 최근 사건 -->
-                <div class="bg-white rounded-xl shadow-md p-6 card">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-bold text-lg text-gray-800">최근 진행중인 사건</h3>
-                        <a href="#" class="text-sm text-blue-600 font-medium flex items-center">
-                            더 보기 <i class="fas fa-arrow-right ml-1 text-xs"></i>
-                        </a>
-                    </div>
-
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead>
-                                <tr class="text-left text-xs text-gray-500 uppercase border-b">
-                                    <th class="pb-3">사건명</th>
-                                    <th class="pb-3">고객</th>
-                                    <th class="pb-3">상태</th>
-                                    <th class="pb-3">마감일</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr class="data-row border-b text-sm">
-                                    <td class="py-3">
-                                        <div class="font-medium">금융사기 소송</div>
-                                        <div class="text-xs text-gray-500">#S2023-045</div>
-                                    </td>
-                                    <td class="py-3">박민수</td>
-                                    <td class="py-3">
-                                        <span
-                                            class="px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800">진행중</span>
-                                    </td>
-                                    <td class="py-3 text-gray-500">2023-11-15</td>
-                                </tr>
-                                <tr class="data-row border-b text-sm">
-                                    <td class="py-3">
-                                        <div class="font-medium">이혼 사건</div>
-                                        <div class="text-xs text-gray-500">#F2023-089</div>
-                                    </td>
-                                    <td class="py-3">이지영</td>
-                                    <td class="py-3">
-                                        <span
-                                            class="px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800">조정중</span>
-                                    </td>
-                                    <td class="py-3 text-gray-500">2023-11-02</td>
-                                </tr>
-                                <tr class="data-row border-b text-sm">
-                                    <td class="py-3">
-                                        <div class="font-medium">상속 분쟁</div>
-                                        <div class="text-xs text-gray-500">#I2023-112</div>
-                                    </td>
-                                    <td class="py-3">정태호</td>
-                                    <td class="py-3">
-                                        <span
-                                            class="px-2 py-1 rounded-full text-xs bg-purple-100 text-purple-800">심의중</span>
-                                    </td>
-                                    <td class="py-3 text-red-600">2023-10-28</td>
-                                </tr>
-                                <tr class="data-row text-sm">
-                                    <td class="py-3">
-                                        <div class="font-medium">부동산 계약 무효</div>
-                                        <div class="text-xs text-gray-500">#P2023-076</div>
-                                    </td>
-                                    <td class="py-3">강미영</td>
-                                    <td class="py-3">
-                                        <span
-                                            class="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">조사완료</span>
-                                    </td>
-                                    <td class="py-3 text-gray-500">2023-12-10</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- 다가오는 일정 -->
-                <div class="bg-white rounded-xl shadow-md p-6 card">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-bold text-lg text-gray-800">다가오는 일정</h3>
-                        <a href="#" class="text-sm text-blue-600 font-medium flex items-center">
-                            더 보기 <i class="fas fa-arrow-right ml-1 text-xs"></i>
-                        </a>
-                    </div>
-
-                    <div class="space-y-4">
-                        <div class="flex border-l-4 border-blue-500 pl-4 py-2 hover:bg-gray-50">
-                            <div class="mr-4">
-                                <div class="text-xs text-gray-500">10:30 AM</div>
-                                <div class="text-xs text-gray-500">~11:30 AM</div>
-                            </div>
-                            <div>
-                                <div class="font-medium">이민수 고객 상담</div>
-                                <div class="text-sm text-gray-600 mt-1">신규 사건 접수 - 부동산 계약 문제</div>
-                                <div class="text-xs text-gray-500 mt-1 flex items-center">
-                                    <i class="fas fa-map-marker-alt mr-1"></i>
-                                    본사 3층 회의실
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="flex border-l-4 border-green-500 pl-4 py-2 hover:bg-gray-50">
-                            <div class="mr-4">
-                                <div class="text-xs text-gray-500">02:15 PM</div>
-                                <div class="text-xs text-gray-500">~03:00 PM</div>
-                            </div>
-                            <div>
-                                <div class="font-medium">법원 제출 서류 마감</div>
-                                <div class="text-sm text-gray-600 mt-1">#S2023-045 금융사기 소송 관련 서류</div>
-                                <div class="text-xs text-green-600 font-medium mt-1 flex items-center">
-                                    <i class="fas fa-exclamation-circle mr-1"></i>
-                                    마감기한 임박
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="flex border-l-4 border-purple-500 pl-4 py-2 hover:bg-gray-50">
-                            <div class="mr-4">
-                                <div class="text-xs text-gray-500">04:00 PM</div>
-                                <div class="text-xs text-gray-500">~05:30 PM</div>
-                            </div>
-                            <div>
-                                <div class="font-medium">팀 회의</div>
-                                <div class="text-sm text-gray-600 mt-1">분기별 실적 평가 및 전략 회의</div>
-                                <div class="text-xs text-gray-500 mt-1 flex items-center">
-                                    <i class="fas fa-map-marker-alt mr-1"></i>
-                                    본사 8층 대회의실
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="flex border-l-4 border-yellow-500 pl-4 py-2 hover:bg-gray-50">
-                            <div class="mr-4">
-                                <div class="text-xs text-gray-500">07:00 PM</div>
-                                <div class="text-xs text-gray-500">~09:00 PM</div>
-                            </div>
-                            <div>
-                                <div class="font-medium">변호사 협회 만찬</div>
-                                <div class="text-sm text-gray-600 mt-1">서울지부 월간 네트워킹 행사</div>
-                                <div class="text-xs text-gray-500 mt-1 flex items-center">
-                                    <i class="fas fa-map-marker-alt mr-1"></i>
-                                    그랜드 하얏트 호텔
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 추가 정보 섹션 -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-                <!-- 최근 문서 -->
-                <div class="bg-white rounded-xl shadow-md p-6 lg:col-span-2 card">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-bold text-lg text-gray-800">최근 문서</h3>
-                        <a href="#" class="text-sm text-blue-600 font-medium flex items-center">
-                            더 보기 <i class="fas fa-arrow-right ml-1 text-xs"></i>
-                        </a>
-                    </div>
-
-                    <div class="space-y-4">
-                        <div class="flex items-start hover:bg-gray-50 p-2 rounded-lg">
-                            <div class="mr-3 text-blue-600">
-                                <i class="fas fa-file-word text-2xl"></i>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <div class="font-medium truncate">이혼 합의서 초안_최종.docx</div>
-                                <div class="text-sm text-gray-600 flex justify-between mt-1">
-                                    <span>#F2023-089</span>
-                                    <span class="text-gray-500">2023-10-24 16:42</span>
-                                </div>
-                            </div>
-                            <button class="ml-3 text-gray-400 hover:text-blue-600">
-                                <i class="fas fa-ellipsis-v"></i>
-                            </button>
-                        </div>
-
-                        <div class="flex items-start hover:bg-gray-50 p-2 rounded-lg">
-                            <div class="mr-3 text-green-600">
-                                <i class="fas fa-file-pdf text-2xl"></i>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <div class="font-medium truncate">금융사기 소송 증거자료.pdf</div>
-                                <div class="text-sm text-gray-600 flex justify-between mt-1">
-                                    <span>#S2023-045</span>
-                                    <span class="text-gray-500">2023-10-23 10:15</span>
-                                </div>
-                            </div>
-                            <button class="ml-3 text-gray-400 hover:text-blue-600">
-                                <i class="fas fa-ellipsis-v"></i>
-                            </button>
-                        </div>
-
-                        <div class="flex items-start hover:bg-gray-50 p-2 rounded-lg">
-                            <div class="mr-3 text-indigo-600">
-                                <i class="fas fa-file-contract text-2xl"></i>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <div class="font-medium truncate">부동산 계약서 검토안.hwp</div>
-                                <div class="text-sm text-gray-600 flex justify-between mt-1">
-                                    <span>#P2023-076</span>
-                                    <span class="text-gray-500">2023-10-22 14:33</span>
-                                </div>
-                            </div>
-                            <button class="ml-3 text-gray-400 hover:text-blue-600">
-                                <i class="fas fa-ellipsis-v"></i>
-                            </button>
-                        </div>
-
-                        <div class="flex items-start hover:bg-gray-50 p-2 rounded-lg">
-                            <div class="mr-3 text-purple-600">
-                                <i class="fas fa-file-invoice text-2xl"></i>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <div class="font-medium truncate">상속관련 자산 목록.xlsx</div>
-                                <div class="text-sm text-gray-600 flex justify-between mt-1">
-                                    <span>#I2023-112</span>
-                                    <span class="text-gray-500">2023-10-21 09:47</span>
-                                </div>
-                            </div>
-                            <button class="ml-3 text-gray-400 hover:text-blue-600">
-                                <i class="fas fa-ellipsis-v"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 빠른 메뉴 -->
-                <div class="bg-white rounded-xl shadow-md p-6 card">
-                    <h3 class="font-bold text-lg text-gray-800 mb-4">빠른 메뉴</h3>
-                    <div class="grid grid-cols-2 gap-3">
-                        <a href="#"
-                            class="p-4 rounded-lg bg-blue-50 hover:bg-blue-100 flex flex-col items-center text-center text-blue-700">
-                            <div class="w-10 h-10 rounded-full bg-blue-200 flex items-center justify-center mb-2">
-                                <i class="fas fa-plus"></i>
-                            </div>
-                            <span class="font-medium text-sm">새 사건 등록</span>
-                        </a>
-
-                        <a href="#"
-                            class="p-4 rounded-lg bg-purple-50 hover:bg-purple-100 flex flex-col items-center text-center text-purple-700">
-                            <div class="w-10 h-10 rounded-full bg-purple-200 flex items-center justify-center mb-2">
-                                <i class="fas fa-file-medical"></i>
-                            </div>
-                            <span class="font-medium text-sm">문서 작성</span>
-                        </a>
-
-                        <a href="#"
-                            class="p-4 rounded-lg bg-green-50 hover:bg-green-100 flex flex-col items-center text-center text-green-700">
-                            <div class="w-10 h-10 rounded-full bg-green-200 flex items-center justify-center mb-2">
-                                <i class="fas fa-search-dollar"></i>
-                            </div>
-                            <span class="font-medium text-sm">사건 조회</span>
-                        </a>
-
-                        <a href="#"
-                            class="p-4 rounded-lg bg-yellow-50 hover:bg-yellow-100 flex flex-col items-center text-center text-yellow-700">
-                            <div class="w-10 h-10 rounded-full bg-yellow-200 flex items-center justify-center mb-2">
-                                <i class="fas fa-money-check-alt"></i>
-                            </div>
-                            <span class="font-medium text-sm">비용 청구</span>
-                        </a>
-
-                        <a href="#"
-                            class="p-4 rounded-lg bg-red-50 hover:bg-red-100 flex flex-col items-center text-center text-red-700">
-                            <div class="w-10 h-10 rounded-full bg-red-200 flex items-center justify-center mb-2">
-                                <i class="fas fa-calendar-plus"></i>
-                            </div>
-                            <span class="font-medium text-sm">일정 추가</span>
-                        </a>
-
-                        <a href="#"
-                            class="p-4 rounded-lg bg-indigo-50 hover:bg-indigo-100 flex flex-col items-center text-center text-indigo-700">
-                            <div class="w-10 h-10 rounded-full bg-indigo-200 flex items-center justify-center mb-2">
-                                <i class="fas fa-chart-line"></i>
-                            </div>
-                            <span class="font-medium text-sm">실적 보고</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
+          </div>
         </div>
 
-        <!-- 푸터 -->
-        <footer class="bg-white border-t border-gray-200 py-4">
-            <div class="px-6">
-                <p class="text-center text-sm text-gray-500">© 2023 LAW FIRM. All Rights Reserved.</p>
+        <!-- 대시보드 타이틀 -->
+        <h2 class="text-xl font-bold text-gray-800 mb-8 text-left">대시보드</h2> <!-- mb-4 → mb-8 -->
+
+        <!-- 현황 카드 영역 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-10 mb-10"> <!-- gap-6 mb-6 → gap-10 mb-10 -->
+          <div class="bg-white rounded-lg shadow-md p-4 min-h-[180px]">
+            <h3 class="font-semibold text-gray-700 mb-4">결재 대기 현황</h3>
+            <div class="grid grid-cols-3 gap-5 mt-8 text-center">
+              <div>
+                <div class="text-2xl font-bold text-blue-700">1 건</div>
+                <div class="text-sm text-gray-500">결재 대기</div>
+              </div>
+              <div>
+                <div class="text-2xl font-bold text-gray-600">0 건</div>
+                <div class="text-sm text-gray-500">결재 완료</div>
+              </div>
+              <div>
+                <div class="text-2xl font-bold text-red-600">1 건</div>
+                <div class="text-sm text-gray-500">반려</div>
+              </div>
             </div>
-        </footer>
+          </div>
+
+          <div class="bg-white rounded-lg shadow-md p-4 min-h-[180px]">
+            <h3 class="font-semibold text-gray-700 mb-4">업무 배정 현황</h3>
+            <div class="grid grid-cols-3 gap-5 mt-8 text-center">
+              <div>
+                <div class="text-2xl font-bold text-blue-700">1 건</div>
+                <div class="text-sm text-gray-500">확인 대기</div>
+              </div>
+              <div>
+                <div class="text-2xl font-bold text-gray-600">0 건</div>
+                <div class="text-sm text-gray-500">확인 완료</div>
+              </div>
+              <div>
+                <div class="text-2xl font-bold text-gray-400">0 건</div>
+                <div class="text-sm text-gray-500">진행 불가</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 사건 현황 테이블 -->
+        <div class="bg-white rounded-lg shadow-md p-4 min-h-[240px]">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-semibold text-gray-700">사건 현황</h3>
+            <a href="#" class="text-blue-500 hover:text-blue-700">
+              <i class="fas fa-plus-circle text-xl"></i>
+            </a>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="min-w-full text-left text-sm">
+              <thead>
+                <tr class="border-b text-gray-500">
+                  <th class="pb-2">사건명</th>
+                  <th class="pb-2">클라이언트</th>
+                  <th class="pb-2">담당 변호사</th>
+                  <th class="pb-2">사건 접수일</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="border-t">
+                  <td class="py-2">-</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 푸터 -->
+      <footer class="bg-white border-t border-gray-200 py-3 px-6 text-center text-sm text-gray-500">
+        © 2023 LAW FIRM. All rights reserved.
+      </footer>
     </div>
-
-    <!-- JavaScript -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-
-            // 카드 호버 효과
-            const cards = document.querySelectorAll('.card');
-            cards.forEach(card => {
-                card.addEventListener('mouseenter', function () {
-                    this.style.boxShadow = '0 10px 25px -5px rgba(0, 0, 0, 0.1)';
-                });
-
-                card.addEventListener('mouseleave', function () {
-                    this.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.08)';
-                });
-            });
-
-            // 데이터 로우 호버 효과
-            const dataRows = document.querySelectorAll('.data-row');
-            dataRows.forEach(row => {
-                row.addEventListener('mouseenter', function () {
-                    this.style.backgroundColor = '#eff6ff';
-                });
-
-                row.addEventListener('mouseleave', function () {
-                    this.style.backgroundColor = '';
-                });
-            });
-
-            // 빠른 메뉴 애니메이션
-            const quickLinks = document.querySelectorAll('.bg-blue-50, .bg-purple-50, .bg-green-50, .bg-yellow-50, .bg-red-50, .bg-indigo-50');
-            quickLinks.forEach(link => {
-                link.addEventListener('mouseenter', function () {
-                    this.style.transform = 'translateY(-3px)';
-                });
-
-                link.addEventListener('mouseleave', function () {
-                    this.style.transform = '';
-                });
-            });
-
-            // access_token
-            const token = localStorage.getItem('access_token');
-            fetch('/api/protected/', {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            // 동적 사용자 이름 표시
-            const userName = localStorage.getItem('user_name');
-            if (userName) {
-                document.getElementById('user-name').textContent = userName + ' 변호사';
-                // 이니셜: 이름의 첫 글자 + '변호'
-                document.getElementById('user-initial').textContent = userName[0] + '변호';
-            }
-        });
-    </script>
-</body>
-
+  </body>
 </html>

@@ -19,6 +19,21 @@ class CustomUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
+    def create_partner(self, name, email, phone, password=None, **extra_fields):
+        user = self.create_user(
+            name=name,
+            email=email,
+            phone=phone,
+            password=password,
+            **extra_fields
+        )
+        user.is_active = True
+        user.is_partner = True  # 파트너 여부
+        user.is_staff = True
+
+        user.save(using=self._db)
+        return user
+    
     def create_superuser(self, name, email, phone, password=None, **extra_fields):
         user = self.create_user(
             name=name,
@@ -42,6 +57,7 @@ class CustomUser(AbstractUser, PermissionsMixin):
     role = models.CharField(max_length=30)  # 역할 (예: 관리자, 사용자 등)
     
     is_active = models.BooleanField(default=True)  # 활성화 여부(사내직원)
+    is_partner = models.BooleanField(default=False)  # 파트너 여부(파트너)
     is_staff = models.BooleanField(default=False)  # 관리자 페이지 접근 여부(전산팀)
     is_superuser = models.BooleanField(default=False)  # 슈퍼유저 여부(전산팀)
     
@@ -68,3 +84,5 @@ class CustomUser(AbstractUser, PermissionsMixin):
 
     class Meta:
         db_table = 'custom_user'
+        verbose_name = "사용자"
+        verbose_name_plural = "사용자 목록"

@@ -1,3 +1,4 @@
+# config/settings.py
 """
 Django settings for config project.
 
@@ -42,8 +43,6 @@ INSTALLED_APPS = [
     # 앱 추가
     "rest_framework", 
     "corsheaders",
-    'api',
-    'authentication',
     'code_t',
     'user',
 ]
@@ -90,7 +89,7 @@ REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'authentication.exceptions.status_code_handler',  # 예외 발생 시 호출될 핸들러
     
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'authentication.jwt_auth.JWTAuthentication',
+        'user.service.jwt_auth.JWTAuthentication',  # JWT 인증 클래스 설정
     ]
 }
 
