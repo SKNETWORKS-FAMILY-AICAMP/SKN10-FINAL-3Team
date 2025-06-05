@@ -1,16 +1,35 @@
 # user/admin.py
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import CustomUser
 from django.utils.translation import gettext_lazy as _
+from .models import CustomUser
+from code_t.models import Code_T
 
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
     model = CustomUser
-    list_display = ['email', 'name', 'phone', 'is_staff', 'is_superuser']
-    ordering = ['email'] # 이메일 기준 정렬
-    list_filter = ['is_staff', 'is_superuser', 'is_active']
+    
+    # 리스트에서 라벨 보여주기
+    def org_label(self, obj):
+        code_obj = Code_T.objects.filter(code=obj.org_cd).first()
+        return code_obj.code_label if code_obj else obj.org_cd
+    org_label.short_description = '조직'
+
+    def role_label(self, obj):
+        code_obj = Code_T.objects.filter(code=obj.role_cd).first()
+        return code_obj.code_label if code_obj else obj.role_cd
+    role_label.short_description = '역할'
+    
+    list_display = [
+        'id', 'email', 'name', 'phone',
+        'org_label', 'role_label', 'cat_cd',
+        'is_staff', 'is_superuser', 'created_dt', 'updated_dt'
+    ]
+    ordering = ['id']
+    list_filter = ['is_active', 'is_staff', 'is_superuser']
     search_fields = ['email', 'name']
+
+    readonly_fields = ('created_dt', 'updated_dt', 'org_label', 'role_label')
 
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
@@ -29,16 +48,15 @@ class CustomUserAdmin(UserAdmin):
                 'is_active',
                 'is_staff',
                 'is_superuser',
-                'groups',
-                'user_permissions',
             )
         }),
-        (_('중요한 날짜'), {'fields': ('last_login', 'created_dt', 'updated_dt')}),
+        ('조직 및 역할', {'fields': ('org_label', 'role_label', 'org_cd', 'role_cd', 'cat_cd')}),
+        ('생성 및 수정 날짜', {'fields': ('created_dt', 'updated_dt')}),
     )
 
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'name', 'phone', 'password1', 'password2', 'is_staff', 'is_superuser', 'bio', 'exp_career', 'exp_activity', 'education_high', 'education_univ', 'education_grad'),
+            'fields': ('email', 'name', 'phone', 'password1', 'password2', 'is_staff', 'is_superuser', 'org_cd', 'role_cd', 'cat_cd','bio', 'exp_career', 'exp_activity', 'education_high', 'education_univ', 'education_grad'),
         }),
     )

@@ -44,8 +44,8 @@ INSTALLED_APPS = [
     "corsheaders",
     'api',
     'authentication',
-    'user',
     'code_t',
+    'user',
 ]
 
 # 사용자 커스텀 모델 설정

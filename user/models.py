@@ -1,5 +1,6 @@
+# user/models.py
 from django.db import models
-from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.contrib.auth.models import AbstractUser, BaseUserManager, PermissionsMixin
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, name, email, phone, password=None, **extra_fields):
@@ -26,25 +27,35 @@ class CustomUserManager(BaseUserManager):
             password=password,
             **extra_fields
         )
+        user.is_active = True
         user.is_staff = True
         user.is_superuser = True
         user.save(using=self._db)
         return user
 
-class CustomUser(AbstractUser):
+class CustomUser(AbstractUser, PermissionsMixin):
     username = None  # 사용자 이름 필드 제거
     # 필수 정보
     name = models.CharField(max_length=20)
     email = models.EmailField(max_length=255, unique=True)
     phone = models.CharField(max_length=20, unique=True)
-
+    role = models.CharField(max_length=30)  # 역할 (예: 관리자, 사용자 등)
+    
+    is_active = models.BooleanField(default=True)  # 활성화 여부(사내직원)
+    is_staff = models.BooleanField(default=False)  # 관리자 페이지 접근 여부(전산팀)
+    is_superuser = models.BooleanField(default=False)  # 슈퍼유저 여부(전산팀)
+    
     # 선택 입력
-    bio = models.TextField(blank=True, null=True)              # 자기소개
-    exp_career = models.TextField(blank=True, null=True)       # 소속경력
-    exp_activity = models.TextField(blank=True, null=True)      # 수행경력
-    education_high = models.CharField(max_length=255, blank=True, null=True)   # 고등학력
-    education_univ = models.CharField(max_length=255, blank=True, null=True)   # 대학 학력
-    education_grad = models.CharField(max_length=255, blank=True, null=True)   # 대학원 학력
+    org_cd = models.CharField(max_length=30)  # 소속 코드
+    role_cd = models.CharField(max_length=30)  # 역할 코드
+    cat_cd = models.CharField(max_length=30, blank=True, null=True)  # 전문분야 코드
+
+    bio = models.TextField(blank=True, null=True)  # 자기소개
+    exp_career = models.TextField(blank=True, null=True)  # 소속경력
+    exp_activity = models.TextField(blank=True, null=True)  # 수행경력
+    education_high = models.CharField(max_length=255, blank=True, null=True)  # 고등학력
+    education_univ = models.CharField(max_length=255, blank=True, null=True)  # 대학 학력
+    education_grad = models.CharField(max_length=255, blank=True, null=True)  # 대학원 학력
 
     # 생성/수정 시간
     created_dt = models.DateTimeField(auto_now_add=True)
