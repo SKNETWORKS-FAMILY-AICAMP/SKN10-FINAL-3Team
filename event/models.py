@@ -1,5 +1,4 @@
 from django.db import models
-from code_t.models import Code_T
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -12,26 +11,23 @@ class Event(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        verbose_name="사용자 번호"
+        verbose_name="사용자 ID"
     )
     e_title = models.CharField(
         max_length=100,
         verbose_name="사건명"
     )
     e_description = models.TextField(
-        verbose_name="본문"
+        verbose_name="사건 본문"
     )
     client = models.CharField(
         max_length=20,
         verbose_name="클라이언트"
     )
 
-    # 사건 유형 (대/중/소)
-    cat_cd = models.ForeignKey(
-        Code_T,
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name="event_cat_cd",
+    # 사건 유형: 코드 값만 저장 (join 시 code_t 테이블 사용)
+    cat_cd = models.CharField(
+        max_length=20,
         verbose_name="사건 유형(대)"
     )
     cat_02 = models.CharField(
@@ -53,35 +49,26 @@ class Event(models.Model):
         verbose_name="메모"
     )
 
-    org_cd = models.ForeignKey(
-        Code_T,
-        on_delete=models.SET_NULL,
+    org_cd = models.CharField(
+        max_length=20,
+        verbose_name="담당 부서",
         null=True,
-        related_name="event_org_cd",
-        verbose_name="담당 부서"
+        blank=True
     )
 
-    # 상태값들
-    estat_cd = models.ForeignKey(
-        Code_T,
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name="event_estat_cd",
+    estat_cd = models.CharField(
+        max_length=20,
         verbose_name="의뢰 및 진행 상태"
     )
-    lstat_cd = models.ForeignKey(
-        Code_T,
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name="event_lstat_cd",
-        verbose_name="소송 심급"
+    lstat_cd = models.CharField(
+        max_length=20,
+        verbose_name="심급"
     )
-    estat_num_cd = models.ForeignKey(
-        Code_T,
-        on_delete=models.SET_NULL,
+    estat_num_cd = models.CharField(
+        max_length=20,
+        verbose_name="종결 세분화",
         null=True,
-        related_name="event_estat_num_cd",
-        verbose_name="사건 종결 세분화"
+        blank=True
     )
 
     submit_at = models.DateTimeField(
@@ -90,10 +77,12 @@ class Event(models.Model):
         verbose_name="소송 재기일"
     )
     created_at = models.DateTimeField(
+        # 객체가 처음 생성될 때 해당 필드에 자동으로 현재 시각(timezone.now())을 저장
         auto_now_add=True,
         verbose_name="생성일"
     )
     update_at = models.DateTimeField(
+        # 객체가 저장될 때마다 해당 필드에 자동으로 현재 시각을 업데이트
         auto_now=True,
         verbose_name="수정일"
     )
