@@ -19,5 +19,5 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('case.urls')),  # 사건 앱의 URL 포함
+    path('', include('event.urls')),  # 사건현황 앱의 URL 포함
 ]

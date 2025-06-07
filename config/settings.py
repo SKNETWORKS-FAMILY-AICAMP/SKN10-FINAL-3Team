@@ -38,8 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'code_t',   # 공통 코드 앱
-    'case',     # 사건 앱
+    'code_t',   # 공통 코드
+    'event' ,   # 사건 현황
 ]
 
 MIDDLEWARE = [
