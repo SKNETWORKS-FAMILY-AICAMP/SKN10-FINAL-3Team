@@ -24,8 +24,6 @@ class Event(models.Model):
         max_length=20,
         verbose_name="클라이언트"
     )
-
-    # 사건 유형: 코드 값만 저장 (join 시 code_t 테이블 사용)
     cat_cd = models.CharField(
         max_length=20,
         verbose_name="사건 유형(대)"

@@ -9,9 +9,15 @@
 {% endblock %} -->
 
 <!-- prettier-ignore -->
-<!-- {% block js %}
-<script src="{% static 'js/write_case.js' %}"></script>
-{% endblock %} -->
+{% block js %}
+<script>
+	const estatData = {
+		ESTAT_01: JSON.parse(document.getElementById('estat01-data').textContent),
+		ESTAT_02: JSON.parse(document.getElementById('estat02-data').textContent),
+	};
+</script>
+<script src="{% static 'js/write_event.js' %}"></script>
+{% endblock %}
 
 <!-- prettier-ignore -->
 {% block content %}
@@ -48,10 +54,13 @@
 					<div>
 						<label class="block text-gray-600">대분류</label>
 						<select
+							id="cat_cd"
+							name="cat_cd"
 							class="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
-							<option>선택</option>
-							<option>민사</option>
-							<option>형사</option>
+							<option value="" selected>선택</option>
+							{% for cat in cat_codes %}
+							<option value="{{ cat.code }}">{{ cat.code_label }}</option>
+							{% endfor %}
 						</select>
 					</div>
 					<div>
@@ -88,29 +97,31 @@
 					<div>
 						<label class="block text-gray-600">진행 상태</label>
 						<select
+							id="estat_cd"
+							name="estat_cd"
 							class="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
-							<option>사건 접수</option>
-							<option>서면 작성 중</option>
-							<option>법원 제출 완료</option>
+							<option value="" selected>선택</option>
 						</select>
 					</div>
 					<div>
 						<label class="block text-gray-600">심급</label>
 						<select
+							id="lstat_cd"
+							name="lstat_cd"
 							class="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
-							<option>1심</option>
-							<option>2심</option>
-							<option>3심</option>
+							<option value="" selected>선택</option>
+							{% for item in lstat_codes %}
+							<option value="{{ item.code }}">{{ item.code_label }}</option>
+							{% endfor %}
 						</select>
 					</div>
 					<div>
 						<label class="block text-gray-600">사건 종결</label>
 						<select
+							id="estat_final_cd"
+							name="estat_final_cd"
 							class="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
-							<option>진행 중</option>
-							<option>종결</option>
-							<option>취하</option>
-							<option>기각</option>
+							<option value="" selected>선택</option>
 						</select>
 					</div>
 				</div>
@@ -141,4 +152,9 @@
 		</form>
 	</div>
 </main>
+<!-- prettier-ignore -->
+{{ estat_01|json_script:"estat01-data" }}
+{{ estat_02|json_script:"estat02-data" }}
+{{ estat_01_sub|json_script:"estat01-sub-data" }}
+{{ estat_02_sub|json_script:"estat02-sub-data" }}
 {% endblock %}
