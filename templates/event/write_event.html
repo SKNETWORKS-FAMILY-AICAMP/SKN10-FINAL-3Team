@@ -25,7 +25,7 @@
 	<div class="max-w-5xl mx-auto">
 		<h2 class="text-3xl font-bold text-center mb-12 text-gray-800">사건 접수</h2>
 
-		<form class="space-y-8">
+		<form id="caseForm" class="space-y-8">
 			<!-- 사건 정보 카드 -->
 			<div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
 				<h3 class="text-xl font-semibold mb-4 text-gray-700">사건 정보</h3>
@@ -33,16 +33,20 @@
 					<div>
 						<label class="block mb-2 text-gray-600">사건명</label>
 						<input
+							id="case_title"
 							type="text"
 							placeholder="사건명을 입력하세요."
-							class="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500" />
+							class="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+							required />
 					</div>
 					<div>
 						<label class="block mb-2 text-gray-600">클라이언트</label>
 						<input
+							id="client_name"
 							type="text"
 							placeholder="클라이언트 이름을 입력하세요."
-							class="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500" />
+							class="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+							required />
 					</div>
 				</div>
 			</div>
@@ -56,7 +60,8 @@
 						<select
 							id="cat_cd"
 							name="cat_cd"
-							class="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
+							class="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+							required>
 							<option value="" selected>선택</option>
 							{% for cat in cat_codes %}
 							<option value="{{ cat.code }}">{{ cat.code_label }}</option>
@@ -66,16 +71,20 @@
 					<div>
 						<label class="block text-gray-600">중분류</label>
 						<input
+							id="cat_mid"
 							type="text"
 							placeholder="중분류를 입력하세요."
-							class="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500" />
+							class="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+							required />
 					</div>
 					<div>
 						<label class="block text-gray-600">소분류</label>
 						<input
+							id="cat_sub"
 							type="text"
 							placeholder="소분류를 입력하세요."
-							class="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500" />
+							class="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+							required />
 					</div>
 				</div>
 			</div>
@@ -85,9 +94,11 @@
 				<h3 class="text-xl font-semibold mb-4 text-gray-700">사건 내용</h3>
 				<label class="block mb-2 text-gray-600">본문</label>
 				<textarea
+					id="case_body"
 					rows="6"
 					placeholder="본문을 입력하세요."
-					class="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"></textarea>
+					class="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+					required></textarea>
 			</div>
 
 			<!-- 추가 정보 카드 -->
@@ -99,7 +110,8 @@
 						<select
 							id="estat_cd"
 							name="estat_cd"
-							class="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
+							class="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+							required>
 							<option value="" selected>선택</option>
 						</select>
 					</div>
@@ -129,13 +141,16 @@
 				<div class="mt-4">
 					<label class="block text-gray-600">소송 재기일</label>
 					<input
+						id="retrial_date"
 						type="date"
-						class="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500" />
+						class="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+						required />
 				</div>
 
 				<div class="mt-4">
 					<label class="block text-gray-600">특이사항 / 메모</label>
 					<textarea
+						id="case_note"
 						rows="3"
 						class="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"></textarea>
 				</div>
