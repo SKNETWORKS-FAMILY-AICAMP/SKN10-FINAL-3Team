@@ -15,13 +15,14 @@ from user.service.token import (
 def login_page(request):
     return render(request, 'user/login.html')
 # 메인 페이지 뷰
-def main_page(request): # 사용자 아이디를 통해 사용자 이름 조회 후 main.html에 전달
+def main_page(request):
+    # 사용자 아이디를 통해 사용자 이름 조회 후 main.html에 전달
     # request.user는 현재 로그인된 사용자 정보를 포함
-    print("[메인 페이지] 요청 받음")
-    print(f"[메인 페이지] 요청 사용자: {request.user}")
-    return render(request, 'user/main.html', {
-        'user_name': request.user
-    })
+    print("[메인 페이지] 진입")
+    print("현재 사용자:", request.user)
+    print("현재 사용자 이메일:", getattr(request.user, "email", "알 수 없음"))
+
+    return render(request, 'user/main.html')
 # 프로필 페이지 뷰
 def profile(request):
     return render(request, 'user/profile.html')
@@ -62,10 +63,24 @@ class LoginView(APIView):
         print(f"[로그인] 토큰 발급 완료 - access_token, refresh_token")
         
         save_refresh_token(user, refresh_token)
-        print(f"[로그인] RefreshToken DB 저장 완료")
+        print(f"[로그인] refresh_token DB 저장 완료")
 
-        response = Response()
-        response.set_cookie(key='refreshToken', value=refresh_token, httponly=True)  # 쿠키에 리프레시 토큰 저장
+        response = Response({'user': user.id})
+        response.set_cookie(
+            key='access_token',
+            value=access_token,
+            httponly=True,
+            secure=False,      # 운영 환경이면 True, 개발은 False로
+            samesite='Lax'
+        )
+        response.set_cookie(
+            key='refresh_token',
+            value=refresh_token,
+            httponly=True,
+            secure=False,
+            samesite='Lax'
+        )  # 쿠키에 리프레시 토큰 저장
+        
         response.data = {
             'token': access_token,  # 액세스 토큰 반환
             'user' : user.id
@@ -77,7 +92,7 @@ class LoginView(APIView):
 class RefreshView(APIView):
     def post(self, request):
         print("[토큰재발급] 요청 받음")
-        refresh_token = request.COOKIES.get('refreshToken')
+        refresh_token = request.COOKIES.get('refresh_token')
         db_token = check_refresh_token(refresh_token)
         if not db_token:
             print("[토큰재발급] 리프레시 토큰 유효성 실패")
@@ -93,14 +108,14 @@ class RefreshView(APIView):
 class Logoutview(APIView):
     def post(self, request):
         print("[로그아웃] 요청 받음")
-        refresh_token = request.COOKIES.get('refreshToken')
+        refresh_token = request.COOKIES.get('refresh_token')
         response = Response()
         # DB에서 해당 토큰을 찾아서 무효화
         if refresh_token:
             delete_refresh_token(refresh_token)
-            print("[로그아웃] RefreshToken DB 삭제 완료")
+            print("[로그아웃] refresh_token DB 삭제 완료")
             response = Response({'message': 'success'})
-            response.delete_cookie(key='refreshToken')
+            response.delete_cookie(key='refresh_token')
         print("[로그아웃] 최종 응답 반환")
         return response
 

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="ko">
 
 <head>
@@ -17,7 +17,7 @@
 </head>
 
 <body class="min-h-screen flex flex-col">
-    <!-- 헤더 -->
+    
     <header class="bg-law-darkblue border-b border-gray-200 shadow-sm px-10 py-4 flex items-center justify-between">
         <div class="flex items-center space-x-6">
             <span class="text-2xl font-bold text-white">LAW FIRM</span>
@@ -32,7 +32,7 @@
         </div>
     </header>
 
-    <!-- 프로필 카드 -->
+    
     <main class="flex-1 flex justify-center items-center bg-gray-50">
         <div class="w-full max-w-xl bg-white rounded-2xl shadow-card p-10">
             <div class="flex items-center mb-8">
@@ -46,7 +46,7 @@
                     <div class="text-gray-500 text-sm" id="profile-email">lawyer@lawfirm.com</div>
                 </div>
             </div>
-            <!-- 학력 -->
+            
             <div class="mb-7">
                 <div class="text-lg font-semibold text-gray-700 mb-3">학력</div>
                 <ul class="space-y-2 text-gray-700 text-base">
@@ -55,7 +55,7 @@
                     <li><i class="fas fa-university text-blue-500 mr-2"></i>서울대학교 법학과 석사</li>
                 </ul>
             </div>
-            <!-- 경력 -->
+           
             <div>
                 <div class="text-lg font-semibold text-gray-700 mb-3">경력</div>
                 <ul class="list-disc pl-6 space-y-1 text-gray-700 text-base">
@@ -65,26 +65,26 @@
             </div>
         </div>
     </main>
-    <!-- 푸터 -->
+    
     <footer class="bg-white border-t border-gray-200 py-4 px-6 text-center text-sm text-gray-500">
         © 2023 LAW FIRM. All rights reserved.
     </footer>
     <script>
         // [1] 로그인 안 했으면 바로 리다이렉트
-        const token = localStorage.getItem('access_token');
-        if (!token) {
-            alert('로그인이 필요합니다.');
-            window.location.href = '/login-page/';
-            return;
-        }
-        // 예시: 로컬스토리지에서 이름, 이메일 불러오기(실제로는 서버에서 데이터 받아와야 함)
-        const userName = localStorage.getItem('user_name') || '김영희';
-        document.getElementById('user-name').textContent = userName + ' 변호사';
-        document.getElementById('profile-name').textContent = userName;
-        document.getElementById('user-initial').textContent = userName.trim()[0];
+        // const token = localStorage.getItem('access_token');
+        // if (!token) {
+        //     alert('로그인이 필요합니다.');
+        //     window.location.href = '/login-page/';
+        //     return;
+        // }
+        // // 예시: 로컬스토리지에서 이름, 이메일 불러오기(실제로는 서버에서 데이터 받아와야 함)
+        // const userName = localStorage.getItem('user_name') || '김영희';
+        // document.getElementById('user-name').textContent = userName + ' 변호사';
+        // document.getElementById('profile-name').textContent = userName;
+        // document.getElementById('user-initial').textContent = userName.trim()[0];
 
         // 실제 구현 시, fetch로 서버에서 학력/경력 받아와서 동적으로 렌더링 가능
     </script>
 </body>
 
-</html>
+</html> -->
