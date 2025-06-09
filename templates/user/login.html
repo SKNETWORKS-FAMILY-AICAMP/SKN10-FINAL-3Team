@@ -8,7 +8,7 @@
 	<script src="https://cdn.tailwindcss.com"></script>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 	<style>
-		body.login-page {
+		body.login {
 			background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2YwZjhmZiIvPjwvc3ZnPg==');
 			background-size: 200px;
 		}
@@ -69,7 +69,7 @@
 </head>
 
 <body
-	class="login-page flex min-h-screen bg-gradient-to-br from-gray-50 to-indigo-50 items-center justify-center p-4 relative overflow-hidden">
+	class="login flex min-h-screen bg-gradient-to-br from-gray-50 to-indigo-50 items-center justify-center p-4 relative overflow-hidden">
 	<!-- Background waves -->
 	<div class="wave-animation"></div>
 	<div class="wave-animation"></div>
@@ -173,9 +173,14 @@
 						credentials: 'include' // 쿠키(리프레시 토큰) 주고받으려면 필요
 					});
 
+					document.addEventListener('DOMContentLoaded', function () {
+						// access_token/refresh_token 삭제
+						document.cookie = "access_token=; Max-Age=0; path=/;";
+						document.cookie = "refresh_token=; Max-Age=0; path=/;";
+					});
+
 					const data = await response.json();
 					if (response.ok) {
-						alert(data.user)
 						location.href = '/main-page/'; // 메인화면 등으로 이동
 					} else {
 						alert(data.detail || '로그인 실패');

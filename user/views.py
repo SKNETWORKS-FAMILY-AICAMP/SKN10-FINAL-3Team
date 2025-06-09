@@ -13,15 +13,17 @@ from user.service.token import (
 
 # 로그인 페이지 뷰
 def login_page(request):
-    return render(request, 'user/login.html')
+    response = render(request, 'user/login.html')
+    response.delete_cookie('access_token')
+    response.delete_cookie('refresh_token')
+    return response
 # 메인 페이지 뷰
 def main_page(request):
     # 사용자 아이디를 통해 사용자 이름 조회 후 main.html에 전달
     # request.user는 현재 로그인된 사용자 정보를 포함
     print("[메인 페이지] 진입")
-    print("현재 사용자:", request.user)
-    print("현재 사용자 이메일:", getattr(request.user, "email", "알 수 없음"))
-
+    # 세션에서 확인하는 방법 -> 에세스 토큰을 열어서 확인
+    # json형태로 값을 넣어야함
     return render(request, 'user/main.html')
 # 프로필 페이지 뷰
 def profile(request):
@@ -29,19 +31,22 @@ def profile(request):
 
 # 프로필 API 뷰
 class ProfileAPIView(APIView):
-    # authentication_classes = [JWTAuthentication]
-    # permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
     
     def get(self, request):
         user = request.user
         return Response({
             "name": user.name,
-            "email": user.email,
+            "role": user.role,  # 권한 정보 추가
             # 추가적으로 학력, 경력 등도 필요하면 포함
         })
-        
+
 # 로그인 뷰
 class LoginView(APIView):
+    authentication_classes = []
+    permission_classes = []
+    
     def post(self, request):
         username = request.data['username']
         password = request.data['password']
