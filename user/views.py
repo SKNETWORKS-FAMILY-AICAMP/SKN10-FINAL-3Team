@@ -1,91 +1,107 @@
 # user/views.py
 from django.shortcuts import render
-
-from rest_framework.authentication import get_authorization_header
 from rest_framework.views import APIView 
+from rest_framework.exceptions import APIException
 from rest_framework.response import Response 
-from rest_framework.exceptions import AuthenticationFailed , APIException
 from rest_framework.permissions import IsAuthenticated
-
+from user.service.jwt_auth import JWTAuthentication
 from user.models import CustomUser
-from user.serializer import UserSerializer
-from user.service.token import create_access_token, create_refresh_token, decode_refresh_token
+from user.service.token import (
+    create_access_token, create_refresh_token, decode_refresh_token,
+    save_refresh_token, check_refresh_token, delete_refresh_token
+)
 
 # 로그인 페이지 뷰
 def login_page(request):
     return render(request, 'user/login.html')
 # 메인 페이지 뷰
-def main_page(request):
-    return render(request, 'user/mainpage.html')
+def main_page(request): # 사용자 아이디를 통해 사용자 이름 조회 후 main.html에 전달
+    # request.user는 현재 로그인된 사용자 정보를 포함
+    print("[메인 페이지] 요청 받음")
+    print(f"[메인 페이지] 요청 사용자: {request.user}")
+    return render(request, 'user/main.html', {
+        'user_name': request.user
+    })
+# 프로필 페이지 뷰
+def profile(request):
+    return render(request, 'user/profile.html')
 
-# 회원가입 뷰
-class Register(APIView):
-    def post(self, request):
-        print(f"request : {request}")  # 요청 객체 출력 (디버깅 용도)
-        print(f"request.data : {request.data}")  # 요청 데이터 출력 (디버깅 용도)
-        # 사용자 데이터 직렬화 및 유효성 검사
-        serializer = UserSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()  # 사용자 DB 저장
-        return Response(serializer.data)
-
+# 프로필 API 뷰
+class ProfileAPIView(APIView):
+    # authentication_classes = [JWTAuthentication]
+    # permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        user = request.user
+        return Response({
+            "name": user.name,
+            "email": user.email,
+            # 추가적으로 학력, 경력 등도 필요하면 포함
+        })
+        
 # 로그인 뷰
 class LoginView(APIView):
     def post(self, request):
         username = request.data['username']
         password = request.data['password']
+        print(f"[로그인] 요청 - username={username}")
 
         # 사용자 이메일로 조회
         user = CustomUser.objects.filter(email=username).first()
         if user is None:
+            print("[로그인] 사용자 없음")
             raise APIException('User not found')  # 사용자가 존재하지 않음
         elif not user.check_password(password):
+            print("[로그인] 비밀번호 불일치")
             raise APIException('Incorrect password')  # 비밀번호 불일치
-        
+        print(f"[로그인] 인증 성공 - user={user.name}")
+
         # 토큰 생성 및 응답
         access_token = create_access_token(user.id)
         refresh_token = create_refresh_token(user.id)
+        print(f"[로그인] 토큰 발급 완료 - access_token, refresh_token")
+        
+        save_refresh_token(user, refresh_token)
+        print(f"[로그인] RefreshToken DB 저장 완료")
 
         response = Response()
         response.set_cookie(key='refreshToken', value=refresh_token, httponly=True)  # 쿠키에 리프레시 토큰 저장
         response.data = {
             'token': access_token,  # 액세스 토큰 반환
-            'user': user.name
+            'user' : user.id
         }
+        print(f"[로그인] 최종 응답 반환")
         return response
-
-# 인증된 사용자만 접근 가능한 API 뷰
-class HelloWorldView(APIView):
-    permission_classes = [IsAuthenticated]
-    
-    def get(self, request):
-        print(f"User: {request.user}")
-        print(f"Is Authenticated: {request.user.is_authenticated}")
-        print(f"Is Active: {request.user.is_active}")
-        content = {
-                "message": "Hello World",
-            }
-        
-        return Response(content)
 
 # 액세스 토큰 재발급 뷰
 class RefreshView(APIView):
     def post(self, request):
-        refresh_token = request.COOKIES.get('refreshToken')  # 클라이언트 쿠키에서 토큰 추출
-        id = decode_refresh_token(refresh_token)  # 리프레시 토큰 복호화 및 검증
-        access_token = create_access_token(id)  # 새로운 액세스 토큰 발급
-        return Response({
-            'token': access_token 
-        })
+        print("[토큰재발급] 요청 받음")
+        refresh_token = request.COOKIES.get('refreshToken')
+        db_token = check_refresh_token(refresh_token)
+        if not db_token:
+            print("[토큰재발급] 리프레시 토큰 유효성 실패")
+            return Response({'error': 'Invalid or expired refresh token'}, status=401)
+
+        user_id = decode_refresh_token(refresh_token)
+        print(f"[토큰재발급] 토큰 검증 및 사용자 확인 user_id={user_id}")
+        access_token = create_access_token(user_id)
+        print(f"[토큰재발급] 새로운 access_token 발급")
+        return Response({'token': access_token})
 
 # 로그아웃 뷰
 class Logoutview(APIView):
-    def post(self, _):
+    def post(self, request):
+        print("[로그아웃] 요청 받음")
+        refresh_token = request.COOKIES.get('refreshToken')
         response = Response()
-        response.delete_cookie(key='refreshToken')  # 쿠키에서 리프레시 토큰 제거
-        response.data = {
-            'message': 'success'
-        }
+        # DB에서 해당 토큰을 찾아서 무효화
+        if refresh_token:
+            delete_refresh_token(refresh_token)
+            print("[로그아웃] RefreshToken DB 삭제 완료")
+            response = Response({'message': 'success'})
+            response.delete_cookie(key='refreshToken')
+        print("[로그아웃] 최종 응답 반환")
         return response
 
 # 로그인 및 인가 흐름:

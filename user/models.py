@@ -1,5 +1,6 @@
 # user/models.py
 from django.db import models
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser, BaseUserManager, PermissionsMixin
 
 class CustomUserManager(BaseUserManager):
@@ -86,3 +87,13 @@ class CustomUser(AbstractUser, PermissionsMixin):
         db_table = 'custom_user'
         verbose_name = "사용자"
         verbose_name_plural = "사용자 목록"
+
+class RefreshToken(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='refresh_tokens')
+    token = models.CharField(max_length=255, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expired_at = models.DateTimeField(null=True, blank=True)
+    is_valid = models.BooleanField(default=True)  # 토큰 무효화(로그아웃 등) 시 사용
+
+    def __str__(self):
+        return f"{self.user.email} - {self.token[:10]}..."
