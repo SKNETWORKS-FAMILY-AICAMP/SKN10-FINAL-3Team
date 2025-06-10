@@ -195,10 +195,10 @@
 						if (response.ok) {
 							if (data.is_superuser) {
 								// 관리자 페이지 중 사용자 목록 페이지로 이동
-								window.location.href = '/admin/user/';
+								window.location.href = '/admin/user/customuser/';
 							} else {
 								// 일반 사용자 페이지로 이동
-								location.href = '/'; // 메인화면 등으로 이동
+								location.href = '/event'; // 메인화면 등으로 이동
 							}
 						} else {
 							alert(data.detail || '로그인 실패');
