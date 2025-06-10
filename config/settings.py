@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     # 앱 추가
     "rest_framework", 
     "corsheaders",
+    'api',
     'code_t',
     'user',
     'event'
