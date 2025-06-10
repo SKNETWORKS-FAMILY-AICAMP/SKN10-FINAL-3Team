@@ -11,7 +11,7 @@ django.setup()
 from code_t.models import Code_T  # code_t 앱의 Code 모델 임포트
 
 # CSV 파일 경로
-csv_file = 'data/code_table_data.csv'
+csv_file = './csv_data/code_table_data.csv'
 
 # CSV 읽기
 df = pd.read_csv(csv_file, encoding='utf-8-sig')

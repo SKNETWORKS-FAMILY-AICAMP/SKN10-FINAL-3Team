@@ -30,7 +30,7 @@ def write_event(request):
         'estat_02_sub': list(estat_02_sub),
         'lstat_codes': lstat_codes,
     }
-    return render(request, 'write_event.html', context)
+    return render(request, 'event/write_event.html', context)
 
 
 
