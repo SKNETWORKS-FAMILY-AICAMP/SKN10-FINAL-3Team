@@ -17,6 +17,7 @@ def login_page(request):
     response.delete_cookie('access_token')
     response.delete_cookie('refresh_token')
     return response
+
 # 메인 페이지 뷰
 def main_page(request):
     # 사용자 아이디를 통해 사용자 이름 조회 후 main.html에 전달
@@ -24,13 +25,14 @@ def main_page(request):
     print("[메인 페이지] 진입")
     # 세션에서 확인하는 방법 -> 에세스 토큰을 열어서 확인
     # json형태로 값을 넣어야함
-    return render(request, 'user/main.html')
+    return render(request, 'main.html')
+
 # 프로필 페이지 뷰
 def profile(request):
     return render(request, 'user/profile.html')
 
 # 프로필 API 뷰
-class ProfileAPIView(APIView):
+class JWTAPIView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     
@@ -39,6 +41,7 @@ class ProfileAPIView(APIView):
         return Response({
             "name": user.name,
             "role": user.role,  # 권한 정보 추가
+            # user.id
             # 추가적으로 학력, 경력 등도 필요하면 포함
         })
 
