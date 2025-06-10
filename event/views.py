@@ -2,7 +2,7 @@ from django.shortcuts import render
 from code_t.models import Code_T
 
 def index(request):
-    return render(request, 'event/main.html')
+    return render(request, 'main.html')
 
 def write_event(request):
     cat_codes = Code_T.objects.filter(code__startswith='CAT_').order_by('code')
