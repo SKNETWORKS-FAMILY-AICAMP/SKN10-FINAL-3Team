@@ -8,6 +8,7 @@ from user.service.token import (
     create_access_token, create_refresh_token, decode_refresh_token,
     save_refresh_token, check_refresh_token, delete_refresh_token
 )
+from django.contrib.auth import login
 
 # Create your views here.
 # JWT API 뷰
@@ -44,6 +45,11 @@ class LoginView(APIView):
             raise APIException('Incorrect password')  # 비밀번호 불일치
         print(f"[로그인] 인증 성공 - user={user.name}")
 
+        # superuser인 경우 세션 설정
+        if user.is_superuser:
+            login(request, user) # 추가: superuser인 경우 Django 세션에 로그인
+            print(f"[로그인] Superuser 세션 로그인 완료 - user={user.name}")
+        
         # 토큰 생성 및 응답
         access_token = create_access_token(user.id)
         refresh_token = create_refresh_token(user.id)
