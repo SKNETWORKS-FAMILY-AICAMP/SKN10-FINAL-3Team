@@ -1,4 +1,12 @@
-# AI 기반 법률 업무 보조 플랫폼
+# AI 기반 법률 업무 보조 플랫폼 [LAWMATE]
+
+## 0. 팀원 소개 
+
+팀장 : 배민경
+
+팀원 : 김현수, 문승기, 신민주
+
+---
 
 ## 1. 서비스 개요
 이 플랫폼은 로펌 내 변호사 및 실무자의 민사소송 관련 업무를 지원하는 생성형 AI 기반 도구입니다.  
@@ -33,6 +41,18 @@
 - 역할별 대시보드 (변호사, 실무자, 임원 등)
 - 사건 등록 시 AI기반 팀 추천 
 - 권한 기반 기능 접근 및 내부 보안 강화
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/0454dc72-51e1-49e2-8516-94651419d12a" width="30%"/>
+  <img src="https://github.com/user-attachments/assets/43260e81-4fb9-426e-b5dc-f6fce3603a4b" width="30%"/>
+  <img src="https://github.com/user-attachments/assets/f5f8b1fd-1019-4abd-bea3-ec89f9780b0f" width="30%"/>
+  <img src="https://github.com/user-attachments/assets/13b178b1-7c8c-4eab-a021-48d856c16129" width="45%"/>
+  <img src="https://github.com/user-attachments/assets/0d559df8-7922-4961-b477-a8b1bf0ed529" width="45%"/>
+  <img src="https://github.com/user-attachments/assets/cd6f0605-17f2-4a99-ad15-521b44b12598" width="30%"/>
+  <img src="https://github.com/user-attachments/assets/84fbc071-06bb-43a3-9220-390823c68c02" width="30%"/>
+  <img src="https://github.com/user-attachments/assets/5308a77a-1e84-42f9-b9f4-c5b724420386" width="30%"/>
+</p>
+
 
 ---
 
@@ -102,7 +122,3 @@
 | 전략 판단 지원 | AI 분석 결과 기반으로 명확한 판단 근거 확보 |
 | 정보 보안 강화 | 사용자 역할 기반 접근 제어 및 민감 정보 보호 |
 | 도입 유연성 | 중소형 로펌, 대형 로펌, 기업 법무팀 모두 적용 가능 |
-
----
-
-
