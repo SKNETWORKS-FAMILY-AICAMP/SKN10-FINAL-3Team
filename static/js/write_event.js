@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	const aiTeamBtn = document.querySelector('#ai-team-list .team-btn');
 	const availableTeamBtns = document.querySelectorAll('#available-teams-list .team-btn');
 
-	// 선택된 팀의 ID를 저장할 변수 (초기값은 null)
+	// 선택된 팀의 ID를 저장할 변수
 	let selectedTeamId = null;
 
 	// 모달 스타일 업데이트 함수
