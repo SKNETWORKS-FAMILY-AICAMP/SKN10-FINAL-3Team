@@ -1,7 +1,4 @@
 # SKN10-FINAL-3Team
-## 🛡️ Django REST API Server (with JWT + CSRF)
-
-<br>
 
 ## 📌 프로젝트 개요
 
@@ -16,7 +13,7 @@ HTML/CSS/JavaScript 기반의 프론트엔드와 통신할 수 있도록 설계�
 | 구분        | 기술 명세                         |
 |-------------|----------------------------------|
 | Backend     | Django 4.x, Django REST framework |
-| Auth        | JWT (HttpOnly 쿠키 저장), CSRF Token |
+| Auth        | JWT (HttpOnly 쿠키 저장), Session |
 | API 스타일  | RESTful API                      |
 | 보안 설정   | django-cors-headers, HTTPS, SameSite |
 | 프론트 연동 | HTML/CSS/JS (Vanilla JavaScript) |
