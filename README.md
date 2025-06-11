@@ -27,32 +27,33 @@
 
 ## 3. 기능 요약
 
-### 3.1 판례 검색 및 분석
-- 사건 키워드 입력 → 유사 판례 검색 결과 제공
-- 판결 결과 자동 분류 (인용, 기각, 일부 인용 등)
-- 주요 판시사항과 판단 요인 요약 제공
-
-### 3.2 문서 기반 지원 기능
-- 계약서, 소장, 증빙자료 등의 핵심 내용 요약
-- 문서 유형 자동 분류로 체계적 관리 가능
-- 누락된 필수 항목 탐지 및 리스크 요소 표시
-
-### 3.3 사용자 맞춤 기능
+### 3.1 사용자 맞춤 기능
 - 역할별 대시보드 (변호사, 실무자, 임원 등)
 - 사건 등록 시 AI기반 팀 추천 
 - 권한 기반 기능 접근 및 내부 보안 강화
+  
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/13b178b1-7c8c-4eab-a021-48d856c16129" width="600"/>
+  <img src="https://github.com/user-attachments/assets/0d559df8-7922-4961-b477-a8b1bf0ed529" width="45%"/>
+  <img src="https://github.com/user-attachments/assets/cd6f0605-17f2-4a99-ad15-521b44b12598" width="45%"/>
+  <img src="https://github.com/user-attachments/assets/84fbc071-06bb-43a3-9220-390823c68c02" width="45%"/>
+  <img src="https://github.com/user-attachments/assets/5308a77a-1e84-42f9-b9f4-c5b724420386" width="45%"/>
+</p>
 
+### 3.2 판례 검색 및 분석
+- 사건 키워드 입력 → 유사 판례 검색 결과 제공
+- 판결 결과 자동 분류 (인용, 기각, 일부 인용 등)
+- 주요 판시사항과 판단 요인 요약 제공
 <p align="center">
   <img src="https://github.com/user-attachments/assets/0454dc72-51e1-49e2-8516-94651419d12a" width="30%"/>
   <img src="https://github.com/user-attachments/assets/43260e81-4fb9-426e-b5dc-f6fce3603a4b" width="30%"/>
   <img src="https://github.com/user-attachments/assets/f5f8b1fd-1019-4abd-bea3-ec89f9780b0f" width="30%"/>
-  <img src="https://github.com/user-attachments/assets/13b178b1-7c8c-4eab-a021-48d856c16129" width="45%"/>
-  <img src="https://github.com/user-attachments/assets/0d559df8-7922-4961-b477-a8b1bf0ed529" width="45%"/>
-  <img src="https://github.com/user-attachments/assets/cd6f0605-17f2-4a99-ad15-521b44b12598" width="30%"/>
-  <img src="https://github.com/user-attachments/assets/84fbc071-06bb-43a3-9220-390823c68c02" width="30%"/>
-  <img src="https://github.com/user-attachments/assets/5308a77a-1e84-42f9-b9f4-c5b724420386" width="30%"/>
 </p>
 
+### 3.3 문서 기반 지원 기능
+- 계약서, 소장, 증빙자료 등의 핵심 내용 요약
+- 문서 유형 자동 분류로 체계적 관리 가능
+- 누락된 필수 항목 탐지 및 리스크 요소 표시
 
 ---
 
