@@ -67,12 +67,58 @@ document.addEventListener('DOMContentLoaded', function () {
 	// 선택된 팀의 ID를 저장할 변수
 	let selectedTeamId = null;
 
+	/**
+	 * API 응답 데이터로 모달의 팀 버튼들을 동적으로 생성/업데이트하는 함수
+	 */
+	function populateModalWithTeams(recommendedTeam, availableTeams) {
+		const aiTeamListDiv = document.getElementById('ai-team-list');
+		const availableTeamsListDiv = document.getElementById('available-teams-list');
+
+		aiTeamListDiv.innerHTML = '';
+		availableTeamsListDiv.innerHTML = '';
+
+		if (recommendedTeam) {
+			const aiBtn = createTeamButton(recommendedTeam, true);
+			aiTeamListDiv.appendChild(aiBtn);
+		}
+
+		availableTeams.forEach((teamName) => {
+			const btn = createTeamButton(teamName, false);
+			availableTeamsListDiv.appendChild(btn);
+		});
+
+		selectedTeamId = recommendedTeam ? `ai_team_${recommendedTeam}` : null;
+		updateModalStyles();
+	}
+
+	/**
+	 * 팀 버튼 엘리먼트를 생성하는 헬퍼 함수
+	 */
+	function createTeamButton(name, isAI) {
+		const button = document.createElement('button');
+		button.type = 'button';
+		button.className = 'team-btn px-4 py-2 rounded-md bg-gray-100 text-black';
+		button.textContent = name;
+		button.dataset.teamId = isAI ? `ai_team_${name}` : name;
+		return button;
+	}
+
 	// 모달 스타일 업데이트 함수
 	function updateModalStyles() {
+		// [수정] 함수가 호출될 때마다 현재 존재하는 버튼들을 새로 찾습니다.
+		const aiTeamBtn = modal.querySelector('#ai-team-list .team-btn');
+		const availableTeamBtns = modal.querySelectorAll('#available-teams-list .team-btn');
+
+		// [수정] 추천팀이 없는 경우(API 결과가 빈 경우 등)를 대비한 방어 코드
+		if (!aiTeamBtn) {
+			console.warn('AI 추천 팀 버튼이 존재하지 않습니다.');
+			return;
+		}
+
 		const aiTeamName = aiTeamBtn.textContent.trim();
 		const selectedTeamName = selectedTeamId ? selectedTeamId.replace('ai_team_', '') : null;
 
-		// 1. AI 추천 팀 버튼 스타일 업데이트
+		// AI 추천 팀 버튼 스타일 업데이트
 		if (selectedTeamId === aiTeamBtn.dataset.teamId) {
 			aiTeamBtn.classList.add('bg-blue-500', 'text-white');
 			aiTeamBtn.classList.remove('bg-gray-100', 'text-black');
@@ -81,20 +127,18 @@ document.addEventListener('DOMContentLoaded', function () {
 			aiTeamBtn.classList.add('bg-gray-100', 'text-black');
 		}
 
-		// 2. 가용 팀 버튼 목록 스타일 및 활성화 상태 업데이트
+		// 가용 팀 버튼 목록 스타일 및 활성화 상태 업데이트
 		availableTeamBtns.forEach((btn) => {
 			const btnName = btn.textContent.trim();
 			btn.disabled = false;
 			btn.classList.remove('bg-blue-500', 'text-white', 'bg-gray-300', 'text-gray-500');
 			btn.classList.add('bg-gray-100', 'text-black');
 
-			// 현재 선택된 팀과 이름이 같다면 활성화(파란색)
 			if (btnName === selectedTeamName) {
 				btn.classList.add('bg-blue-500', 'text-white');
 				btn.classList.remove('bg-gray-100', 'text-black');
 			}
 
-			// AI 추천 팀이 선택되었을 경우, 가용 팀 목록의 동일한 팀을 비활성화(회색)
 			if (selectedTeamId === aiTeamBtn.dataset.teamId && btnName === aiTeamName) {
 				btn.disabled = true;
 				btn.classList.add('bg-gray-300', 'text-gray-500');
@@ -103,12 +147,12 @@ document.addEventListener('DOMContentLoaded', function () {
 		});
 	}
 
-	// 폼 제출 시 모달 열기
-	form.addEventListener('submit', function (event) {
+	// 폼 제출 시 API 호출 및 동적 모달 생성
+	form.addEventListener('submit', async function (event) {
 		if (!form.checkValidity()) return;
-		event.preventDefault();
+		event.preventDefault(); // 기본 제출 방지
 
-		// 입력값 수집 및 콘솔 출력
+		// --- 1. 입력값 수집 및 콘솔 출력 (이 부분은 그대로 유지) ---
 		const formData = {
 			caseTitle: document.getElementById('case_title').value,
 			clientName: document.getElementById('client_name').value,
@@ -122,7 +166,6 @@ document.addEventListener('DOMContentLoaded', function () {
 			retrialDate: document.getElementById('retrial_date').value,
 			caseNote: document.getElementById('case_note').value,
 		};
-
 		console.log('--- 사건 접수 입력값 ---');
 		console.log('사건명:', formData.caseTitle);
 		console.log('클라이언트:', formData.clientName);
@@ -137,12 +180,36 @@ document.addEventListener('DOMContentLoaded', function () {
 		console.log('특이사항/메모:', formData.caseNote);
 		console.log('--------------------');
 
-		// 모달이 처음 열릴 때, AI 추천 팀을 기본으로 선택
-		selectedTeamId = aiTeamBtn.dataset.teamId;
+		// --- 2. API 호출 및 모달 제어 (이 부분을 수정) ---
+		if (!formData.catCd) {
+			alert('대분류를 선택해주세요.');
+			return;
+		}
 
-		// 스타일 업데이트 및 모달 표시
-		updateModalStyles();
-		modal.classList.remove('hidden');
+		try {
+			// 'fetch'를 사용해 백엔드 API로 팀 목록을 비동기 요청
+			const response = await fetch(`/api/recommend/?cat_cd=${formData.catCd}`, {
+				method: 'GET',
+				credentials: 'include',
+			});
+
+			if (!response.ok) {
+				const errorData = await response.json();
+				throw new Error(errorData.error || '팀 목록을 불러오는 데 실패했습니다.');
+			}
+
+			const data = await response.json();
+			console.log('API 응답 데이터:', data);
+
+			// API 응답 데이터로 모달의 팀 버튼들을 동적으로 생성
+			populateModalWithTeams(data.recommended_team, data.available_teams);
+
+			// API 통신이 성공한 후에 모달을 화면에 표시
+			modal.classList.remove('hidden');
+		} catch (error) {
+			console.error('API 호출 또는 처리 중 오류 발생:', error);
+			alert(error.message);
+		}
 	});
 
 	// 모든 팀 버튼에 클릭 이벤트 리스너 추가 (이벤트 위임 활용)
