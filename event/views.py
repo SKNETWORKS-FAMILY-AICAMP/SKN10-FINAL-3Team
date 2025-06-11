@@ -2,6 +2,7 @@ from django.shortcuts import render
 from code_t.models import Code_T
 
 def index(request):
+    print("[메인 페이지] 로그인 정보 : ", request.user)
     return render(request, 'main.html')
 
 def write_event(request):
