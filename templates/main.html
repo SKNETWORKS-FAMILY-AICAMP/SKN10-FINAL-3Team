@@ -1,0 +1,126 @@
+<!-- template/user/main.html -->
+
+<!-- prettier-ignore -->
+{% extends 'base/index.html' %} 
+{% load static %} 
+{% block title %}LAW FIRM{% endblock %}
+
+<!-- prettier-ignore -->
+<!-- {% block css %}
+<link rel="stylesheet" href="{% static 'css/main.css' %}" />
+{% endblock %} -->
+
+<!-- prettier-ignore -->
+<!-- {% block js %}
+<script src="{% static 'js/main.js' %}"></script>
+{% endblock %} -->
+
+<!-- prettier-ignore -->
+{% block content %}
+<main class="flex-1 overflow-y-auto px-20 py-16 bg-gray-50">
+	<!-- 검색창 -->
+	<div class="flex justify-center items-center gap-4 mb-20">
+		<button
+			class="w-12 h-12 flex items-center justify-center rounded-full bg-blue-500 hover:bg-blue-600 text-white shadow-md">
+			<i class="fas fa-upload text-base"></i>
+		</button>
+		<div class="w-full max-w-6xl">
+			<div
+				class="flex items-center w-full bg-white rounded-full border border-gray-300 px-6 py-3 shadow-sm">
+				<i class="fas fa-search text-blue-500 text-lg mr-3"></i>
+				<input
+					type="text"
+					placeholder="Search Text"
+					class="flex-grow focus:outline-none text-sm" />
+				<div
+					class="flex items-center space-x-2 bg-sky-100 text-sky-700 text-sm rounded-full px-6 py-2 ml-4">
+					<span class="font-semibold">플러그인</span>
+					<select
+						class="bg-white rounded-full px-4 py-2 focus:outline-none border border-gray-300">
+						<option>분석 및 요약</option>
+						<option>판례 검색</option>
+					</select>
+				</div>
+				<button
+					class="ml-3 w-10 h-10 flex items-center justify-center rounded-full bg-white border border-blue-500 text-blue-500 hover:bg-blue-50 transition">
+					<i class="fas fa-paper-plane text-lg"></i>
+				</button>
+			</div>
+		</div>
+	</div>
+	<!-- 현황 카드 -->
+	<div class="grid grid-cols-1 md:grid-cols-2 gap-16 mb-16">
+		<div class="bg-white rounded-lg shadow-md p-4 min-h-[180px]">
+			<h3 class="text-base font-semibold text-gray-700 mb-4">결재 대기 현황</h3>
+			<div class="grid grid-cols-3 gap-5 mt-8 text-center">
+				<div>
+					<div class="text-2xl font-bold text-blue-700">1 건</div>
+					<div class="text-sm text-gray-500">결재 대기</div>
+				</div>
+				<div>
+					<div class="text-2xl font-bold text-gray-600">0 건</div>
+					<div class="text-sm text-gray-500">결재 완료</div>
+				</div>
+				<div>
+					<div class="text-2xl font-bold text-red-600">1 건</div>
+					<div class="text-sm text-gray-500">반려</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="bg-white rounded-lg shadow-md p-4 min-h-[180px]">
+			<h3 class="text-base font-semibold text-gray-700 mb-4">업무 배정 현황</h3>
+			<div class="grid grid-cols-3 gap-5 mt-8 text-center">
+				<div>
+					<div class="text-2xl font-bold text-blue-700">1 건</div>
+					<div class="text-sm text-gray-500">확인 대기</div>
+				</div>
+				<div>
+					<div class="text-2xl font-bold text-gray-600">0 건</div>
+					<div class="text-sm text-gray-500">확인 완료</div>
+				</div>
+				<div>
+					<div class="text-2xl font-bold text-gray-400">0 건</div>
+					<div class="text-sm text-gray-500">진행 불가</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- 사건 현황 테이블 -->
+	<div class="bg-white rounded-lg shadow-md p-4 min-h-[300px]">
+		<div class="flex items-center justify-between mb-8">
+			<h3 class="text-base font-semibold text-gray-700">사건 현황</h3>
+			<a
+				href="/event/write"
+				id="add_case_btn"
+				class="text-blue-500 hover:text-blue-700"
+				style="display: none">
+				<i class="fas fa-plus-circle text-2xl"></i>
+			</a>
+		</div>
+		<div class="overflow-x-auto px-10">
+			<table class="min-w-full text-left text-sm">
+				<thead>
+					<tr class="border-b text-gray-500 text-center">
+						<th class="pb-2">번호</th>
+						<th class="pb-2">사건명</th>
+						<th class="pb-2">사건 유형</th>
+						<th class="pb-2">담당 부서</th>
+						<th class="pb-2">생성일</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="border-t">
+						<td class="py-2 text-center">1</td>
+						<td class="text-center">교통사고로 인한 손해배상</td>
+						<td class="text-center">손해배상 / 자</td>
+						<td class="text-center">민사 1팀</td>
+						<td class="text-center">2025-06-06</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</main>
+{% endblock %}

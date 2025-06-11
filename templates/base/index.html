@@ -1,0 +1,167 @@
+<!-- template/base/index.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>{% block title %} {% endblock %}</title>
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
+			rel="stylesheet" />
+		{% block css %} {% endblock %}
+		<script src="https://cdn.tailwindcss.com"></script>
+		<script>
+			tailwind.config = {
+				theme: {
+					extend: {
+						fontSize: {
+							base: '1.25rem', // 20px
+							sm: '1.05rem', // 16.8px
+							lg: '1.5rem', // 24px
+						},
+						colors: {
+							'law-darkblue': '#1e40af',
+							'law-blue': '#2563eb',
+							'law-lightblue': '#3b82f6',
+						},
+						boxShadow: {
+							card: '0 4px 20px rgba(0, 0, 0, 0.08)',
+							floating: '0 10px 25px -5px rgba(0, 0, 0, 0.1)',
+						},
+					},
+				},
+			};
+		</script>
+		<style>
+			body {
+				font-family: 'Noto Sans KR', sans-serif;
+				background-color: #f8fafc;
+			}
+		</style>
+	</head>
+	<body class="min-h-screen flex flex-col">
+		<div class="flex-1 flex flex-col overflow-hidden">
+			<!-- 헤더 -->
+			<header
+				class="bg-law-darkblue border-b border-gray-200 shadow-sm px-10 py-4 flex items-center justify-between">
+				<div class="flex items-center space-x-6">
+					<a href="/" class="text-2xl font-bold text-white hover:no-underline"
+						>LAW FIRM</a
+					>
+					<span class="text-base text-blue-100 font-medium">대시보드</span>
+				</div>
+				<div class="flex items-center space-x-6">
+					<div class="relative">
+						<button
+							id="profile-toggle"
+							class="flex items-center space-x-2 bg-blue-500 rounded-full px-3 py-2 text-white hover:bg-blue-600 transition">
+							<span
+								class="w-8 h-8 rounded-full bg-blue-200 flex items-center justify-center text-blue-800 font-bold"
+								id="user-initial"
+								>-</span
+							>
+							<span class="font-medium" id="user-name">로딩 중</span>
+							<i class="fas fa-chevron-down text-blue-100"></i>
+						</button>
+						<div
+							id="profile-dropdown"
+							class="hidden absolute right-0 w-full max-w-[230px] bg-blue-400 rounded-lg shadow-lg z-10">
+							<div class="py-1">
+								<a
+									href="#"
+									id="profile-link"
+									class="block px-4 py-2 text-sm text-white hover:bg-blue-500 rounded-md"
+									>내 프로필</a
+								>
+								<a
+									href="#"
+									id="logout-link"
+									class="block px-4 py-2 text-sm text-white hover:bg-blue-500 rounded-md"
+									>로그아웃</a
+								>
+							</div>
+						</div>
+					</div>
+				</div>
+			</header>
+
+			<!-- 본문 -->
+			{% block content %} {% endblock %}
+
+			<!-- 푸터 -->
+			<footer
+				class="bg-white border-t border-gray-200 py-4 px-6 text-center text-sm text-gray-500">
+				© 2023 LAW FIRM. All rights reserved.
+			</footer>
+		</div>
+		{% block js %} {% endblock %}
+		<script>
+			document.addEventListener('DOMContentLoaded', function () {
+				const profileToggle = document.getElementById('profile-toggle');
+				const profileDropdown = document.getElementById('profile-dropdown');
+				const logoutBtn = document.getElementById('logout-link');
+				const profileLink = document.getElementById('profile-link');
+
+				profileToggle.addEventListener('click', function () {
+					profileDropdown.classList.toggle('hidden');
+				});
+
+				document.addEventListener('click', function (event) {
+					if (
+						!event.target.closest('#profile-toggle') &&
+						!event.target.closest('#profile-dropdown')
+					) {
+						profileDropdown.classList.add('hidden');
+					}
+				});
+
+				// 로그인 상태 확인 및 사용자 정보 가져오기
+				fetch('/api/jwt/', {
+					method: 'GET',
+					credentials: 'include',
+				})
+					.then((res) => {
+						if (res.ok) return res.json();
+						else throw new Error('로그인 필요');
+					})
+					.then((data) => {
+						const userName = data.name;
+						console.log('로그인 사용자:', data);
+						// 권한() 확인 코드 추가 then
+						document.getElementById('user-name').textContent = userName;
+						// 성이름 첫 글자(예: "김")만 추출 (이름이 한글 2~4자 가정)
+						const initial = userName.trim()[0];
+						document.getElementById('user-initial').textContent = initial;
+					})
+					.catch((e) => {
+						window.location.href = '/';
+					});
+
+				// 로그아웃 버튼 이벤트 핸들러 추가
+				if (logoutBtn) {
+					logoutBtn.addEventListener('click', async function (e) {
+						e.preventDefault();
+						try {
+							const response = await fetch('/api/logout/', {
+								method: 'POST',
+								credentials: 'include', // 쿠키 전송
+							});
+							// 성공/실패 상관없이 토큰/이름 삭제
+							localStorage.removeItem('access_token');
+							localStorage.removeItem('user_name');
+							// 로그인 페이지로 이동
+							window.location.href = '/';
+						} catch (error) {
+							alert('로그아웃 실패: ' + error);
+							window.location.href = '/';
+						}
+					});
+				}
+			});
+		</script>
+	</body>
+</html>
