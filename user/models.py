@@ -28,9 +28,7 @@ class CustomUserManager(BaseUserManager):
             password=password,
             **extra_fields
         )
-        user.is_active = True
         user.is_partner = True  # 파트너 여부
-        user.is_staff = True
 
         user.save(using=self._db)
         return user
@@ -43,7 +41,6 @@ class CustomUserManager(BaseUserManager):
             password=password,
             **extra_fields
         )
-        user.is_active = True
         user.is_staff = True
         user.is_superuser = True
         user.save(using=self._db)
@@ -55,7 +52,6 @@ class CustomUser(AbstractUser, PermissionsMixin):
     name = models.CharField(max_length=20)
     email = models.EmailField(max_length=255, unique=True)
     phone = models.CharField(max_length=20, unique=True)
-    role = models.CharField(max_length=30)  # 역할 (예: 관리자, 사용자 등)
     
     is_active = models.BooleanField(default=True)  # 활성화 여부(사내직원)
     is_partner = models.BooleanField(default=False)  # 파트너 여부(파트너)
@@ -63,9 +59,9 @@ class CustomUser(AbstractUser, PermissionsMixin):
     is_superuser = models.BooleanField(default=False)  # 슈퍼유저 여부(전산팀)
     
     # 선택 입력
-    org_cd = models.CharField(max_length=30)  # 소속 코드
-    role_cd = models.CharField(max_length=30)  # 역할 코드
-    cat_cd = models.CharField(max_length=30, blank=True, null=True)  # 전문분야 코드
+    org_cd = models.CharField(max_length=20)  # 소속 코드
+    role_cd = models.CharField(max_length=20)  # 역할 코드
+    cat_cd = models.CharField(max_length=20, blank=True, null=True)  # 전문분야 코드
 
     bio = models.TextField(blank=True, null=True)  # 자기소개
     exp_career = models.TextField(blank=True, null=True)  # 소속경력

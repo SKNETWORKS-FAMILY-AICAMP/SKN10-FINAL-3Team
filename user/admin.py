@@ -50,7 +50,7 @@ class CustomUserAdmin(UserAdmin):
         'is_staff', 'is_superuser', 'created_dt', 'updated_dt'
     ]
     ordering = ['id']
-    list_filter = ['is_active', 'is_staff', 'is_superuser']
+    list_filter = ['is_active', 'is_partner', 'is_staff', 'is_superuser']
     search_fields = ['email', 'name']
 
     readonly_fields = ('created_dt', 'updated_dt', 'org_label', 'role_label')
@@ -70,6 +70,7 @@ class CustomUserAdmin(UserAdmin):
         (_('권한'), {
             'fields': (
                 'is_active',
+                'is_partner',
                 'is_staff',
                 'is_superuser',
             )
@@ -81,7 +82,7 @@ class CustomUserAdmin(UserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'name', 'phone', 'password1', 'password2', 'is_staff', 'is_superuser', 'org_cd', 'role_cd', 'cat_cd','bio', 'exp_career', 'exp_activity', 'education_high', 'education_univ', 'education_grad'),
+            'fields': ('email', 'name', 'phone', 'password1', 'password2', 'is_partner', 'is_staff', 'is_superuser', 'org_cd', 'role_cd', 'cat_cd','bio', 'exp_career', 'exp_activity', 'education_high', 'education_univ', 'education_grad'),
         }),
     )
 

@@ -20,9 +20,8 @@ class JWTAPIView(APIView):
         user = request.user
         return Response({
             "name": user.name,
-            "role": user.role,  # 권한 정보 추가
-            # user.id
-            # 추가적으로 학력, 경력 등도 필요하면 포함
+            "role": user.role_cd,           # 권한 정보 추가
+            'is_partner': user.is_partner,  # 파트너 여부
         })
 
 # 로그인 뷰
