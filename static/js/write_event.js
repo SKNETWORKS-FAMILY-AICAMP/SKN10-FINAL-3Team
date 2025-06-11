@@ -54,89 +54,126 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 	}
 
-	// 모달 관련 요소
+	// --- 모달 로직 (개선된 부분) ---
 	const form = document.getElementById('caseForm');
 	const modal = document.getElementById('teamModal');
 	const modalCancel = document.getElementById('modalCancelBtn');
 	const modalSelect = document.getElementById('modalSelectBtn');
-	const teamButtons = document.querySelectorAll('.team-btn');
 
-	let selectedTeam = null;
+	// 팀 버튼 목록 가져오기
+	const aiTeamBtn = document.querySelector('#ai-team-list .team-btn');
+	const availableTeamBtns = document.querySelectorAll('#available-teams-list .team-btn');
 
-	// 팀 버튼 선택 처리
-	teamButtons.forEach((btn) => {
-		btn.addEventListener('click', () => {
-			// 모든 버튼 초기화
-			teamButtons.forEach((b) => {
-				b.classList.remove('bg-blue-500', 'text-white');
-				b.classList.add('bg-gray-100', 'text-black');
-			});
+	// 선택된 팀의 ID를 저장할 변수 (초기값은 null)
+	let selectedTeamId = null;
 
-			// 선택된 버튼 강조
-			btn.classList.remove('bg-gray-100', 'text-black');
-			btn.classList.add('bg-blue-500', 'text-white');
+	// 모달 스타일 업데이트 함수
+	function updateModalStyles() {
+		const aiTeamName = aiTeamBtn.textContent.trim();
+		const selectedTeamName = selectedTeamId ? selectedTeamId.replace('ai_team_', '') : null;
 
-			selectedTeam = btn.textContent.trim();
+		// 1. AI 추천 팀 버튼 스타일 업데이트
+		if (selectedTeamId === aiTeamBtn.dataset.teamId) {
+			aiTeamBtn.classList.add('bg-blue-500', 'text-white');
+			aiTeamBtn.classList.remove('bg-gray-100', 'text-black');
+		} else {
+			aiTeamBtn.classList.remove('bg-blue-500', 'text-white');
+			aiTeamBtn.classList.add('bg-gray-100', 'text-black');
+		}
+
+		// 2. 가용 팀 버튼 목록 스타일 및 활성화 상태 업데이트
+		availableTeamBtns.forEach((btn) => {
+			const btnName = btn.textContent.trim();
+			btn.disabled = false;
+			btn.classList.remove('bg-blue-500', 'text-white', 'bg-gray-300', 'text-gray-500');
+			btn.classList.add('bg-gray-100', 'text-black');
+
+			// 현재 선택된 팀과 이름이 같다면 활성화(파란색)
+			if (btnName === selectedTeamName) {
+				btn.classList.add('bg-blue-500', 'text-white');
+				btn.classList.remove('bg-gray-100', 'text-black');
+			}
+
+			// AI 추천 팀이 선택되었을 경우, 가용 팀 목록의 동일한 팀을 비활성화(회색)
+			if (selectedTeamId === aiTeamBtn.dataset.teamId && btnName === aiTeamName) {
+				btn.disabled = true;
+				btn.classList.add('bg-gray-300', 'text-gray-500');
+				btn.classList.remove('bg-gray-100', 'text-black');
+			}
 		});
-	});
+	}
 
-	// 폼 제출 시 유효성 검사 + 콘솔 출력 + 모달 표시
+	// 폼 제출 시 모달 열기
 	form.addEventListener('submit', function (event) {
 		if (!form.checkValidity()) return;
 		event.preventDefault();
 
-		// 입력값 수집
-		const caseTitle = document.getElementById('case_title').value;
-		const clientName = document.getElementById('client_name').value;
-		const catValue = catSelect.value;
-		const catMid = document.getElementById('cat_mid').value;
-		const catSub = document.getElementById('cat_sub').value;
-		const bodyText = document.getElementById('case_body').value;
-		const estatValue = estatSelect.value;
-		const finalValue = finalSelect.value;
-		const lstatValue = document.getElementById('lstat_cd').value;
-		const retrialDate = document.getElementById('retrial_date').value;
-		const memoText = document.getElementById('case_note').value;
+		// 입력값 수집 및 콘솔 출력
+		const formData = {
+			caseTitle: document.getElementById('case_title').value,
+			clientName: document.getElementById('client_name').value,
+			catCd: document.getElementById('cat_cd').value,
+			catMid: document.getElementById('cat_mid').value,
+			catSub: document.getElementById('cat_sub').value,
+			caseBody: document.getElementById('case_body').value,
+			estatCd: document.getElementById('estat_cd').value,
+			lstatCd: document.getElementById('lstat_cd').value,
+			estatFinalCd: document.getElementById('estat_final_cd').value,
+			retrialDate: document.getElementById('retrial_date').value,
+			caseNote: document.getElementById('case_note').value,
+		};
 
-		console.log('사건 접수 입력값');
-		console.log('사건명:', caseTitle);
-		console.log('클라이언트:', clientName);
-		console.log('대분류:', catValue);
-		console.log('중분류:', catMid);
-		console.log('소분류:', catSub);
-		console.log('본문:', bodyText);
-		console.log('진행 상태:', estatValue);
-		console.log('사건 종결 세부:', finalValue);
-		console.log('심급:', lstatValue);
-		console.log('소송 재기일:', retrialDate);
-		console.log('특이사항/메모:', memoText);
+		console.log('--- 사건 접수 입력값 ---');
+		console.log('사건명:', formData.caseTitle);
+		console.log('클라이언트:', formData.clientName);
+		console.log('대분류:', formData.catCd);
+		console.log('중분류:', formData.catMid);
+		console.log('소분류:', formData.catSub);
+		console.log('본문:', formData.caseBody);
+		console.log('진행 상태:', formData.estatCd);
+		console.log('심급:', formData.lstatCd);
+		console.log('사건 종결:', formData.estatFinalCd);
+		console.log('소송 재기일:', formData.retrialDate);
+		console.log('특이사항/메모:', formData.caseNote);
+		console.log('--------------------');
 
-		// 모달 열기
+		// 모달이 처음 열릴 때, AI 추천 팀을 기본으로 선택
+		selectedTeamId = aiTeamBtn.dataset.teamId;
+
+		// 스타일 업데이트 및 모달 표시
+		updateModalStyles();
 		modal.classList.remove('hidden');
 	});
 
-	// 모달 '취소' 클릭
-	modalCancel.addEventListener('click', function () {
-		modal.classList.add('hidden');
-		selectedTeam = null;
+	// 모든 팀 버튼에 클릭 이벤트 리스너 추가 (이벤트 위임 활용)
+	modal.addEventListener('click', function (e) {
+		if (e.target.classList.contains('team-btn')) {
+			// 비활성화된 버튼은 클릭 무시
+			if (e.target.disabled) return;
 
-		// 버튼 스타일 초기화
-		teamButtons.forEach((b) => {
-			b.classList.remove('bg-blue-500', 'text-white');
-			b.classList.add('bg-gray-100', 'text-black');
-		});
+			// 선택된 팀 ID 업데이트
+			selectedTeamId = e.target.dataset.teamId;
+
+			// 스타일 즉시 갱신
+			updateModalStyles();
+		}
 	});
 
-	// 모달 '선택' 클릭
+	// 모달 '취소' 클릭 시: 상태 변경 없이 모달만 닫음
+	modalCancel.addEventListener('click', function () {
+		modal.classList.add('hidden');
+	});
+
+	// 모달 '선택' 클릭 시
 	modalSelect.addEventListener('click', function () {
-		if (!selectedTeam) {
+		const selectedBtn = document.querySelector(`.team-btn[data-team-id="${selectedTeamId}"]`);
+		if (!selectedTeamId || !selectedBtn) {
 			alert('팀을 선택해주세요.');
 			return;
 		}
 
-		alert(`선택된 담당 팀: ${selectedTeam}`);
+		alert(`선택된 담당 팀: ${selectedBtn.textContent.trim()}`);
 		modal.classList.add('hidden');
-
-		// 이후 실제 서버 전송 or form.submit() 연결 가능
+		// 이후 실제 서버 전송 로직 연결
 	});
 });
