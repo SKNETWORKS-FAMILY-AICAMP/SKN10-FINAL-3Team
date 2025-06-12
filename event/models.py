@@ -18,6 +18,8 @@ class Event(models.Model):
     # 기록 보존을 위한 스냅샷 필드
     creator_name = models.CharField(
         max_length=50, 
+        null=True,
+        blank=True,
         verbose_name="작성자 이름",
         help_text="사건 생성 시점의 작성자 이름(기록용)"
     )
