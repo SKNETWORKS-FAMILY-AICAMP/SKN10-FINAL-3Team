@@ -15,8 +15,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	let currentCategory = null;
 
-	// '대분류' select 요소의 변경 이벤트에 대한 리스너입니다.
-	// 선택된 대분류에 따라 '진행 상태' 드롭다운 메뉴의 옵션을 동적으로 변경합니다.
+	// UTF-8 바이트 단위로 문자열 길이를 계산하는 함수
+	function getUtf8Bytes(str) {
+		return new Blob([str]).size;
+	}
+
+	// 빈 문자열을 null로 변환
+	function sanitize(value) {
+		return value === '' ? null : value;
+	}
+	// '대분류' select 요소의 변경 이벤트 리스너.
 	catSelect.addEventListener('change', function () {
 		const selected = this.value;
 		estatSelect.innerHTML = '<option value="">선택</option>';
@@ -33,8 +41,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 	});
 
-	// '진행 상태' select 요소의 변경 이벤트에 대한 리스너입니다.
-	// '사건 종결' 상태가 선택되었을 경우에만 '사건 종결 세부' 드롭다운 메뉴를 채웁니다.
+	// '진행 상태' select 요소의 변경 이벤트 리스너.
 	estatSelect.addEventListener('change', function () {
 		const selectedCode = this.value;
 		finalSelect.innerHTML = '<option value="">선택</option>';
@@ -49,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 	});
 
-	// 특정 <select> 요소를 받아, 주어진 옵션 배열로 <option> 태그를 만들어 채워줍니다.
+	// 특정 <select> 요소를 받아, 주어진 옵션 배열로 <option> 태그를 만들어 채워줌.
 	function renderOptions(selectElement, options) {
 		for (const item of options) {
 			const opt = document.createElement('option');
@@ -64,9 +71,10 @@ document.addEventListener('DOMContentLoaded', function () {
 	const modal = document.getElementById('teamModal');
 	const modalCancel = document.getElementById('modalCancelBtn');
 	const modalSelect = document.getElementById('modalSelectBtn');
-	let selectedTeamId = null; // 현재 선택된 팀의 ID를 저장하는 변수
+	let selectedTeamId = null;
+	let formData = {};
 
-	// API로부터 받은 팀 데이터를 사용하여 모달 내부의 'AI 추천 팀'과 '가용 팀' 버튼들을 동적으로 생성하고 화면을 갱신합니다.
+	// API로부터 받은 팀 데이터를 사용하여 모달 내부의 버튼들을 동적으로 생성하고 화면을 갱신함.
 	function populateModalWithTeams(recommendedTeam, availableTeams) {
 		const aiTeamListDiv = document.getElementById('ai-team-list');
 		const availableTeamsListDiv = document.getElementById('available-teams-list');
@@ -88,23 +96,29 @@ document.addEventListener('DOMContentLoaded', function () {
 		updateModalStyles();
 	}
 
-	// 팀 버튼 DOM 요소를 생성하는 헬퍼 함수입니다.
+	// 팀 버튼 DOM 요소를 생성하는 헬퍼 함수.
 	function createTeamButton(name, isAI) {
 		const button = document.createElement('button');
 		button.type = 'button';
 		button.className = 'team-btn px-4 py-2 rounded-md bg-gray-100 text-black';
 		button.textContent = name;
 		button.dataset.teamId = isAI ? `ai_team_${name}` : name;
+
+		// AI 추천팀으로 생성되는 버튼일 경우, disabled 속성을 추가함.
+		if (isAI) {
+			button.disabled = true;
+		}
+
 		return button;
 	}
 
-	// 현재 선택된 팀(selectedTeamId)을 기준으로 모달 내 모든 버튼의 시각적 스타일(선택, 비활성화, 기본)을 업데이트합니다.
+	// 현재 선택된 팀을 기준으로 모달 내 모든 버튼의 시각적 스타일(선택, 비활성화, 기본)을 업데이트함.
 	function updateModalStyles() {
 		const aiTeamBtn = modal.querySelector('#ai-team-list .team-btn');
 		const availableTeamBtns = modal.querySelectorAll('#available-teams-list .team-btn');
 
 		if (!aiTeamBtn) {
-			console.warn('AI 추천 팀 버튼이 존재하지 않습니다.');
+			console.warn('AI 추천 팀 버튼이 존재하지 않음.');
 			return;
 		}
 
@@ -140,13 +154,13 @@ document.addEventListener('DOMContentLoaded', function () {
 		});
 	}
 
-	// 사용자가 '등록' 버튼을 눌러 폼을 제출할 때의 동작을 정의합니다.
-	// 폼 데이터를 서버 API로 보내 추천 팀 목록을 받아오고, 결과로 모달을 띄웁니다.
+	// '등록' 버튼 제출 시 동작 정의.
 	form.addEventListener('submit', async function (event) {
 		if (!form.checkValidity()) return;
 		event.preventDefault();
 
-		const formData = {
+		// 폼 데이터를 상위 스코프의 formData 변수에 저장
+		formData = {
 			caseTitle: document.getElementById('case_title').value,
 			clientName: document.getElementById('client_name').value,
 			catCd: document.getElementById('cat_cd').value,
@@ -185,8 +199,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 	});
 
-	// 모달 내에서 발생하는 클릭 이벤트를 처리합니다. (이벤트 위임)
-	// 'team-btn' 클래스를 가진 버튼이 클릭되었을 때만 선택 상태를 변경하고 스타일을 업데이트합니다.
+	// 모달 내 클릭 이벤트 처리
 	modal.addEventListener('click', function (e) {
 		if (e.target.classList.contains('team-btn')) {
 			if (e.target.disabled) return;
@@ -195,21 +208,77 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 	});
 
-	// 모달의 '취소' 버튼에 대한 클릭 이벤트 리스너입니다.
+	// 모달 '취소' 버튼 클릭 이벤트 리스너.
 	modalCancel.addEventListener('click', function () {
 		modal.classList.add('hidden');
 	});
 
-	// 모달의 '선택' 버튼에 대한 클릭 이벤트 리스너입니다.
-	modalSelect.addEventListener('click', function () {
-		const selectedBtn = document.querySelector(`.team-btn[data-team-id="${selectedTeamId}"]`);
+	// [수정] 모달의 '선택' 버튼 클릭 시, 최종 데이터를 서버로 전송
+	modalSelect.addEventListener('click', async function () {
+		const selectedBtn = modal.querySelector(`.team-btn[data-team-id="${selectedTeamId}"]`);
 		if (!selectedTeamId || !selectedBtn) {
 			alert('팀을 선택해주세요.');
 			return;
 		}
 
-		alert(`선택된 담당 팀: ${selectedBtn.textContent.trim()}`);
-		modal.classList.add('hidden');
-		// TODO: 이후 실제 사건 데이터와 선택된 팀 정보를 서버로 전송하는 로직 연결
+		const selectedTeamName = selectedBtn.textContent.trim();
+
+		// UTF-8 바이트 기반 유효성 검사
+		if (getUtf8Bytes(formData.caseTitle) > 100) {
+			alert('사건명은 한글 기준 약 33자, 영문 기준 100자 이하로 입력해주세요.');
+			return;
+		}
+		if (getUtf8Bytes(formData.clientName) > 20) {
+			alert('클라이언트명은 한글 기준 약 6자, 영문 기준 20자 이하로 입력해주세요.');
+			return;
+		}
+		if (formData.catMid && getUtf8Bytes(formData.catMid) > 50) {
+			alert('중분류(catMid)는 한글 기준 약 16자, 영문 기준 50자 이하로 입력해주세요.');
+			return;
+		}
+		if (formData.catSub && getUtf8Bytes(formData.catSub) > 50) {
+			alert('소분류(catSub)는 한글 기준 약 16자, 영문 기준 50자 이하로 입력해주세요.');
+			return;
+		}
+
+		// 1. 폼 데이터와 선택된 팀 이름을 합쳐 최종 전송 데이터 생성
+		const finalData = {
+			...formData,
+			cat_02: sanitize(formData.catMid),
+			cat_03: sanitize(formData.catSub),
+			e_description: formData.caseBody,
+			estat_cd: formData.estatCd,
+			lstat_cd: sanitize(formData.lstatCd),
+			estat_num_cd: sanitize(formData.estatFinalCd),
+			submit_at: sanitize(formData.retrialDate),
+			memo: sanitize(formData.caseNote),
+			selectedTeamName: selectedTeamName,
+		};
+
+		try {
+			// 새로 만든 사건 저장 API(/api/event/create/)에 POST 요청
+			const response = await fetch('/api/event/create/', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				credentials: 'include', // 인증 쿠키 전송
+				body: JSON.stringify(finalData),
+			});
+
+			if (!response.ok) {
+				const errorData = await response.json();
+				throw new Error(errorData.error || '사건 등록에 실패했습니다.');
+			}
+
+			const result = await response.json();
+			console.log('[사건 등록]', result.message);
+
+			// 성공 시 메인 페이지로 이동
+			window.location.href = '/event';
+		} catch (error) {
+			console.error('사건 등록 실패:', error);
+			alert(error.message);
+		}
 	});
 });

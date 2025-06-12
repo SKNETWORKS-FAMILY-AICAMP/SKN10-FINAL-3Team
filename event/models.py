@@ -1,17 +1,25 @@
 from django.db import models
-from django.contrib.auth import get_user_model
-
-User = get_user_model()
+from django.conf import settings
 
 class Event(models.Model):
     event_id = models.AutoField(
         primary_key=True,
         verbose_name="사건 ID"
     )
+    # 실시간 연결을 위한 외래키 필드
     user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        verbose_name="사용자 ID"
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL, # 사용자가 삭제되면 이 연결은 NULL이 됨
+        null=True,
+        blank=True,
+        verbose_name="작성자 계정"
+    )
+    
+    # 기록 보존을 위한 스냅샷 필드
+    creator_name = models.CharField(
+        max_length=50, 
+        verbose_name="작성자 이름",
+        help_text="사건 생성 시점의 작성자 이름(기록용)"
     )
     e_title = models.CharField(
         max_length=100,
@@ -60,6 +68,7 @@ class Event(models.Model):
     )
     lstat_cd = models.CharField(
         max_length=20,
+        null=True,
         verbose_name="심급"
     )
     estat_num_cd = models.CharField(

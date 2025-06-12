@@ -29,10 +29,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-# LOGOUT_REDIRECT_URL = '/'
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -46,7 +44,7 @@ INSTALLED_APPS = [
     'api',
     'code_t',
     'user',
-    'event'
+    'event',
 ]
 
 # 사용자 커스텀 모델 설정
