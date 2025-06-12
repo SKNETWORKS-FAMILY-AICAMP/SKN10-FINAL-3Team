@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
+	// --- DOM 요소 및 데이터 초기화 ---
 	const catSelect = document.getElementById('cat_cd');
 	const estatSelect = document.getElementById('estat_cd');
 	const finalSelect = document.getElementById('estat_final_cd');
@@ -14,27 +15,30 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	let currentCategory = null;
 
-	// 대분류 선택 시
+	// '대분류' select 요소의 변경 이벤트에 대한 리스너입니다.
+	// 선택된 대분류에 따라 '진행 상태' 드롭다운 메뉴의 옵션을 동적으로 변경합니다.
 	catSelect.addEventListener('change', function () {
 		const selected = this.value;
 		estatSelect.innerHTML = '<option value="">선택</option>';
 		finalSelect.innerHTML = '<option value="">선택</option>';
 
 		if (selected === 'CAT_01') {
+			// 민사
 			currentCategory = 'ESTAT_01';
 			renderOptions(estatSelect, estatData.ESTAT_01);
 		} else if (selected === 'CAT_02') {
+			// 형사
 			currentCategory = 'ESTAT_02';
 			renderOptions(estatSelect, estatData.ESTAT_02);
 		}
 	});
 
-	// 진행 상태 선택 시
+	// '진행 상태' select 요소의 변경 이벤트에 대한 리스너입니다.
+	// '사건 종결' 상태가 선택되었을 경우에만 '사건 종결 세부' 드롭다운 메뉴를 채웁니다.
 	estatSelect.addEventListener('change', function () {
 		const selectedCode = this.value;
 		finalSelect.innerHTML = '<option value="">선택</option>';
 
-		// 종결 코드 선택 시만 하위 카테고리 출력
 		const isCivilEnd = selectedCode === 'ESTAT_01_12';
 		const isCriminalEnd = selectedCode === 'ESTAT_02_09';
 
@@ -45,6 +49,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 	});
 
+	// 특정 <select> 요소를 받아, 주어진 옵션 배열로 <option> 태그를 만들어 채워줍니다.
 	function renderOptions(selectElement, options) {
 		for (const item of options) {
 			const opt = document.createElement('option');
@@ -54,22 +59,14 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 	}
 
-	// --- 모달 로직 (개선된 부분) ---
+	// --- 모달 관련 로직 ---
 	const form = document.getElementById('caseForm');
 	const modal = document.getElementById('teamModal');
 	const modalCancel = document.getElementById('modalCancelBtn');
 	const modalSelect = document.getElementById('modalSelectBtn');
+	let selectedTeamId = null; // 현재 선택된 팀의 ID를 저장하는 변수
 
-	// 팀 버튼 목록 가져오기
-	const aiTeamBtn = document.querySelector('#ai-team-list .team-btn');
-	const availableTeamBtns = document.querySelectorAll('#available-teams-list .team-btn');
-
-	// 선택된 팀의 ID를 저장할 변수
-	let selectedTeamId = null;
-
-	/**
-	 * API 응답 데이터로 모달의 팀 버튼들을 동적으로 생성/업데이트하는 함수
-	 */
+	// API로부터 받은 팀 데이터를 사용하여 모달 내부의 'AI 추천 팀'과 '가용 팀' 버튼들을 동적으로 생성하고 화면을 갱신합니다.
 	function populateModalWithTeams(recommendedTeam, availableTeams) {
 		const aiTeamListDiv = document.getElementById('ai-team-list');
 		const availableTeamsListDiv = document.getElementById('available-teams-list');
@@ -91,9 +88,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		updateModalStyles();
 	}
 
-	/**
-	 * 팀 버튼 엘리먼트를 생성하는 헬퍼 함수
-	 */
+	// 팀 버튼 DOM 요소를 생성하는 헬퍼 함수입니다.
 	function createTeamButton(name, isAI) {
 		const button = document.createElement('button');
 		button.type = 'button';
@@ -103,13 +98,11 @@ document.addEventListener('DOMContentLoaded', function () {
 		return button;
 	}
 
-	// 모달 스타일 업데이트 함수
+	// 현재 선택된 팀(selectedTeamId)을 기준으로 모달 내 모든 버튼의 시각적 스타일(선택, 비활성화, 기본)을 업데이트합니다.
 	function updateModalStyles() {
-		// [수정] 함수가 호출될 때마다 현재 존재하는 버튼들을 새로 찾습니다.
 		const aiTeamBtn = modal.querySelector('#ai-team-list .team-btn');
 		const availableTeamBtns = modal.querySelectorAll('#available-teams-list .team-btn');
 
-		// [수정] 추천팀이 없는 경우(API 결과가 빈 경우 등)를 대비한 방어 코드
 		if (!aiTeamBtn) {
 			console.warn('AI 추천 팀 버튼이 존재하지 않습니다.');
 			return;
@@ -147,12 +140,12 @@ document.addEventListener('DOMContentLoaded', function () {
 		});
 	}
 
-	// 폼 제출 시 API 호출 및 동적 모달 생성
+	// 사용자가 '등록' 버튼을 눌러 폼을 제출할 때의 동작을 정의합니다.
+	// 폼 데이터를 서버 API로 보내 추천 팀 목록을 받아오고, 결과로 모달을 띄웁니다.
 	form.addEventListener('submit', async function (event) {
 		if (!form.checkValidity()) return;
-		event.preventDefault(); // 기본 제출 방지
+		event.preventDefault();
 
-		// --- 1. 입력값 수집 및 콘솔 출력 (이 부분은 그대로 유지) ---
 		const formData = {
 			caseTitle: document.getElementById('case_title').value,
 			clientName: document.getElementById('client_name').value,
@@ -166,28 +159,13 @@ document.addEventListener('DOMContentLoaded', function () {
 			retrialDate: document.getElementById('retrial_date').value,
 			caseNote: document.getElementById('case_note').value,
 		};
-		console.log('--- 사건 접수 입력값 ---');
-		console.log('사건명:', formData.caseTitle);
-		console.log('클라이언트:', formData.clientName);
-		console.log('대분류:', formData.catCd);
-		console.log('중분류:', formData.catMid);
-		console.log('소분류:', formData.catSub);
-		console.log('본문:', formData.caseBody);
-		console.log('진행 상태:', formData.estatCd);
-		console.log('심급:', formData.lstatCd);
-		console.log('사건 종결:', formData.estatFinalCd);
-		console.log('소송 재기일:', formData.retrialDate);
-		console.log('특이사항/메모:', formData.caseNote);
-		console.log('--------------------');
 
-		// --- 2. API 호출 및 모달 제어 (이 부분을 수정) ---
 		if (!formData.catCd) {
 			alert('대분류를 선택해주세요.');
 			return;
 		}
 
 		try {
-			// 'fetch'를 사용해 백엔드 API로 팀 목록을 비동기 요청
 			const response = await fetch(`/api/recommend/?cat_cd=${formData.catCd}`, {
 				method: 'GET',
 				credentials: 'include',
@@ -199,12 +177,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 
 			const data = await response.json();
-			console.log('API 응답 데이터:', data);
-
-			// API 응답 데이터로 모달의 팀 버튼들을 동적으로 생성
 			populateModalWithTeams(data.recommended_team, data.available_teams);
-
-			// API 통신이 성공한 후에 모달을 화면에 표시
 			modal.classList.remove('hidden');
 		} catch (error) {
 			console.error('API 호출 또는 처리 중 오류 발생:', error);
@@ -212,26 +185,22 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 	});
 
-	// 모든 팀 버튼에 클릭 이벤트 리스너 추가 (이벤트 위임 활용)
+	// 모달 내에서 발생하는 클릭 이벤트를 처리합니다. (이벤트 위임)
+	// 'team-btn' 클래스를 가진 버튼이 클릭되었을 때만 선택 상태를 변경하고 스타일을 업데이트합니다.
 	modal.addEventListener('click', function (e) {
 		if (e.target.classList.contains('team-btn')) {
-			// 비활성화된 버튼은 클릭 무시
 			if (e.target.disabled) return;
-
-			// 선택된 팀 ID 업데이트
 			selectedTeamId = e.target.dataset.teamId;
-
-			// 스타일 즉시 갱신
 			updateModalStyles();
 		}
 	});
 
-	// 모달 '취소' 클릭 시: 상태 변경 없이 모달만 닫음
+	// 모달의 '취소' 버튼에 대한 클릭 이벤트 리스너입니다.
 	modalCancel.addEventListener('click', function () {
 		modal.classList.add('hidden');
 	});
 
-	// 모달 '선택' 클릭 시
+	// 모달의 '선택' 버튼에 대한 클릭 이벤트 리스너입니다.
 	modalSelect.addEventListener('click', function () {
 		const selectedBtn = document.querySelector(`.team-btn[data-team-id="${selectedTeamId}"]`);
 		if (!selectedTeamId || !selectedBtn) {
@@ -241,6 +210,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		alert(`선택된 담당 팀: ${selectedBtn.textContent.trim()}`);
 		modal.classList.add('hidden');
-		// 이후 실제 서버 전송 로직 연결
+		// TODO: 이후 실제 사건 데이터와 선택된 팀 정보를 서버로 전송하는 로직 연결
 	});
 });
