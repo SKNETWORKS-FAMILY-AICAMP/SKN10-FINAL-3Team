@@ -109,16 +109,7 @@ REST_FRAMEWORK = {
 # }
 
 # AWS RDS MySQL 설정
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'final_db',
-        'USER': 'bengio',
-        'PASSWORD': 'bengio1234!',
-        'HOST': 'finalproj-mysql.cv80y2eimd24.ap-northeast-2.rds.amazonaws.com',
-        'PORT': '3306',
-    }
-}
+# AWS를 참고하여 작성하기
 
 
 # Password validation
