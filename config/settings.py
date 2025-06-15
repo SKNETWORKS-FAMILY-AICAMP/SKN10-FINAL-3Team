@@ -96,13 +96,26 @@ REST_FRAMEWORK = {
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+# 로컬 MySQL 설정 (docker 환경에서 사용)
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'final_db',
+#         'USER': 'final_user',
+#         'PASSWORD': 'f1234',
+#         'HOST': 'localhost',
+#         'PORT': '3306',
+#     }
+# }
+
+# AWS RDS MySQL 설정
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'final_db',
-        'USER': 'final_user',
-        'PASSWORD': 'f1234',
-        'HOST': 'localhost',
+        'USER': 'bengio',
+        'PASSWORD': 'bengio1234!',
+        'HOST': 'finalproj-mysql.cv80y2eimd24.ap-northeast-2.rds.amazonaws.com',
         'PORT': '3306',
     }
 }
