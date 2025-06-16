@@ -1,3 +1,6 @@
+// --- 토큰 만료 자동 재발급 & 재요청 유틸 ---
+import { apiRequest } from './apiRequest.js';
+
 document.addEventListener('DOMContentLoaded', function () {
 	// --- DOM 요소 및 데이터 초기화 ---
 	const catSelect = document.getElementById('cat_cd');
@@ -180,17 +183,11 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 
 		try {
-			const response = await fetch(`/api/recommend/?cat_cd=${formData.catCd}`, {
+			const data = await apiRequest(`/api/recommend/?cat_cd=${formData.catCd}`, {
 				method: 'GET',
 				credentials: 'include',
 			});
 
-			if (!response.ok) {
-				const errorData = await response.json();
-				throw new Error(errorData.error || '팀 목록을 불러오는 데 실패했습니다.');
-			}
-
-			const data = await response.json();
 			populateModalWithTeams(data.recommended_team, data.available_teams);
 			modal.classList.remove('hidden');
 		} catch (error) {

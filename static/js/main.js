@@ -1,24 +1,23 @@
+// static/js/main.js
+
+import { apiRequest } from './apiRequest.js';
+
 document.addEventListener('DOMContentLoaded', function () {
 	// 로그인 상태 확인 및 사용자 정보 가져오기
-	fetch('/api/jwt/', {
+	apiRequest('/api/jwt/', {
 		method: 'GET',
 		credentials: 'include',
-	})
-		.then((res) => {
-			if (res.ok) return res.json();
-			else throw new Error('로그인 필요');
-		})
-		.then((data) => {
-			console.log('main.js의 data : ', data);
-			console.log('main.js의 data.is_partner : ', data.is_partner);
-			// 1. 파트너일 경우 버튼 보이기
-			if (data.is_partner) {
-				document.getElementById('add_case_btn').style.display = 'block';
-			}
+	}).then((data) => {
+		console.log('main.js의 data : ', data);
+		console.log('main.js의 data.is_partner : ', data.is_partner);
+		// 1. 파트너일 경우 버튼 보이기
+		if (data.is_partner) {
+			document.getElementById('add_case_btn').style.display = 'block';
+		}
 
-			// 2. 사건 목록 불러오기
-			loadEventList();
-		})
+		// 2. 사건 목록 불러오기
+		loadEventList();
+	})
 		.catch((e) => {
 			alert(e.message);
 			window.location.href = '/';
@@ -27,13 +26,12 @@ document.addEventListener('DOMContentLoaded', function () {
 	// 사건 리스트 API 호출 함수
 	async function loadEventList() {
 		try {
-			const res = await fetch('/api/event/by-org/', {
+			const data = await apiRequest('/api/event/by-org/', {
 				method: 'GET',
 				credentials: 'include',
 			});
 
-			const data = await res.json();
-			if (!res.ok) throw new Error(data.error || '사건 조회 실패');
+			if (!data.error) throw new Error(data.error || '사건 조회 실패');
 
 			const tableBody = document.querySelector('table tbody');
 			tableBody.innerHTML = '';

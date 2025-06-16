@@ -120,14 +120,10 @@
 				});
 
 				// 로그인 상태 확인 및 사용자 정보 가져오기
-				fetch('/api/jwt/', {
+				apiRequest('/api/jwt/', {
 					method: 'GET',
 					credentials: 'include',
 				})
-					.then((res) => {
-						if (res.ok) return res.json();
-						else throw new Error('로그인 필요');
-					})
 					.then((data) => {
 						const userName = data.name;
 						console.log('로그인 사용자:', data);
@@ -146,9 +142,9 @@
 					logoutBtn.addEventListener('click', async function (e) {
 						e.preventDefault();
 						try {
-							const response = await fetch('/api/logout/', {
+							const response = await apiRequest('/api/logout/', {
 								method: 'POST',
-								credentials: 'include', // 쿠키 전송
+								credentials: 'include'
 							});
 							// 성공/실패 상관없이 토큰/이름 삭제
 							localStorage.removeItem('access_token');

@@ -62,6 +62,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'user.middleware.JWTAuthRefreshMiddleware',
 ]
 
 # 모든 도메인의 요청을 허용하고 쿠키 포함 허용
