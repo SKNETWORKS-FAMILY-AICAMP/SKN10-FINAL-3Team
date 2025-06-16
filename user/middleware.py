@@ -10,7 +10,7 @@ from user.models import CustomUser
 
 # 인증이 필요 없는 URL (로그인, 리프레시 등)
 EXEMPT_URLS = [
-    '/', '/api/refresh/', '/static/',
+    '/', '/api/refresh/', '/static/'
 ]
 
 class JWTAuthRefreshMiddleware(MiddlewareMixin):
@@ -28,6 +28,7 @@ class JWTAuthRefreshMiddleware(MiddlewareMixin):
 
         try:
             # 3. access_token 유효성 검사
+            # JWT에서 user_id 추출 → DB에서 최신 정보 조회
             user_id = decode_access_token(access_token)
             request.user = CustomUser.objects.get(id=user_id)
         except Exception as e:

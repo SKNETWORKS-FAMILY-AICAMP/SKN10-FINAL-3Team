@@ -184,9 +184,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		try {
 			const data = await apiRequest(`/api/recommend/?cat_cd=${formData.catCd}`, {
-				method: 'GET',
-				credentials: 'include',
-			});
+				method: 'GET'});
 
 			populateModalWithTeams(data.recommended_team, data.available_teams);
 			modal.classList.remove('hidden');
@@ -254,21 +252,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		try {
 			// 새로 만든 사건 저장 API(/api/event/create/)에 POST 요청
-			const response = await fetch('/api/event/create/', {
+			const response = await apiRequest('/api/event/create/', {
 				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				credentials: 'include', // 인증 쿠키 전송
+				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify(finalData),
 			});
-
-			if (!response.ok) {
-				const errorData = await response.json();
-				throw new Error(errorData.error || '사건 등록에 실패했습니다.');
-			}
-
-			const result = await response.json();
 			console.log('[사건 등록]', result.message);
 
 			// 성공 시 메인 페이지로 이동
