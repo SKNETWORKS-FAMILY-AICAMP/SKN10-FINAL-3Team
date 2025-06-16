@@ -1,9 +1,14 @@
-django
-djangorestframework
-django-cors-headers
-PyJWT
+# Django 웹 프레임워크 및 API
+django                      
+djangorestframework         
+django-cors-headers         
 
-mysqlclient
+# 인증 및 보안
+PyJWT                       
 
-pandas
-dotenv
+# 데이터베이스 연동
+mysqlclient                 
+
+# 데이터 처리 및 환경 설정
+pandas                      
+python-dotenv               
