@@ -6,3 +6,4 @@ PyJWT
 mysqlclient
 
 pandas
+dotenv
