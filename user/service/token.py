@@ -8,7 +8,7 @@ from user.models import RefreshToken, CustomUser
 from django.utils import timezone
 # 토큰 설정 Enum 클래스
 # - access token: 2분 (단기 사용)
-# - refresh token: 2일 (장기 사용)
+# - refresh token: 1일 (장기 사용)
 class JWT_KEY(enum.Enum):
     RANDOM_OF_ACCESS_KEY = (enum.auto(), 'access_secret', datetime.timedelta(seconds=120), 'HS256', '랜덤한 조합의 키')
     RANDOM_OF_REFRESH_KEY = (enum.auto(), 'refresh_secret', datetime.timedelta(days=1), 'HS256', '랜덤한 조합의 키')

@@ -16,11 +16,17 @@ class JWTAuthRefreshMiddleware(MiddlewareMixin):
     def process_request(self, request):
         print("[🧩 Middleware] process_request 진입 >>>")
         print("[🧩 Path]", request.path)
+        
+        # Ajax 요청인지 검사
+        if request.headers.get('X-Requested-With') != 'XMLHttpRequest':
+            return JsonResponse({'error': '잘못된 요청입니다.'}, status=400)
 
+        # 인증이 필요 없는 URL은 패스
         if request.path in EXEMPT_URLS:
             print("[🛑 예외 URL 패스됨]", request.path)
             return None
 
+        # 쿠키에서 JWT 토큰 읽기
         access_token = request.COOKIES.get('access_token')
         refresh_token = request.COOKIES.get('refresh_token')
 
@@ -31,12 +37,15 @@ class JWTAuthRefreshMiddleware(MiddlewareMixin):
             print("[❗] access_token 없음")
             return JsonResponse({'error': '인증 정보가 없습니다.'}, status=401)
 
+        # access_token 디코딩
         try:
             user_id = decode_access_token(access_token)
             user = CustomUser.objects.get(id=user_id)
             request.user = user
             request._cached_user = user
             print("[✅ 유저 인증 완료] user_id:", user_id, "name:", user.name)
+            
+        # 토큰 만료 등 문제가 있을 경우 -> refresh_token 확인
         except Exception as e:
             print("[⚠️ access_token 예외 발생]", e)
 
@@ -62,7 +71,7 @@ class JWTAuthRefreshMiddleware(MiddlewareMixin):
                 resp.delete_cookie('access_token')
                 resp.delete_cookie('refresh_token')
                 return resp
-
+        return None
 
     def process_response(self, request, response):
         # 5. 만약 새 access_token이 발급됐다면 응답에 set_cookie

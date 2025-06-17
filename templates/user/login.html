@@ -173,10 +173,11 @@
 					const password = document.getElementById('password').value;
 
 					try {
-						const response = await fetch('/api/login/', {
+						const response = await apiRequest('/api/login/', {
 							method: 'POST',
 							headers: {
 								'Content-Type': 'application/json',
+								'X-Requested-With': 'XMLHttpRequest', // CSRF 보호를 위한 헤더
 							},
 							body: JSON.stringify({
 								username: email,
