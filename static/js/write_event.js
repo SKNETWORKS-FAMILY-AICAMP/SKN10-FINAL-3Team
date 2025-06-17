@@ -1,5 +1,3 @@
-// --- 토큰 만료 자동 재발급 & 재요청 유틸 ---
-import { apiRequest } from '/static/js/apiRequest.js';
 
 document.addEventListener('DOMContentLoaded', function () {
 	// --- DOM 요소 및 데이터 초기화 ---
@@ -183,10 +181,10 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 
 		try {
-			const data = await apiRequest(`/api/recommend/?cat_cd=${formData.catCd}`, {
+			const data = await fetch(`/api/recommend/?cat_cd=${formData.catCd}`, {
 				method: 'GET',
 				credentials: 'include'
-			});
+			}).then((response) => response.json());
 			populateModalWithTeams(data.recommended_team, data.available_teams);
 			modal.classList.remove('hidden');
 		} catch (error) {
@@ -253,7 +251,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		try {
 			// 새로 만든 사건 저장 API(/api/event/create/)에 POST 요청
-			const response = await apiRequest('/api/event/create/', {
+			const response = await fetch('/api/event/create/', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -262,7 +260,8 @@ document.addEventListener('DOMContentLoaded', function () {
 				body: JSON.stringify(finalData),
 				credentials: 'include'
 			});
-			console.log('[사건 등록]', response.message);
+			const data = await response.json();
+			console.log('[사건 등록]', data.message);
 
 			// 성공 시 메인 페이지로 이동
 			window.location.href = '/event';

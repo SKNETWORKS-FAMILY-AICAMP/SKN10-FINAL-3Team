@@ -3,7 +3,11 @@ from code_t.models import Code_T
 
 def index(request):
     print("[메인 페이지] 로그인 정보 : ", request.user)
-    return render(request, 'main.html')
+    context = {
+        'user_name' : request.user.name,
+        'user_name_first' : request.user.name[0]
+    }
+    return render(request, 'main.html', context)
 
 def write_event(request):
     cat_codes = Code_T.objects.filter(code__startswith='CAT_').order_by('code')

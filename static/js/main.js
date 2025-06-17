@@ -1,14 +1,12 @@
 // static/js/main.js
 
-import { apiRequest } from '/static/js/apiRequest.js';
-
 document.addEventListener('DOMContentLoaded', function () {
 	console.log('main.js가 로드되었습니다.');
 	// 로그인 상태 확인 및 사용자 정보 가져오기
-	apiRequest('/api/jwt/', {
+	fetch('/api/jwt/', {
 		method: 'GET',
 		credentials: 'include'
-	}).then((data) => {
+	}).then((response) => response.json()).then((data) => {
 		console.log('main.js의 data : ', data);
 		console.log('main.js의 data.is_partner : ', data.is_partner);
 		
@@ -23,10 +21,11 @@ document.addEventListener('DOMContentLoaded', function () {
 	// 사건 리스트 API 호출 함수
 	async function loadEventList() {
 		try {
-			const data = await apiRequest('/api/event/by-org/', {
+			const response = await fetch('/api/event/by-org/', {
 				method: 'GET',
 				credentials: 'include'
 			});
+			const data = await response.json();
 			console.log('사건 목록 데이터:', data);
 			if (data.error) throw new Error(data.error || '사건 조회 실패');
 

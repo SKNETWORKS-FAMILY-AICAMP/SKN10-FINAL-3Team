@@ -11,7 +11,7 @@ from django.utils import timezone
 # - refresh token: 1일 (장기 사용)
 class JWT_KEY(enum.Enum):
     RANDOM_OF_ACCESS_KEY = (enum.auto(), 'access_secret', datetime.timedelta(seconds=120), 'HS256', '랜덤한 조합의 키')
-    RANDOM_OF_REFRESH_KEY = (enum.auto(), 'refresh_secret', datetime.timedelta(days=1), 'HS256', '랜덤한 조합의 키')
+    RANDOM_OF_REFRESH_KEY = (enum.auto(), 'refresh_secret', datetime.timedelta(seconds=180), 'HS256', '랜덤한 조합의 키')
 
 # 토큰 생성 공통 함수
 # - 사용자 ID를 기반으로 payload 생성 후 서명하여 토큰 발급
@@ -47,9 +47,11 @@ def __decode_token(token, key):
         payload = jwt.decode(token, random_key, algorithms=alg)  # 복호화 시 위조 여부 자동 검증
         print(f"[JWT] Decoded payload: {payload}")
         return payload['user_id']
-    except Exception as e:
-        print(f"[JWT] Token decoding failed: {e}")
-        raise AuthenticationFailed(e)
+    except jwt.ExpiredSignatureError:
+        raise AuthenticationFailed("토큰이 만료되었습니다.")
+    except jwt.InvalidTokenError as e:
+        raise AuthenticationFailed("유효하지 않은 토큰입니다.")
+
 
 # 액세스 토큰 복호화 함수
 def decode_access_token(token):
@@ -63,8 +65,9 @@ def decode_refresh_token(token):
 
 # DB에 리프레시 토큰 저장
 def save_refresh_token(user, token):
+    expiration = timezone.now() + JWT_KEY.RANDOM_OF_REFRESH_KEY.value[2]  # 즉, 1일 후
     print(f"[토큰DB] refresh_token 저장 - user={user.email}, token={token[:10]}...")
-    RefreshToken.objects.create(user=user, token=token)
+    RefreshToken.objects.create(user=user, token=token, expired_at=expiration)
 
 # DB에서 리프레시 토큰 유효성 체크
 def check_refresh_token(token):
@@ -74,16 +77,19 @@ def check_refresh_token(token):
     """
     print(f"[토큰DB] refresh_token 유효성 검사 - token={token[:10]}...")
     db_token = RefreshToken.objects.filter(token=token, is_valid=True).first()
-    if db_token:
-        # 만료일(expired_at)이 있고, 만료됐다면 무효화
-        if db_token.expired_at and db_token.expired_at < timezone.now():
-            db_token.is_valid = False
-            db_token.save()
-            return None
-        print(f"[토큰DB] refresh_token 유효함")
-        return db_token
-    print(f"[토큰DB] 유효하지 않거나 존재하지 않음")
-    return None
+    if not db_token:
+        print(f"[토큰DB] ❌ 유효하지 않음 or 존재하지 않음")
+        return None
+
+    if db_token.expired_at < timezone.now():
+        db_token.is_valid = False
+        db_token.save()
+        print(f"[토큰DB] ⏰ 만료됨 → 무효화 처리됨")
+        return None
+
+    print(f"[토큰DB] ✅ 유효한 refresh_token")
+    return db_token
+
 
 # DB에서 리프레시 토큰 삭제 (또는 무효화)
 def delete_refresh_token(token):

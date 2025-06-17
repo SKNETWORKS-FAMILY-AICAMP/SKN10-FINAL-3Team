@@ -62,9 +62,9 @@
 							<span
 								class="w-8 h-8 rounded-full bg-blue-200 flex items-center justify-center text-blue-800 font-bold"
 								id="user-initial"
-								>-</span
+								>{{ user_name_first }}</span
 							>
-							<span class="font-medium" id="user-name">로딩 중</span>
+							<span class="font-medium" id="user-name">{{ user_name }}</span>
 							<i class="fas fa-chevron-down text-blue-100"></i>
 						</button>
 						<div
@@ -99,10 +99,7 @@
 			</footer>
 		</div>
 		{% block js %} {% endblock %}
-		{% block modulejs %} {% endblock %}
-		<script type="module">
-			import { apiRequest } from '/static/js/apiRequest.js';
-
+		<script>
 			document.addEventListener('DOMContentLoaded', function () {
 				const profileToggle = document.getElementById('profile-toggle');
 				const profileDropdown = document.getElementById('profile-dropdown');
@@ -122,30 +119,12 @@
 					}
 				});
 
-				// 로그인 상태 확인 및 사용자 정보 가져오기
-				apiRequest('/api/jwt/', {
-					method: 'GET',
-					credentials: 'include',
-				})
-					.then((data) => {
-						const userName = data.name;
-						console.log('로그인 사용자:', data);
-						// 권한() 확인 코드 추가 then
-						document.getElementById('user-name').textContent = userName;
-						// 성이름 첫 글자(예: "김")만 추출 (이름이 한글 2~4자 가정)
-						const initial = userName.trim()[0];
-						document.getElementById('user-initial').textContent = initial;
-					})
-					.catch((e) => {
-						window.location.href = '/';
-					});
-
 				// 로그아웃 버튼 이벤트 핸들러 추가
 				if (logoutBtn) {
 					logoutBtn.addEventListener('click', async function (e) {
 						e.preventDefault();
 						try {
-							const response = await apiRequest('/api/logout/', {
+							const response = await fetch('/api/logout/', {
 								method: 'POST',
 								credentials: 'include'
 							});
