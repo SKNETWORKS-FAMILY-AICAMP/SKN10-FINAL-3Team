@@ -1,8 +1,9 @@
 // static/js/main.js
 
-import { apiRequest } from './apiRequest.js';
+import { apiRequest } from '/static/js/apiRequest.js';
 
 document.addEventListener('DOMContentLoaded', function () {
+	console.log('main.js가 로드되었습니다.');
 	// 로그인 상태 확인 및 사용자 정보 가져오기
 	apiRequest('/api/jwt/', {method: 'GET'}).then((data) => {
 		console.log('main.js의 data : ', data);
@@ -20,8 +21,8 @@ document.addEventListener('DOMContentLoaded', function () {
 	async function loadEventList() {
 		try {
 			const data = await apiRequest('/api/event/by-org/', {method: 'GET'});
-
-			if (!data.error) throw new Error(data.error || '사건 조회 실패');
+			console.log('사건 목록 데이터:', data);
+			if (data.error) throw new Error(data.error || '사건 조회 실패');
 
 			const tableBody = document.querySelector('table tbody');
 			tableBody.innerHTML = '';

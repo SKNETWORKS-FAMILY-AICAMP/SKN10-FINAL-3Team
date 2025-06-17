@@ -99,7 +99,10 @@
 			</footer>
 		</div>
 		{% block js %} {% endblock %}
-		<script>
+		{% block modulejs %} {% endblock %}
+		<script type="module">
+			import { apiRequest } from '/static/js/apiRequest.js';
+
 			document.addEventListener('DOMContentLoaded', function () {
 				const profileToggle = document.getElementById('profile-toggle');
 				const profileDropdown = document.getElementById('profile-dropdown');
@@ -146,6 +149,7 @@
 								method: 'POST',
 								credentials: 'include'
 							});
+
 							// 성공/실패 상관없이 토큰/이름 삭제
 							localStorage.removeItem('access_token');
 							localStorage.removeItem('user_name');

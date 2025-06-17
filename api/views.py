@@ -24,6 +24,7 @@ class JWTAPIView(APIView):
     
     def get(self, request):
         user = request.user
+        print(f"[JWT API] 요청 - user={user.name}, role={user.role_cd}, is_partner={user.is_partner}")
         return Response({
             "name": user.name,
             "role": user.role_cd,           # 권한 정보 추가
@@ -108,12 +109,13 @@ class Logoutview(APIView):
     def post(self, request):
         print("[로그아웃] 요청 받음")
         refresh_token = request.COOKIES.get('refresh_token')
-        response = Response()
+        response = Response({'message': 'success'})
         # DB에서 해당 토큰을 찾아서 무효화
         if refresh_token:
             delete_refresh_token(refresh_token)
             print("[로그아웃] refresh_token DB 삭제 완료")
             response = Response({'message': 'success'})
+            response.delete_cookie(key='access_token')
             response.delete_cookie(key='refresh_token')
         print("[로그아웃] 최종 응답 반환")
         return response

@@ -1,5 +1,5 @@
 // --- 토큰 만료 자동 재발급 & 재요청 유틸 ---
-import { apiRequest } from './apiRequest.js';
+import { apiRequest } from '/static/js/apiRequest.js';
 
 document.addEventListener('DOMContentLoaded', function () {
 	// --- DOM 요소 및 데이터 초기화 ---
@@ -257,7 +257,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify(finalData),
 			});
-			console.log('[사건 등록]', result.message);
+			console.log('[사건 등록]', response.message);
 
 			// 성공 시 메인 페이지로 이동
 			window.location.href = '/event';
