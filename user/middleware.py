@@ -2,7 +2,7 @@ from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.utils.deprecation import MiddlewareMixin
 from user.models import CustomUser
-from user.service.token import decode_access_token
+from user.service.token import decode_access_token, try_refresh_access_token
 from rest_framework.exceptions import AuthenticationFailed
 import logging
 
@@ -48,37 +48,25 @@ class JWTAuthRefreshMiddleware(MiddlewareMixin):
             request.user = CustomUser.objects.get(id=user_id)
             return self.get_response(request)
 
-        except Exception as e:
+        except AuthenticationFailed as e:
             logger.warning(f"[⚠️ access_token 오류] {str(e)}")
 
-            # refresh_token 존재 여부 확인
             if not refresh_token:
                 return self._redirect_to_login(request)
 
-            try:
-                # ✅ 서버 내부에서 /api/refresh/ 호출
-                from django.test import Client
-                client = Client()
-                client.cookies['refresh_token'] = refresh_token
-                response = client.post('/api/refresh/')
-
-                if response.status_code != 200:
-                    logger.warning("[❌ 토큰 재발급 실패]")
-                    return self._redirect_to_login(request)
-
-                new_access_token = response.json().get('token')
-                if not new_access_token:
-                    logger.error("[❌ 응답에 access_token 없음]")
-                    return self._redirect_to_login(request)
-
-                user_id = decode_access_token(new_access_token)
-                request.user = CustomUser.objects.get(id=user_id)
-
-                response_obj = self.get_response(request)
-                response_obj.set_cookie('access_token', new_access_token, httponly=True, samesite='Lax')
-                logger.info(f"[♻️ 재발급 완료] user_id: {user_id}")
-                return response_obj
-
-            except Exception as inner_e:
-                logger.error(f"[🧨 refresh 실패] {str(inner_e)}")
+            # 🟡 새 access_token 직접 재발급 시도
+            new_token, user_id = try_refresh_access_token(refresh_token)
+            if not new_token or not user_id:
+                logger.error("[🧨 refresh_token 검증 실패 또는 만료]")
                 return self._redirect_to_login(request)
+
+            # 🟢 request.user 설정 + 쿠키 갱신
+            try:
+                request.user = CustomUser.objects.get(id=user_id)
+            except CustomUser.DoesNotExist:
+                return self._redirect_to_login(request)
+
+            response_obj = self.get_response(request)
+            response_obj.set_cookie('access_token', new_token, httponly=True, samesite='Lax')
+            logger.info(f"[♻️ 재발급 완료] user_id: {user_id}")
+            return response_obj

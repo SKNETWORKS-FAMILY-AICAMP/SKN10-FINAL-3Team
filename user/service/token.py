@@ -103,3 +103,17 @@ def delete_refresh_token(token):
 # - 토큰 만료 시: 리프레시 토큰을 사용하여 새 액세스 토큰 발급
 # - 토큰 위조 시: 예외 발생 → 사용자 요청 거절
 
+# access_token 재발급 로직을 캡슐화한 함수
+def try_refresh_access_token(refresh_token):
+    try:
+        user_id = decode_refresh_token(refresh_token)
+    except AuthenticationFailed:
+        return None, None
+
+    db_token = check_refresh_token(refresh_token)
+    if not db_token:
+        return None, None
+
+    # 새로운 access_token 생성
+    new_token = create_access_token(user_id)
+    return new_token, user_id
