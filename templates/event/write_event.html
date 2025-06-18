@@ -26,7 +26,11 @@
 	<div class="max-w-5xl mx-auto">
 		<h2 class="text-3xl font-bold text-center mb-12 text-gray-800">사건 접수</h2>
 
-		<form id="caseForm" class="space-y-8">
+		<form id="caseForm" class="space-y-8" method="POST" action="/event/write/">
+			{% csrf_token %}
+			<!-- 모달창에서 선택한 팀 정보 -->
+			<input type="hidden" id="selected_team_name" name="selected_team_name" />
+
 			<!-- 사건 정보 카드 -->
 			<div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
 				<h3 class="text-xl font-semibold mb-4 text-gray-700">사건 정보</h3>
@@ -35,6 +39,7 @@
 						<label class="block mb-2 text-gray-600">사건명</label>
 						<input
 							id="case_title"
+							name="case_title"
 							type="text"
 							placeholder="사건명을 입력하세요."
 							class="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
@@ -44,6 +49,7 @@
 						<label class="block mb-2 text-gray-600">클라이언트</label>
 						<input
 							id="client_name"
+							name="client_name"
 							type="text"
 							placeholder="클라이언트 이름을 입력하세요."
 							class="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
@@ -73,6 +79,7 @@
 						<label class="block text-gray-600">중분류</label>
 						<input
 							id="cat_mid"
+							name="cat_mid"
 							type="text"
 							placeholder="중분류를 입력하세요."
 							class="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
@@ -82,6 +89,7 @@
 						<label class="block text-gray-600">소분류</label>
 						<input
 							id="cat_sub"
+							name="cat_sub"
 							type="text"
 							placeholder="소분류를 입력하세요."
 							class="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
@@ -96,6 +104,7 @@
 				<label class="block mb-2 text-gray-600">본문</label>
 				<textarea
 					id="case_body"
+					name="case_body"
 					rows="6"
 					placeholder="본문을 입력하세요."
 					class="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
@@ -143,6 +152,7 @@
 					<label class="block text-gray-600">소송 재기일</label>
 					<input
 						id="retrial_date"
+						name="retrial_date"
 						type="date"
 						class="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500" />
 				</div>
@@ -151,6 +161,7 @@
 					<label class="block text-gray-600">특이사항 / 메모</label>
 					<textarea
 						id="case_note"
+						name="case_note"
 						rows="3"
 						class="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"></textarea>
 				</div>

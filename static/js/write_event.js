@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', function () {
 	// --- DOM 요소 및 데이터 초기화 ---
 	const catSelect = document.getElementById('cat_cd');
@@ -183,7 +182,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		try {
 			const data = await fetch(`/api/recommend/?cat_cd=${formData.catCd}`, {
 				method: 'GET',
-				credentials: 'include'
+				credentials: 'include',
 			}).then((response) => response.json());
 			populateModalWithTeams(data.recommended_team, data.available_teams);
 			modal.classList.remove('hidden');
@@ -208,7 +207,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	});
 
 	// [수정] 모달의 '선택' 버튼 클릭 시, 최종 데이터를 서버로 전송
-	modalSelect.addEventListener('click', async function () {
+	modalSelect.addEventListener('click', function () {
 		const selectedBtn = modal.querySelector(`.team-btn[data-team-id="${selectedTeamId}"]`);
 		if (!selectedTeamId || !selectedBtn) {
 			alert('팀을 선택해주세요.');
@@ -235,39 +234,14 @@ document.addEventListener('DOMContentLoaded', function () {
 			return;
 		}
 
-		// 1. 폼 데이터와 선택된 팀 이름을 합쳐 최종 전송 데이터 생성
-		const finalData = {
-			...formData,
-			cat_02: sanitize(formData.catMid),
-			cat_03: sanitize(formData.catSub),
-			e_description: formData.caseBody,
-			estat_cd: formData.estatCd,
-			lstat_cd: sanitize(formData.lstatCd),
-			estat_num_cd: sanitize(formData.estatFinalCd),
-			submit_at: sanitize(formData.retrialDate),
-			memo: sanitize(formData.caseNote),
-			selectedTeamName: selectedTeamName,
-		};
-
-		try {
-			// 새로 만든 사건 저장 API(/api/event/create/)에 POST 요청
-			const response = await fetch('/api/event/create/', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					'X-Requested-With': 'XMLHttpRequest'
-				},
-				body: JSON.stringify(finalData),
-				credentials: 'include'
-			});
-			const data = await response.json();
-			console.log('[사건 등록]', data.message);
-
-			// 성공 시 메인 페이지로 이동
-			window.location.href = '/event';
-		} catch (error) {
-			console.error('사건 등록 실패:', error);
-			alert(error.message);
+		// 팀명 hidden input에 주입
+		const teamInput = document.getElementById('selected_team_name');
+		if (teamInput) {
+			teamInput.value = selectedTeamName;
 		}
+
+		// 모달 닫고 form 동기 전송
+		modal.classList.add('hidden');
+		form.submit();
 	});
 });

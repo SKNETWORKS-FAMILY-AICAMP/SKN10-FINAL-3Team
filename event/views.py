@@ -1,5 +1,6 @@
 from django.core.paginator import Paginator
-from django.shortcuts import render
+from django.shortcuts import render,redirect
+from django.utils import timezone
 from code_t.models import Code_T
 from event.models import Event
 
@@ -23,7 +24,15 @@ def index(request):
 
     # 사건 조회 및 페이지네이션
     all_events = Event.objects.filter(org_cd__in=matching_org_codes).order_by('-created_at')
-    paginator = Paginator(all_events, 10)  # 한 페이지에 10건씩
+    
+    # 진행상태 label을 붙여주는 작업
+    estat_code_map = {
+        code.code: code.code_label for code in Code_T.objects.filter(code__startswith='ESTAT_')
+    }
+    for event in all_events:
+        event.estat_label = estat_code_map.get(event.estat_cd, event.estat_cd)
+
+    paginator = Paginator(all_events, 10)
     page_number = request.GET.get('page') or 1
     page_obj = paginator.get_page(page_number)
 
@@ -31,14 +40,66 @@ def index(request):
         'user': user,
         'user_name': user.name,
         'user_name_first': user.name[0],
-        'page_obj': page_obj,  # ✅ 페이지 객체 전달
+        'page_obj': page_obj,
     }
-
     return render(request, 'main.html', context)
 
 
 
 def write_event(request):
+    if request.method == 'POST':
+        user = request.user
+
+        # 1. POST 데이터 수집
+        case_title = request.POST.get('case_title')
+        client_name = request.POST.get('client_name')
+        cat_cd = request.POST.get('cat_cd')
+        cat_mid = request.POST.get('cat_mid') or None
+        cat_sub = request.POST.get('cat_sub') or None
+        case_body = request.POST.get('case_body')
+        estat_cd = request.POST.get('estat_cd')
+        lstat_cd = request.POST.get('lstat_cd') or None
+        estat_final_cd = request.POST.get('estat_final_cd') or None
+        retrial_date = request.POST.get('retrial_date') or None
+        case_note = request.POST.get('case_note') or None
+        team_name = request.POST.get('selected_team_name')  # ✅ form에서 넘어온 label 값
+
+        # 2. 날짜 변환
+        retrial_dt = None
+        if retrial_date:
+            try:
+                retrial_dt = timezone.datetime.strptime(retrial_date, "%Y-%m-%d")
+            except ValueError:
+                retrial_dt = None
+
+        # 3. team_name(label)에 해당하는 code 값을 org_cd로 조회
+        try:
+            org_code = Code_T.objects.get(code_label=team_name).code
+        except Code_T.DoesNotExist:
+            org_code = None  # 또는 예외처리
+
+        # 4. Event 저장
+        Event.objects.create(
+            user=user,
+            creator_name=user.name,
+            e_title=case_title,
+            client=client_name,
+            cat_cd=cat_cd,
+            cat_02=cat_mid,
+            cat_03=cat_sub,
+            e_description=case_body,
+            estat_cd=estat_cd,
+            lstat_cd=lstat_cd,
+            estat_num_cd=estat_final_cd,
+            submit_at=retrial_dt,
+            memo=case_note,
+            org_cd=org_code,
+        )
+
+        return redirect('/event')
+    
+    user = request.user
+    
     cat_codes = Code_T.objects.filter(code__startswith='CAT_').order_by('code')
 
     estat_01_raw = Code_T.objects.filter(code__startswith='ESTAT_01_').values('code', 'code_label', 'upper_code')
@@ -57,6 +118,9 @@ def write_event(request):
     lstat_codes = Code_T.objects.filter(code__startswith='LSTAT_').order_by('code')
 
     context = {
+        'user': user,
+        'user_name': user.name,
+        'user_name_first': user.name[0],
         'cat_codes': cat_codes,
         'estat_01': estat_01,
         'estat_02': estat_02,
