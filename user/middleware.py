@@ -22,7 +22,7 @@ class JWTAuthRefreshMiddleware(MiddlewareMixin):
                 'redirect_url': '/'
             }, status=401)
         else:
-            response = redirect('user-login-page')
+            response = redirect('user-login')
 
         response.delete_cookie('access_token')
         response.delete_cookie('refresh_token')

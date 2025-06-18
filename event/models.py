@@ -87,12 +87,12 @@ class Event(models.Model):
     )
     created_at = models.DateTimeField(
         # 객체가 처음 생성될 때 해당 필드에 자동으로 현재 시각(timezone.now())을 저장
-        auto_now_add=True,
+        # auto_now_add=True,
         verbose_name="생성일"
     )
     update_at = models.DateTimeField(
         # 객체가 저장될 때마다 해당 필드에 자동으로 현재 시각을 업데이트
-        auto_now=True,
+        # auto_now=True,
         verbose_name="수정일"
     )
 

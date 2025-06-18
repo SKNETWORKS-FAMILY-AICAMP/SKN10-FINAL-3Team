@@ -77,12 +77,15 @@
 									class="block px-4 py-2 text-sm text-white hover:bg-blue-500 rounded-md"
 									>내 프로필</a
 								>
-								<a
-									href="#"
-									id="logout-link"
-									class="block px-4 py-2 text-sm text-white hover:bg-blue-500 rounded-md"
-									>로그아웃</a
-								>
+								<!-- form POST 방식 로그아웃 -->
+								<form method="POST" action="/logout/">
+									{% csrf_token %}
+									<button
+										type="submit"
+										class="w-full text-left px-4 py-2 text-sm text-white hover:bg-blue-500 rounded-md">
+										로그아웃
+									</button>
+								</form>
 							</div>
 						</div>
 					</div>
@@ -126,7 +129,7 @@
 						try {
 							const response = await fetch('/api/logout/', {
 								method: 'POST',
-								credentials: 'include'
+								credentials: 'include',
 							});
 
 							// 성공/실패 상관없이 토큰/이름 삭제
