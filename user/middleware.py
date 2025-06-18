@@ -2,7 +2,7 @@ from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.utils.deprecation import MiddlewareMixin
 from user.models import CustomUser
-from user.service.token import decode_access_token
+from user.service.token import decode_access_token, decode_refresh_token, check_refresh_token, create_access_token
 from rest_framework.exceptions import AuthenticationFailed
 import logging
 
@@ -56,24 +56,21 @@ class JWTAuthRefreshMiddleware(MiddlewareMixin):
                 return self._redirect_to_login(request)
 
             try:
-                # ✅ 서버 내부에서 /api/refresh/ 호출
-                from django.test import Client
-                client = Client()
-                client.cookies['refresh_token'] = refresh_token
-                response = client.post('/api/refresh/')
-
-                if response.status_code != 200:
-                    logger.warning("[❌ 토큰 재발급 실패]")
+                # ✅ 내부 HTTP 요청 대신 직접 refresh_token 검증 및 access_token 재발급
+                db_token = check_refresh_token(refresh_token)
+                if not db_token:
+                    logger.warning("[❌ DB에 refresh_token 없음]")
                     return self._redirect_to_login(request)
 
-                new_access_token = response.json().get('token')
-                if not new_access_token:
-                    logger.error("[❌ 응답에 access_token 없음]")
+                user_id = decode_refresh_token(refresh_token)
+                if not user_id:
+                    logger.warning("[❌ refresh_token 복호화 실패]")
                     return self._redirect_to_login(request)
 
-                user_id = decode_access_token(new_access_token)
-                request.user = CustomUser.objects.get(id=user_id)
+                user = CustomUser.objects.get(id=user_id)
+                request.user = user
 
+                new_access_token = create_access_token(user_id)
                 response_obj = self.get_response(request)
                 response_obj.set_cookie('access_token', new_access_token, httponly=True, samesite='Lax')
                 logger.info(f"[♻️ 재발급 완료] user_id: {user_id}")
