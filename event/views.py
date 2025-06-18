@@ -4,6 +4,7 @@ from code_t.models import Code_T
 def index(request):
     print("[메인 페이지] 로그인 정보 : ", request.user)
     context = {
+        'user': request.user,
         'user_name' : request.user.name,
         'user_name_first' : request.user.name[0]
     }

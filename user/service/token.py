@@ -6,6 +6,7 @@ import enum
 from rest_framework.exceptions import AuthenticationFailed
 from user.models import RefreshToken, CustomUser
 from django.utils import timezone
+
 # 토큰 설정 Enum 클래스
 # - access token: 2분 (단기 사용)
 # - refresh token: 1일 (장기 사용)
@@ -52,7 +53,6 @@ def __decode_token(token, key):
     except jwt.InvalidTokenError as e:
         raise AuthenticationFailed("유효하지 않은 토큰입니다.")
 
-
 # 액세스 토큰 복호화 함수
 def decode_access_token(token):
     print(f"[JWT] decode_access_token() called")
@@ -69,12 +69,11 @@ def save_refresh_token(user, token):
     print(f"[토큰DB] refresh_token 저장 - user={user.email}, token={token[:10]}...")
     RefreshToken.objects.create(user=user, token=token, expired_at=expiration)
 
-
 # DB에서 리프레시 토큰 삭제 (또는 무효화)
 def delete_refresh_token(token):
     print(f"[토큰DB] refresh_token 삭제 - token={token[:10]}...")
     RefreshToken.objects.filter(token=token).delete()
-    
+
 # DB에서 리프레시 토큰 유효성 체크
 def check_refresh_token(token):
     """
@@ -84,30 +83,29 @@ def check_refresh_token(token):
     print(f"[토큰DB] refresh_token 유효성 검사 - token={token[:10]}...")
     db_token = RefreshToken.objects.filter(token=token, is_valid=True).first()
     if not db_token:
-        print(f"[토큰DB] ❌ 유효하지 않음 or 존재하지 않음")
+        print(f"[토큰DB] 유효하지 않음 or 존재하지 않음")
         return None
 
     now = timezone.now()
     remaining = db_token.expired_at - now
 
     if remaining.total_seconds() <= 0:
-        # ✅ 만료된 토큰 → is_valid=False 처리 후 로그 기록
+        # 만료된 토큰 → is_valid=False 처리 후 로그 기록
         db_token.is_valid = False
         db_token.save()
-        print(f"[토큰DB] ⏰ 만료된 refresh_token → is_valid=False로 무효화")
+        print(f"[토큰DB] 만료된 refresh_token → is_valid=False로 무효화")
         print(f"[토큰DB] 로그: 사용자={db_token.user.email}, 만료시각={db_token.expired_at}, 삭제예정")
 
         # 만료된 토큰은 DB에서 삭제
         delete_refresh_token(token)
         return None
 
-    print(f"[토큰DB] ✅ 유효한 refresh_token - 남은 시간: {remaining.total_seconds():.0f}초")
+    print(f"[토큰DB] 유효한 refresh_token - 남은 시간: {remaining.total_seconds():.0f}초")
     return db_token
-
 
 # access_token 재발급 로직을 캡슐화한 함수
 def try_refresh_access_token(refresh_token):
-    # ✅ 먼저 DB에서 유효성 체크 및 삭제/무효화 처리
+    # 먼저 DB에서 유효성 체크 및 삭제/무효화 처리
     db_token = check_refresh_token(refresh_token)
     if not db_token:
         return None, None
@@ -119,4 +117,3 @@ def try_refresh_access_token(refresh_token):
 
     new_token = create_access_token(user_id)
     return new_token, user_id
-

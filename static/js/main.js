@@ -2,28 +2,12 @@
 
 document.addEventListener('DOMContentLoaded', function () {
 	console.log('main.js가 로드되었습니다.');
-	// 로그인 상태 확인 및 사용자 정보 가져오기
-	fetch('/api/jwt/', {
-		method: 'GET',
-		credentials: 'include'
-	}).then((response) => response.json()).then((data) => {
-		console.log('main.js의 data : ', data);
-		console.log('main.js의 data.is_partner : ', data.is_partner);
-		
-		// 1. 파트너일 경우 버튼 보이기
-		if (data && data.is_partner) {
-			document.getElementById('add_case_btn').style.display = 'block';
-		}
-
-		// 2. 사건 목록 불러오기
-		loadEventList();
-	})
 	// 사건 리스트 API 호출 함수
 	async function loadEventList() {
 		try {
 			const response = await fetch('/api/event/by-org/', {
 				method: 'GET',
-				credentials: 'include'
+				credentials: 'include',
 			});
 			const data = await response.json();
 			console.log('사건 목록 데이터:', data);

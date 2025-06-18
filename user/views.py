@@ -8,8 +8,3 @@ def login_page(request):
     response.delete_cookie('refresh_token')
     return response
 
-# 프로필 페이지 뷰
-def profile(request):
-    return render(request, 'user/profile.html')
-
-

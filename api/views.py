@@ -16,21 +16,6 @@ from event.models import Event
 from django.contrib.auth import login, logout
 import random
 
-# Create your views here.
-# JWT API 뷰
-class JWTAPIView(APIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-    
-    def get(self, request):
-        user = request.user
-        print(f"[JWT API] 요청 - user={user.name}, role={user.role_cd}, is_partner={user.is_partner}")
-        return Response({
-            "name": user.name,
-            "role": user.role_cd,           # 권한 정보 추가
-            'is_partner': user.is_partner,  # 파트너 여부
-        })
-
 # 로그인 뷰
 class LoginView(APIView):
     authentication_classes = []
@@ -87,22 +72,6 @@ class LoginView(APIView):
         }
         print(f"[로그인] 최종 응답 반환")
         return response
-
-# 액세스 토큰 재발급 뷰
-class RefreshView(APIView):
-    def post(self, request):
-        print("[토큰재발급] 요청 받음")
-        refresh_token = request.COOKIES.get('refresh_token')
-        db_token = check_refresh_token(refresh_token)
-        if not db_token:
-            print("[토큰재발급] 리프레시 토큰 유효성 실패")
-            return Response({'error': 'Invalid or expired refresh token'}, status=401)
-
-        user_id = decode_refresh_token(refresh_token)
-        print(f"[토큰재발급] 토큰 검증 및 사용자 확인 user_id={user_id}")
-        access_token = create_access_token(user_id)
-        print(f"[토큰재발급] 새로운 access_token 발급")
-        return Response({'token': access_token})
 
 # 로그아웃 뷰
 class Logoutview(APIView):
