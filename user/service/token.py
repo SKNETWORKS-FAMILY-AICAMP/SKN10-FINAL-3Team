@@ -69,11 +69,17 @@ def save_refresh_token(user, token):
     print(f"[토큰DB] refresh_token 저장 - user={user.email}, token={token[:10]}...")
     RefreshToken.objects.create(user=user, token=token, expired_at=expiration)
 
+
+# DB에서 리프레시 토큰 삭제 (또는 무효화)
+def delete_refresh_token(token):
+    print(f"[토큰DB] refresh_token 삭제 - token={token[:10]}...")
+    RefreshToken.objects.filter(token=token).delete()
+    
 # DB에서 리프레시 토큰 유효성 체크
 def check_refresh_token(token):
     """
     DB에서 유효한 리프레시 토큰만 리턴.
-    만료되었으면 is_valid를 False로 바꾸고 None 리턴.
+    만료되었으면 is_valid=False 처리 + 로그 남기고 삭제 예약.
     """
     print(f"[토큰DB] refresh_token 유효성 검사 - token={token[:10]}...")
     db_token = RefreshToken.objects.filter(token=token, is_valid=True).first()
@@ -81,39 +87,36 @@ def check_refresh_token(token):
         print(f"[토큰DB] ❌ 유효하지 않음 or 존재하지 않음")
         return None
 
-    if db_token.expired_at < timezone.now():
+    now = timezone.now()
+    remaining = db_token.expired_at - now
+
+    if remaining.total_seconds() <= 0:
+        # ✅ 만료된 토큰 → is_valid=False 처리 후 로그 기록
         db_token.is_valid = False
         db_token.save()
-        print(f"[토큰DB] ⏰ 만료됨 → 무효화 처리됨")
+        print(f"[토큰DB] ⏰ 만료된 refresh_token → is_valid=False로 무효화")
+        print(f"[토큰DB] 로그: 사용자={db_token.user.email}, 만료시각={db_token.expired_at}, 삭제예정")
+
+        # 만료된 토큰은 DB에서 삭제
+        delete_refresh_token(token)
         return None
 
-    print(f"[토큰DB] ✅ 유효한 refresh_token")
+    print(f"[토큰DB] ✅ 유효한 refresh_token - 남은 시간: {remaining.total_seconds():.0f}초")
     return db_token
 
 
-# DB에서 리프레시 토큰 삭제 (또는 무효화)
-def delete_refresh_token(token):
-    print(f"[토큰DB] refresh_token 삭제 - token={token[:10]}...")
-    RefreshToken.objects.filter(token=token).delete()
-    # 또는 .update(is_valid=False)로 무효화만 할 수도 있음
-
-# 인증 및 인가 흐름에서 사용:
-# - 로그인 성공 시: 액세스 및 리프레시 토큰 발급
-# - 요청 시: 액세스 토큰 유효성 검사
-# - 토큰 만료 시: 리프레시 토큰을 사용하여 새 액세스 토큰 발급
-# - 토큰 위조 시: 예외 발생 → 사용자 요청 거절
-
 # access_token 재발급 로직을 캡슐화한 함수
 def try_refresh_access_token(refresh_token):
+    # ✅ 먼저 DB에서 유효성 체크 및 삭제/무효화 처리
+    db_token = check_refresh_token(refresh_token)
+    if not db_token:
+        return None, None
+
     try:
         user_id = decode_refresh_token(refresh_token)
     except AuthenticationFailed:
         return None, None
 
-    db_token = check_refresh_token(refresh_token)
-    if not db_token:
-        return None, None
-
-    # 새로운 access_token 생성
     new_token = create_access_token(user_id)
     return new_token, user_id
+
