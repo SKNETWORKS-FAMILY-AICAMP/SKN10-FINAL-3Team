@@ -38,12 +38,12 @@ def index(request):
     page_number = request.GET.get('page') or 1
     page_obj = paginator.get_page(page_number)
 
-    # ✅ 번호 계산 및 zip 처리
+    # 번호 계산 및 zip 처리
     total_count = all_events.count()
     page_number_int = int(page_number)
     start_index = total_count - ((page_number_int - 1) * paginator.per_page)
 
-    # ✅ 번호와 객체를 튜플로 묶어서 넘김
+    # 번호와 객체를 튜플로 묶어서 넘김
     page_with_numbers = list(zip(
         range(start_index, start_index - len(page_obj), -1),
         page_obj
@@ -186,7 +186,34 @@ def edit_event(request, event_id):
     event = get_object_or_404(Event, event_id=event_id)
     
     if request.method == 'POST':
-        
+        # 1. 데이터 수집
+        client_name = request.POST.get('client_name')
+        case_body = request.POST.get('case_body')
+        estat_cd = request.POST.get('estat_cd')
+        lstat_cd = request.POST.get('lstat_cd') or None
+        estat_final_cd = request.POST.get('estat_final_cd') or None
+        retrial_date = request.POST.get('retrial_date') or None
+        case_note = request.POST.get('case_note') or None
+
+        # 2. 날짜 변환
+        retrial_dt = None
+        if retrial_date:
+            try:
+                retrial_dt = timezone.datetime.strptime(retrial_date, "%Y-%m-%d")
+            except ValueError:
+                retrial_dt = None
+
+        # 3. 필드 업데이트
+        event.client = client_name
+        event.e_description = case_body
+        event.estat_cd = estat_cd
+        event.lstat_cd = lstat_cd
+        event.estat_num_cd = estat_final_cd
+        event.submit_at = retrial_dt
+        event.memo = case_note
+
+        event.save()
+
         return redirect('event-detail', event_id=event.event_id)
 
     user = request.user
