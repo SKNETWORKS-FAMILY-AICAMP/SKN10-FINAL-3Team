@@ -114,7 +114,12 @@
 				</div>
 				<div class="md:col-span-3">
 					<p class="text-gray-500 text-sm mb-1">소송 재기일</p>
+					<!-- prettier-ignore -->
+					{% if event.submit_at and event.submit_at != "None" and event.submit_at != "nan" %}
 					<p class="font-medium" id="case-retrial">{{ event.submit_at|date:"Y-m-d" }}</p>
+					{% else %}
+					<p class="font-medium" id="case-retrial">소송 재기일 미정</p>
+					{% endif %}
 				</div>
 			</div>
 		</div>
@@ -130,10 +135,7 @@
 						<!-- prettier-ignore -->
 						{% if event.memo and event.memo != "None" and event.memo != "nan" %}
 						<p class="whitespace-pre-line text-gray-700 text-start">{{ event.memo }}</p>
-						<!-- prettier-ignore -->
-						{% else %} 
-                            
-                        {% endif %}
+						{% endif %}
 					</div>
 				</div>
 			</div>
