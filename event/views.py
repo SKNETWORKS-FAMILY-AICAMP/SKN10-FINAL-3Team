@@ -4,6 +4,7 @@ from django.utils import timezone
 from code_t.models import Code_T
 from event.models import Event
 import math
+from django.contrib import messages
 
 def index(request):
     user = request.user
@@ -156,3 +157,11 @@ def detail_event(request, event_id):
         "user_name_first": request.user.name[0]
     }
     return render(request, 'event/detail_event.html', context)
+
+# 사건 삭제
+def delete_event(request, event_id):
+    event = get_object_or_404(Event, event_id=event_id)
+    
+    event.delete()
+    messages.success(request, "사건이 삭제되었습니다.")
+    return redirect('/event')

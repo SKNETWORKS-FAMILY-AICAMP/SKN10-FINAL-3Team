@@ -7,10 +7,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from user.service.jwt_auth import JWTAuthentication
 from user.models import CustomUser
-from user.service.token import (
-    create_access_token, create_refresh_token, decode_refresh_token,
-    save_refresh_token, check_refresh_token, delete_refresh_token
-)
+
 from code_t.models import Code_T
 from event.models import Event
 from django.contrib.auth import login, logout
