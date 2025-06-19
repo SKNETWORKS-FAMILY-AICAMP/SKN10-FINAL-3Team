@@ -23,26 +23,40 @@ def index(request):
         except Code_T.DoesNotExist:
             matching_org_codes = [user_org_cd]
 
-    # 사건 조회 및 페이지네이션
+    # 사건 최신순 정렬
     all_events = Event.objects.filter(org_cd__in=matching_org_codes).order_by('-created_at')
-    
-    # 진행상태 label을 붙여주는 작업
+
+    # 진행상태 label 매핑
     estat_code_map = {
         code.code: code.code_label for code in Code_T.objects.filter(code__startswith='ESTAT_')
     }
     for event in all_events:
         event.estat_label = estat_code_map.get(event.estat_cd, event.estat_cd)
 
+    # 페이지네이션
     paginator = Paginator(all_events, 10)
     page_number = request.GET.get('page') or 1
     page_obj = paginator.get_page(page_number)
+
+    # ✅ 번호 계산 및 zip 처리
+    total_count = all_events.count()
+    page_number_int = int(page_number)
+    start_index = total_count - ((page_number_int - 1) * paginator.per_page)
+
+    # ✅ 번호와 객체를 튜플로 묶어서 넘김
+    page_with_numbers = list(zip(
+        range(start_index, start_index - len(page_obj), -1),
+        page_obj
+    ))
 
     context = {
         'user': user,
         'user_name': user.name,
         'user_name_first': user.name[0],
         'page_obj': page_obj,
+        'page_with_numbers': page_with_numbers,  # ✅ 새로 추가된 리스트
     }
+    
     return render(request, 'main.html', context)
 
 
@@ -155,6 +169,15 @@ def detail_event(request, event_id):
     context = {
         "event": event,
         "user_name": request.user.name,
-        "user_name_first": request.user.name[0]
+        "user_name_first": request.user.name[0],
+        'is_partner': request.user.is_partner,
     }
     return render(request, 'event/detail_event.html', context)
+
+# 사건 삭제
+def delete_event(request, event_id):
+    event = get_object_or_404(Event, event_id=event_id)
+    
+    event.delete()
+    
+    return redirect('/event')

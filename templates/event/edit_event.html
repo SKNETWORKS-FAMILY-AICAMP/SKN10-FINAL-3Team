@@ -1,0 +1,108 @@
+<!-- prettier-ignore -->
+{% extends 'base/index.html' %} 
+{% load static %} 
+{% block title %}사건 수정{% endblock %}
+
+<!-- prettier-ignore -->
+{% block content %}
+<main class="flex-1 overflow-y-auto px-20 py-16 bg-gray-100">
+	<div class="max-w-5xl mx-auto">
+		<h2 class="text-3xl font-bold text-center mb-12 text-gray-800">사건 수정</h2>
+
+		<form class="space-y-8">
+			<!-- 사건 정보 -->
+			<div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+				<h3 class="text-xl font-semibold mb-4 text-gray-700">사건 정보</h3>
+				<div class="grid grid-cols-2 gap-6">
+					<input
+						type="text"
+						placeholder="사건명을 입력하세요."
+						value="김대리 vs. OO건설 손해배상 사건"
+						class="w-full border border-gray-200 rounded-lg px-4 py-2"
+						required />
+					<input
+						type="text"
+						placeholder="클라이언트 이름을 입력하세요."
+						value="김대리"
+						class="w-full border border-gray-200 rounded-lg px-4 py-2"
+						required />
+				</div>
+			</div>
+
+			<!-- 분류 정보 -->
+			<div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+				<h3 class="text-xl font-semibold mb-4 text-gray-700">분류 정보</h3>
+				<div class="grid grid-cols-3 gap-4">
+					<select class="w-full border border-gray-200 rounded-lg px-3 py-2">
+						<option>선택</option>
+						<option selected>민사</option>
+						<option>형사</option>
+						<option>행정</option>
+					</select>
+					<input
+						type="text"
+						placeholder="중분류를 입력하세요."
+						value="손해배상"
+						class="w-full border border-gray-200 rounded-lg px-3 py-2" />
+					<input
+						type="text"
+						placeholder="소분류를 입력하세요."
+						value="건설하자"
+						class="w-full border border-gray-200 rounded-lg px-3 py-2" />
+				</div>
+			</div>
+
+			<!-- 사건 내용 -->
+			<div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+				<h3 class="text-xl font-semibold mb-4 text-gray-700">사건 내용</h3>
+				<textarea
+					rows="6"
+					placeholder="본문을 입력하세요."
+					class="w-full border border-gray-200 rounded-lg px-4 py-2"
+					required></textarea>
+			</div>
+
+			<!-- 추가 정보 -->
+			<div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+				<h3 class="text-xl font-semibold mb-4 text-gray-700">추가 정보</h3>
+				<div class="grid grid-cols-3 gap-6">
+					<select class="w-full border border-gray-200 rounded-lg px-3 py-2">
+						<option>진행중</option>
+						<option selected>심리중</option>
+						<option>종결</option>
+					</select>
+					<select class="w-full border border-gray-200 rounded-lg px-3 py-2">
+						<option>1심</option>
+						<option selected>2심</option>
+						<option>3심</option>
+					</select>
+					<select class="w-full border border-gray-200 rounded-lg px-3 py-2">
+						<option selected>진행중</option>
+						<option>종결</option>
+						<option>취하</option>
+					</select>
+				</div>
+				<input
+					type="date"
+					value="2023-07-15"
+					class="mt-4 w-full border border-gray-200 rounded-lg px-4 py-2" />
+				<textarea
+					rows="3"
+					class="mt-4 w-full border border-gray-200 rounded-lg px-4 py-2"
+					placeholder="특이사항 / 메모">
+2023년 8월 1일 예정된 증인신문을 대비하여 서류를 추가로 준비해야 함.</textarea
+				>
+			</div>
+
+			<!-- 제출 -->
+			<div class="pt-4 text-right">
+				<button
+					type="submit"
+					class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-8 py-3 rounded-lg shadow-sm">
+					수정
+				</button>
+			</div>
+		</form>
+	</div>
+</main>
+{% endblock %}

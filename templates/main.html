@@ -106,13 +106,11 @@
 						</tr>
 					</thead>
 					<tbody class="min-h-[440px]">
-						{% for item in page_obj %}
+						{% for row_number, item in page_with_numbers %}
 						<tr
 							class="border-t text-center h-12 align-middle cursor-pointer hover:bg-gray-50 transition"
 							data-id="{{ item.event_id }}">
-							<td class="py-0 truncate">
-								{{ forloop.counter0|add:page_obj.start_index }}
-							</td>
+							<td class="py-0 truncate">{{ row_number }}</td>
 							<td class="py-0 truncate">{{ item.e_title }}</td>
 							<td class="py-0 truncate">{{ item.client }}</td>
 							<td class="py-0 truncate">{{ item.cat_02 }} / {{ item.cat_03 }}</td>
@@ -121,20 +119,15 @@
 							<td class="py-0">{{ item.created_at|date:"Y-m-d" }}</td>
 						</tr>
 						{% empty %}
-						<tr class="h-12">
-							<td colspan="7" class="text-center text-gray-400 py-10">
-								배정된 사건이 없습니다.
+						<tr>
+							<td colspan="7">
+								<div
+									class="flex justify-center items-center h-[400px] text-gray-400 text-center">
+									배정된 사건이 없습니다.
+								</div>
 							</td>
 						</tr>
 						{% endfor %}
-
-						<!-- 빈 줄 채움 -->
-						<!-- prettier-ignore -->
-						{% for i in "0123456789" %} {% if forloop.counter > page_obj.paginator.per_page|add:"-page_obj|length" %}
-						<tr class="h-12">
-							<td colspan="7" class="bg-white"></td>
-						</tr>
-						{% endif %} {% endfor %}
 					</tbody>
 				</table>
 			</div>

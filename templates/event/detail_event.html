@@ -23,7 +23,11 @@
 					</h1>
 					<p class="text-gray-600">
 						클라이언트:
-						<span class="font-medium" id="case-client">{{ event.client }}</span>
+						<span class="font-medium mr-2" id="case-client">{{ event.client }}</span>
+						<span
+							class="inline-block text-xs font-semibold px-2 py-1 rounded-full {% if event.client_role == '원고' %} bg-green-100 text-green-700 {% elif event.client_role == '피고' %} bg-red-100 text-red-700 {% else %} bg-gray-200 text-gray-700 {% endif %}">
+							{{ event.client_role }}
+						</span>
 					</p>
 				</div>
 				<div class="mt-4 md:mt-0">
@@ -140,6 +144,25 @@
 				</div>
 			</div>
 		</div>
+		<!-- 액션 버튼 -->
+		{% if user.is_authenticated and is_partner and user.id == event.user.id %}
+
+		<div class="flex justify-end space-x-4 mt-8">
+			<button
+				type="button"
+				class="bg-law-blue hover:bg-law-darkblue text-white font-medium py-2 px-6 rounded-lg transition"
+				id="edit-btn">
+				<i class="fas fa-edit mr-2"></i>수정
+			</button>
+			<button
+				type="button"
+				class="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-6 rounded-lg transition"
+				id="delete-btn"
+				data-event-id="{{ event.event_id }}">
+				<i class="fas fa-trash-alt mr-2"></i>삭제
+			</button>
+		</div>
+		{% endif %}
 	</div>
 </main>
 {% endblock %}
