@@ -45,15 +45,27 @@
 							class="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
 							required />
 					</div>
+					<!-- 클라이언트 + 역할 -->
 					<div>
 						<label class="block mb-2 text-gray-600">클라이언트</label>
-						<input
-							id="client_name"
-							name="client_name"
-							type="text"
-							placeholder="클라이언트 이름을 입력하세요."
-							class="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
-							required />
+						<div class="flex gap-4">
+							<input
+								id="client_name"
+								name="client_name"
+								type="text"
+								placeholder="이름"
+								class="w-2/3 border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+								required />
+							<select
+								id="client_role"
+								name="client_role"
+								class="w-1/3 border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+								required>
+								<option value="" disabled selected>역할</option>
+								<option value="원고">원고</option>
+								<option value="피고">피고</option>
+							</select>
+						</div>
 					</div>
 				</div>
 			</div>

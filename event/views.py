@@ -54,6 +54,7 @@ def write_event(request):
         # 1. POST 데이터 수집
         case_title = request.POST.get('case_title')
         client_name = request.POST.get('client_name')
+        client_role = request.POST.get('client_role')
         cat_cd = request.POST.get('cat_cd')
         cat_mid = request.POST.get('cat_mid') or None
         cat_sub = request.POST.get('cat_sub') or None
@@ -85,6 +86,7 @@ def write_event(request):
             creator_name=user.name,
             e_title=case_title,
             client=client_name,
+            client_role = client_role,
             cat_cd=cat_cd,
             cat_02=cat_mid,
             cat_03=cat_sub,
