@@ -35,7 +35,11 @@ class Event(models.Model):
         max_length=20,
         verbose_name="클라이언트"
     )
-
+    client_role = models.CharField(
+        max_length=10,
+        verbose_name="클라이언트 역할",
+        help_text="예: 원고, 피고"
+    )
     # 4. 사건 유형 (필수)
     cat_cd = models.CharField(
         max_length=20,
