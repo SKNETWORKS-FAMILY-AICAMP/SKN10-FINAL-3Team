@@ -4,11 +4,6 @@
 {% block title %}LAW FIRM{% endblock %}
 
 <!-- prettier-ignore -->
-<!-- {% block css %}
-<link rel="stylesheet" href="{% static 'css/main.css' %}" />
-{% endblock %} -->
-
-<!-- prettier-ignore -->
 {% block js %}
 <script src="{% static 'js/main.js' %}"></script>
 {% endblock %}
@@ -112,7 +107,9 @@
 					</thead>
 					<tbody class="min-h-[440px]">
 						{% for item in page_obj %}
-						<tr class="border-t text-center h-12 align-middle">
+						<tr
+							class="border-t text-center h-12 align-middle cursor-pointer hover:bg-gray-50 transition"
+							data-id="{{ item.event_id }}">
 							<td class="py-0 truncate">
 								{{ forloop.counter0|add:page_obj.start_index }}
 							</td>

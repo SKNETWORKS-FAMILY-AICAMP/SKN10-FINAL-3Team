@@ -1,8 +1,9 @@
 from django.core.paginator import Paginator
-from django.shortcuts import render,redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from code_t.models import Code_T
 from event.models import Event
+import math
 
 def index(request):
     user = request.user
@@ -130,5 +131,28 @@ def write_event(request):
     }
     return render(request, 'event/write_event.html', context)
 
+def detail_event(request, event_id):
+    event = get_object_or_404(Event, event_id=event_id)
 
+    # 코드 → 라벨 매핑
+    def get_label(code):
+        try:
+            if code is None or str(code).lower() == 'nan' or (isinstance(code, float) and math.isnan(code)):
+                return None
+            return Code_T.objects.get(code=code).code_label
+        except Code_T.DoesNotExist:
+            return None
 
+    # 라벨 정보 추가
+    event.org_label = get_label(event.org_cd)
+    event.cat_label = get_label(event.cat_cd)
+    event.estat_label = get_label(event.estat_cd)
+    event.lstat_label = get_label(event.lstat_cd) if event.lstat_cd else "미정"
+    event.estat_num_label = get_label(event.estat_num_cd) if event.estat_num_cd else "사건 진행중"
+
+    context = {
+        "event": event,
+        "user_name": request.user.name,
+        "user_name_first": request.user.name[0]
+    }
+    return render(request, 'event/detail_event.html', context)
