@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>내부 직원 로그인</title>
+		<script src="https://cdn.tailwindcss.com"></script>
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+		<style>
+			body.login {
+				background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2YwZjhmZiIvPjwvc3ZnPg==');
+				background-size: 200px;
+			}
+
+			.logo {
+				font-family: 'Arial Rounded MT Bold', 'Helvetica Rounded', Arial, sans-serif;
+			}
+
+			.wave-animation {
+				position: absolute;
+				bottom: 0;
+				left: 0;
+				width: 100%;
+				height: 100px;
+				background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAwIDEyMCI+PHBhdGggZmlsbD0iI2U0ZTBmZiIgZD0iTTAsMzBDMjAwLDcwIDQwMCwxMTAgNjAwLDgwQzgwMCw1MCAxMDAwLDcwIDEwMDAsNzBMMTAwMCwxMjBMMCwxMjBaIi8+PC9zdmc+')
+					repeat-x;
+				animation: wave 15s cubic-bezier(0.36, 0.45, 0.63, 0.53) infinite;
+				transform: translate3d(0, 0, 0);
+			}
+
+			.wave-animation:nth-child(2) {
+				animation-delay: -5s;
+				opacity: 0.5;
+			}
+
+			@keyframes wave {
+				0% {
+					margin-left: 0;
+				}
+
+				100% {
+					margin-left: -1600px;
+				}
+			}
+
+			.input-highlight {
+				transition: all 0.3s ease;
+				box-shadow: 0 0 0 1px #d1d5db inset;
+			}
+
+			.input-highlight:focus {
+				box-shadow: 0 0 0 2px #1e40af inset;
+			}
+
+			.glow {
+				animation: glow 1.5s ease-in-out infinite alternate;
+			}
+
+			@keyframes glow {
+				from {
+					box-shadow: 0 0 5px rgba(30, 64, 175, 0.2);
+				}
+
+				to {
+					box-shadow: 0 0 15px rgba(30, 64, 175, 0.4);
+				}
+			}
+		</style>
+	</head>
+
+	<body
+		class="login flex min-h-screen bg-gradient-to-br from-gray-50 to-indigo-50 items-center justify-center p-4 relative overflow-hidden">
+		<!-- Background waves -->
+		<div class="wave-animation"></div>
+		<div class="wave-animation"></div>
+
+		<!-- Login card -->
+		<div class="w-full max-w-md bg-white rounded-2xl shadow-xl z-10">
+			<!-- Card header with logo -->
+			<div class="bg-gradient-to-r from-blue-800 to-blue-900 rounded-t-2xl p-6 text-center">
+				<div class="flex items-center justify-center space-x-3 mb-4">
+					<div class="w-12 h-12 rounded-lg bg-white flex items-center justify-center">
+						<i class="fas fa-balance-scale text-blue-800 text-xl"></i>
+					</div>
+					<h1 class="text-white font-bold text-2xl logo">LAW FIRM</h1>
+				</div>
+			</div>
+
+			<!-- 에러 메시지 (에러 있을 때만 마진 부여) -->
+			{% if error %}
+			<div class="flex justify-center mt-6 mb-4">
+				<div
+					class="w-full max-w-xs bg-red-50 border border-red-300 text-red-700 px-4 py-3 rounded-md flex items-center space-x-2 text-sm shadow-sm">
+					<i class="fas fa-exclamation-circle"></i>
+					<span>{{ error }}</span>
+				</div>
+			</div>
+			{% endif %}
+
+			<!-- Login form -->
+			<div class="{% if error %}pt-0{% else %}pt-6{% endif %} px-8 pb-8">
+				<form method="POST" action="/" id="login-form" class="space-y-6">
+					{% csrf_token %}
+
+					<!-- Email field -->
+					<div class="space-y-2">
+						<label class="block text-sm font-medium text-gray-700">이메일 주소</label>
+						<div class="relative">
+							<div
+								class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+								<i class="fas fa-envelope text-gray-400"></i>
+							</div>
+							<input
+								id="email"
+								name="email"
+								type="email"
+								placeholder="name@lawfirm.com"
+								class="input-highlight pl-10 block w-full rounded-lg border-0 py-3 bg-gray-50 shadow-sm focus:ring-indigo-500 focus:bg-white"
+								autofocus />
+						</div>
+					</div>
+
+					<!-- Password field -->
+					<div class="space-y-2">
+						<div class="flex justify-between items-center">
+							<label class="block text-sm font-medium text-gray-700">비밀번호</label>
+						</div>
+						<div class="relative">
+							<div
+								class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+								<i class="fas fa-lock text-gray-400"></i>
+							</div>
+							<input
+								id="password"
+								name="password"
+								type="password"
+								placeholder="••••••••"
+								class="input-highlight pl-10 block w-full rounded-lg border-0 py-3 bg-gray-50 shadow-sm focus:ring-indigo-500 focus:bg-white" />
+						</div>
+					</div>
+
+					<!-- Remember me -->
+					<div class="flex items-center justify-between">
+						<div class="flex items-center"></div>
+					</div>
+
+					<!-- Submit button -->
+					<div>
+						<button
+							type="submit"
+							class="glow w-full py-3 px-4 rounded-lg bg-gradient-to-r from-blue-800 to-blue-900 text-white font-medium shadow-md hover:from-blue-900 hover:to-blue-950 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-800 transition-all duration-200 transform hover:scale-[1.02]">
+							로그인
+						</button>
+					</div>
+				</form>
+			</div>
+
+			<!-- Card footer -->
+			<div class="bg-gray-50 rounded-b-2xl px-8 py-4 text-center">
+				<p class="text-xs text-gray-500">© 2023 LAW FIRM. All Rights Reserved.</p>
+			</div>
+		</div>
+
+		<!-- Decorative elements -->
+		<div class="absolute top-4 right-4 w-10 h-10 rounded-full bg-blue-100 opacity-50"></div>
+		<div class="absolute bottom-20 left-4 w-16 h-16 rounded-full bg-blue-100 opacity-30"></div>
+		<div class="absolute top-20 left-1/4 w-8 h-8 rounded-full bg-blue-100 opacity-40"></div>
+
+		<script>
+			// Add slight input animation on focus
+			const inputs = document.querySelectorAll('.input-highlight');
+
+			inputs.forEach((input) => {
+				input.addEventListener('focus', () => {
+					input.parentElement.parentElement.classList.add('animate-pulse');
+					input.parentElement.parentElement.classList.add('duration-200');
+				});
+
+				input.addEventListener('blur', () => {
+					input.parentElement.parentElement.classList.remove('animate-pulse');
+				});
+			});
+
+			// Animate button on hover
+			const loginBtn = document.querySelector('button');
+
+			loginBtn.addEventListener('mouseenter', () => {
+				loginBtn.classList.add('shadow-lg');
+			});
+
+			loginBtn.addEventListener('mouseleave', () => {
+				loginBtn.classList.remove('shadow-lg');
+			});
+		</script>
+	</body>
+</html>
