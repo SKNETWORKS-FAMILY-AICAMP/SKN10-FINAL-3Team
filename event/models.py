@@ -22,6 +22,11 @@ class Event(models.Model):
         verbose_name="작성자 이름",
         help_text="사건 생성 시점의 작성자 이름(기록용)"
     )
+    
+    event_num = models.CharField(
+        max_length=60,
+        verbose_name="사건 번호"
+    )
 
     # 3. 사건 기본 정보 (필수)
     e_title = models.CharField(
@@ -30,6 +35,9 @@ class Event(models.Model):
     )
     e_description = models.TextField(
         verbose_name="사건 본문"
+    )
+    claim_summary = models.TextField(
+        verbose_name="청구 내용"
     )
     client = models.CharField(
         max_length=20,
@@ -43,15 +51,11 @@ class Event(models.Model):
     # 4. 사건 유형 (필수)
     cat_cd = models.CharField(
         max_length=20,
-        verbose_name="사건 유형(대)"
+        verbose_name="사건 유형"
     )
     cat_02 = models.CharField(
-        max_length=50,
-        verbose_name="사건 유형(중)"
-    )
-    cat_03 = models.CharField(
-        max_length=50,
-        verbose_name="사건 유형(소)"
+        max_length=100,
+        verbose_name="세부 유형"
     )
 
     # 5. 담당 부서 (필수)
@@ -83,6 +87,11 @@ class Event(models.Model):
         null=True,
         blank=True,
         verbose_name="메모"
+    )
+    event_file = models.TextField(
+        null=True,
+        blank=True,
+        verbose_name="증거자료"
     )
     submit_at = models.DateTimeField(
         null=True,
