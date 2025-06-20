@@ -71,7 +71,6 @@ def write_event(request):
         client_role = request.POST.get('client_role')
         cat_cd = request.POST.get('cat_cd')
         cat_mid = request.POST.get('cat_mid') or None
-        cat_sub = request.POST.get('cat_sub') or None
         case_body = request.POST.get('case_body')
         estat_cd = request.POST.get('estat_cd')
         lstat_cd = request.POST.get('lstat_cd') or None
@@ -103,7 +102,6 @@ def write_event(request):
             client_role = client_role,
             cat_cd=cat_cd,
             cat_02=cat_mid,
-            cat_03=cat_sub,
             e_description=case_body,
             estat_cd=estat_cd,
             lstat_cd=lstat_cd,
