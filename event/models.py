@@ -37,7 +37,8 @@ class Event(models.Model):
         verbose_name="사건 본문"
     )
     claim_summary = models.TextField(
-        verbose_name="청구 내용"
+        verbose_name="청구 내용",
+        help_text="청구 취지 및 청구 원인을 요약한 문장 (예: 불법행위에 따른 손해배상 청구)"
     )
     client = models.CharField(
         max_length=20,
