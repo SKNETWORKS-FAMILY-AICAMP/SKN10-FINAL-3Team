@@ -35,7 +35,12 @@ def login_view(request):
         response.set_cookie('refresh_token', refresh_token, httponly=True, samesite='Lax')
         return response
 
-    # GET 요청이면 로그인 페이지 렌더링 (기존 토큰 제거)
+    # GET 요청 시 기존 토큰 제거 + 세션 로그아웃 + DB의 refresh token도 삭제
+    refresh_token = request.COOKIES.get('refresh_token')
+    if refresh_token:
+        delete_refresh_token(refresh_token)  # DB에서도 삭제
+
+    logout(request)
     response = render(request, 'user/login.html')
     response.delete_cookie('access_token')
     response.delete_cookie('refresh_token')
@@ -57,4 +62,4 @@ def logout_view(request):
         response.delete_cookie('refresh_token')
         return response
 
-    return redirect('user-login')  # GET 요청은 리다이렉트만
+    return redirect('user-login')
