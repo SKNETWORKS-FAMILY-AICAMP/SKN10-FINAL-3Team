@@ -226,11 +226,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			return;
 		}
 		if (formData.catMid && getUtf8Bytes(formData.catMid) > 50) {
-			alert('중분류(catMid)는 한글 기준 약 16자, 영문 기준 50자 이하로 입력해주세요.');
-			return;
-		}
-		if (formData.catSub && getUtf8Bytes(formData.catSub) > 50) {
-			alert('소분류(catSub)는 한글 기준 약 16자, 영문 기준 50자 이하로 입력해주세요.');
+			alert('세부유형(catMid)는 한글 기준 약 16자, 영문 기준 50자 이하로 입력해주세요.');
 			return;
 		}
 

@@ -100,12 +100,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 		if (catMid && getUtf8Bytes(catMid) > 50) {
 			e.preventDefault();
-			alert('중분류는 한글 약 16자 또는 영문 50자 이하로 입력해주세요.');
-			return;
-		}
-		if (catSub && getUtf8Bytes(catSub) > 50) {
-			e.preventDefault();
-			alert('소분류는 한글 약 16자 또는 영문 50자 이하로 입력해주세요.');
+			alert('세부유형은 한글 약 16자 또는 영문 50자 이하로 입력해주세요.');
 			return;
 		}
 		// 유효성 검사 통과 → 동기 form 제출 허용
