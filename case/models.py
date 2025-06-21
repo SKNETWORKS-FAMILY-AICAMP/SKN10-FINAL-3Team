@@ -8,8 +8,7 @@ class Case(models.Model):
     )
 
     # 2. 사건 번호, 법원명, 사건명, 선고일자
-    case_num = models.CharField(
-        max_length=60,
+    case_num = models.TextField(
         verbose_name="사건 번호"
     )
     court_name = models.CharField(
