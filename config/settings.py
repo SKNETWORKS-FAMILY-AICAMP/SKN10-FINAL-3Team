@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'code_t',
     'user',
     'event',
+    'case',
 ]
 
 # 사용자 커스텀 모델 설정

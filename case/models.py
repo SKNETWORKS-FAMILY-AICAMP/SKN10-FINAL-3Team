@@ -73,16 +73,6 @@ class Case(models.Model):
         verbose_name="키워드"
     )
 
-    # 8. 생성/수정 시각 (자동)
-    created_at = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name="생성일"
-    )
-    updated_at = models.DateTimeField(
-        auto_now=True,
-        verbose_name="수정일"
-    )
-
     class Meta:
         db_table = 'case'
         verbose_name = "판례"

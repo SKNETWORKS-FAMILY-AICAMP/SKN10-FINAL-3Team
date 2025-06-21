@@ -9,6 +9,7 @@ django.setup()
 
 from code_t.models import Code_T
 from event.models import Event
+from case.models import Case
 
 # ========== 1. 코드 테이블(CODE_T) 데이터 삽입 ==========
 print("📥 [1] Code_T 테이블 데이터 삽입 시작...")
@@ -69,3 +70,33 @@ for _, row in event_df.iterrows():
         print(f"✅ 사건 추가됨: {row['e_title']}")
     except Exception as e:
         print(f"❌ 에러 발생 ({row['e_title']}): {e}")
+        
+# ========== 3. 판례 테이블(CASE) 데이터 삽입 ==========
+print("📥 [3] 판례 테이블(CASE) 데이터 삽입 시작...")
+
+case_file = './csv_data/case_summary_keyword_df.csv'
+case_df = pd.read_csv(case_file, encoding='utf-8-sig')
+
+for idx, row in case_df.iterrows():
+    try:
+        Case.objects.create(
+            vector_id = row['vector_id'],
+            case_num = row['case_num'],
+            court_name = row['court_name'],
+            case_name = row['case_name'],
+            case_at = pd.to_datetime(row['case_at']),
+            refer_cases = row.get('refer_cases', None),
+            refer_statutes = row.get('refer_statutes', None),
+            decision_summary = row['decision_summary'],
+            case_full = row['case_full'],
+            decision_issue = row['decision_issue'],
+            case_result = row['case_result'],
+            facts_summary = row['facts_summary'],
+            facts_keywords = row['facts_keywords'],
+            issue_summary = row['issue_summary'],
+            issue_keywords = row['issue_keywords'],
+            keywords = row['keywords'],
+        )
+        print(f"✅ 판례 추가됨: {row['case_num']} - {row['case_name'][:20]}")
+    except Exception as e:
+        print(f"❌ 에러 발생 ({row['case_num']}): {e}")
