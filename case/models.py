@@ -2,7 +2,7 @@ from django.db import models
 
 class Case(models.Model):
     # 1. 판례 ID
-    event_id = models.AutoField(
+    case_id = models.AutoField(
         primary_key=True,
         verbose_name="판례 ID"
     )
