@@ -160,6 +160,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		event.preventDefault();
 
 		// 폼 데이터를 상위 스코프의 formData 변수에 저장
+		// 클라이언트 원고/피고에 관한 정보 추가 + 사건 상세 페이지에서 입력 정보 있는지 확인
 		formData = {
 			caseTitle: document.getElementById('case_title').value,
 			clientName: document.getElementById('client_name').value,
@@ -178,7 +179,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			alert('대분류를 선택해주세요.');
 			return;
 		}
-
+		// 위의 정보를 ai에게 요청
 		try {
 			const data = await fetch(`/api/recommend/?cat_cd=${formData.catCd}`, {
 				method: 'GET',

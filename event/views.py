@@ -78,6 +78,7 @@ def write_event(request):
         retrial_date = request.POST.get('retrial_date') or None
         case_note = request.POST.get('case_note') or None
         team_name = request.POST.get('selected_team_name')  # ✅ form에서 넘어온 label 값
+        # ai_strategy = request.POST.get('ai_strategy') or None
 
         # 2. 날짜 변환
         retrial_dt = None
@@ -94,6 +95,7 @@ def write_event(request):
             org_code = None  # 또는 예외처리
 
         # 4. Event 저장
+        # 'ai 추천 전략'
         Event.objects.create(
             user=user,
             creator_name=user.name,
@@ -109,6 +111,7 @@ def write_event(request):
             submit_at=retrial_dt,
             memo=case_note,
             org_cd=org_code,
+            # ai_strategy=ai_strategy,
         )
 
         return redirect('/event')
