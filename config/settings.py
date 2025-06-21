@@ -42,12 +42,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # 앱 추가
-    "rest_framework", 
+    # "rest_framework", 
     "corsheaders",
     'api',
     'code_t',
     'user',
     'event',
+    'case',
 ]
 
 # 사용자 커스텀 모델 설정
