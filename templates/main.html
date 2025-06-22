@@ -1,6 +1,6 @@
 <!-- prettier-ignore -->
-{% extends 'base/index.html' %} 
-{% load static %} 
+{% extends 'base/index.html' %}
+{% load static %}
 {% block title %}LAW FIRM{% endblock %}
 
 <!-- prettier-ignore -->
@@ -17,23 +17,11 @@
 			class="w-12 h-12 flex items-center justify-center rounded-full bg-blue-500 hover:bg-blue-600 text-white shadow-md">
 			<i class="fas fa-upload text-base"></i>
 		</button>
-		<div class="w-full max-w-6xl">
-			<div
-				class="flex items-center w-full bg-white rounded-full border border-gray-300 px-6 py-3 shadow-sm">
+		<!-- max-w-lg(약 32rem) 정도로 설정, w-full 제거 -->
+		<div class="max-w-lg w-full">
+			<div class="flex items-center bg-white rounded-full border border-gray-300 px-6 py-3 shadow-sm">
 				<i class="fas fa-search text-blue-500 text-lg mr-3"></i>
-				<input
-					type="text"
-					placeholder="Search Text"
-					class="flex-grow focus:outline-none text-sm" />
-				<div
-					class="flex items-center space-x-2 bg-sky-100 text-sky-700 text-sm rounded-full px-6 py-2 ml-4">
-					<span class="font-semibold">플러그인</span>
-					<select
-						class="bg-white rounded-full px-4 py-2 focus:outline-none border border-gray-300">
-						<option>분석 및 요약</option>
-						<option>판례 검색</option>
-					</select>
-				</div>
+				<input type="text" placeholder="Search Text" class="flex-grow focus:outline-none text-sm" />
 				<button
 					class="ml-3 w-10 h-10 flex items-center justify-center rounded-full bg-white border border-blue-500 text-blue-500 hover:bg-blue-50 transition">
 					<i class="fas fa-paper-plane text-lg"></i>
@@ -107,8 +95,7 @@
 					</thead>
 					<tbody class="min-h-[440px]">
 						{% for row_number, item in page_with_numbers %}
-						<tr
-							class="border-t text-center h-12 align-middle cursor-pointer hover:bg-gray-50 transition"
+						<tr class="border-t text-center h-12 align-middle cursor-pointer hover:bg-gray-50 transition"
 							data-id="{{ item.event_id }}">
 							<td class="py-0 truncate">{{ row_number }}</td>
 							<td class="py-0 truncate">{{ item.e_title }}</td>
@@ -121,8 +108,7 @@
 						{% empty %}
 						<tr>
 							<td colspan="7">
-								<div
-									class="flex justify-center items-center h-[400px] text-gray-400 text-center">
+								<div class="flex justify-center items-center h-[400px] text-gray-400 text-center">
 									배정된 사건이 없습니다.
 								</div>
 							</td>
@@ -137,43 +123,34 @@
 		<div class="mt-8 flex justify-center items-center space-x-2">
 			<!-- 이전 버튼 -->
 			{% if page_obj.has_previous %}
-			<a
-				href="?page={{ page_obj.previous_page_number }}"
+			<a href="?page={{ page_obj.previous_page_number }}"
 				class="px-3 py-1 border rounded text-sm text-gray-700 hover:bg-gray-100 transition">
 				◀ 이전
 			</a>
 			{% else %}
-			<span class="px-3 py-1 border rounded text-sm text-gray-300 cursor-not-allowed"
-				>◀ 이전</span
-			>
+			<span class="px-3 py-1 border rounded text-sm text-gray-300 cursor-not-allowed">◀ 이전</span>
 			{% endif %}
 
 			<!-- 페이지 번호 -->
 			{% for num in page_obj.paginator.page_range %} {% if page_obj.number == num %}
-			<span
-				class="px-3 py-1 border rounded bg-blue-500 text-white text-sm font-semibold transition">
+			<span class="px-3 py-1 border rounded bg-blue-500 text-white text-sm font-semibold transition">
 				{{ num }}
 			</span>
-			{% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-			<a
-				href="?page={{ num }}"
+			{% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %} <a href="?page={{ num }}"
 				class="px-3 py-1 border rounded text-sm text-gray-700 hover:bg-gray-100 transition">
 				{{ num }}
-			</a>
-			{% endif %} {% endfor %}
+				</a>
+				{% endif %} {% endfor %}
 
-			<!-- 다음 버튼 -->
-			{% if page_obj.has_next %}
-			<a
-				href="?page={{ page_obj.next_page_number }}"
-				class="px-3 py-1 border rounded text-sm text-gray-700 hover:bg-gray-100 transition">
-				다음 ▶
-			</a>
-			{% else %}
-			<span class="px-3 py-1 border rounded text-sm text-gray-300 cursor-not-allowed"
-				>다음 ▶</span
-			>
-			{% endif %}
+				<!-- 다음 버튼 -->
+				{% if page_obj.has_next %}
+				<a href="?page={{ page_obj.next_page_number }}"
+					class="px-3 py-1 border rounded text-sm text-gray-700 hover:bg-gray-100 transition">
+					다음 ▶
+				</a>
+				{% else %}
+				<span class="px-3 py-1 border rounded text-sm text-gray-300 cursor-not-allowed">다음 ▶</span>
+				{% endif %}
 		</div>
 	</div>
 </main>
