@@ -34,6 +34,10 @@ document.addEventListener('DOMContentLoaded', () => {
 			summary.textContent = selectedNames.length
 				? `선택된 판례: ${selectedNames.join(', ')}`
 				: '선택된 판례: 없음';
+
+			// 폰트 및 스타일 클래스를 명시적으로 다시 지정
+			summary.className = 'text-sm text-blue-600 font-sans font-normal mb-2';
+			summary.style.fontFamily = '"Noto Sans KR", sans-serif';
 		});
 	});
 });

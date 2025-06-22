@@ -25,9 +25,11 @@
 			<span class="text-gray-300"><i class="fas fa-chevron-up"></i></span>
 			{% endif %}
 
-			<span class="text-sm text-gray-500"
-				>{{ page_obj.number }}/{{ page_obj.paginator.num_pages }}</span
-			>
+			<span class="text-sm text-gray-500">
+				<span class="font-semibold text-gray-800">{{ page_obj.number }}</span>
+				<span class="text-gray-400">/</span>
+				<span class="text-gray-500">{{ page_obj.paginator.num_pages }}</span>
+			</span>
 
 			{% if page_obj.has_next %}
 			<a
@@ -89,9 +91,11 @@
 			<span class="text-gray-300"><i class="fas fa-chevron-up"></i></span>
 			{% endif %}
 
-			<span class="text-sm text-gray-500"
-				>{{ page_obj.number }}/{{ page_obj.paginator.num_pages }}</span
-			>
+			<span class="text-sm text-gray-500">
+				<span class="font-semibold text-gray-800">{{ page_obj.number }}</span>
+				<span class="text-gray-400">/</span>
+				<span class="text-gray-500">{{ page_obj.paginator.num_pages }}</span>
+			</span>
 
 			{% if page_obj.has_next %}
 			<a
@@ -106,10 +110,10 @@
 	</div>
 
 	<!-- 메인 챗봇 영역 -->
-	<div class="w-3/4 flex items-center justify-center px-4 md:px-8 lg:px-0 pt-4 pb-4">
-		<div class="w-full max-w-7xl mt-4 mb-4">
+	<div class="w-3/4 flex items-center justify-center px-4 md:px-8 lg:px-0 pt-2 pb-2">
+		<div class="w-full max-w-7xl mt-2 mb-2">
 			<div
-				class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 h-[650px] max-h-[90vh] flex flex-col">
+				class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 h-[80vh] flex flex-col">
 				<h3
 					class="text-xl font-semibold mb-4 text-gray-700 border-b pb-2 flex items-center">
 					<i class="fas fa-comments text-law-blue mr-2"></i> 챗봇
@@ -128,9 +132,13 @@
 						<!-- JS로 메시지 추가 -->
 					</div>
 					<!-- 선택된 판례 표시 영역 -->
-					<div id="selected-cases-summary" class="text-sm text-blue-600 mb-2">
+					<div
+						id="selected-cases-summary"
+						class="text-sm text-blue-600 font-sans font-normal mb-2"
+						style="font-family: Noto Sans KR, sans-serif">
 						선택된 판례: 없음
 					</div>
+
 					<!-- 입력창 -->
 					<div class="flex items-center space-x-2">
 						<input
