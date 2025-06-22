@@ -69,8 +69,8 @@ class RecommendTeamAPIView(APIView):
         return Response(response_data, status=status.HTTP_200_OK)
 
 class ChatLLMAPIView(APIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [JWTAuthentication]
+    # permission_classes = [IsAuthenticated]
     
     def post(self, request):
         query = request.data.get('query')

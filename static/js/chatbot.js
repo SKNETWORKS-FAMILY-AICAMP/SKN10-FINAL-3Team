@@ -61,6 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
 				credentials: 'include',
 				headers: {
 					'Content-Type': 'application/json',
+					'X-Requested-With': 'XMLHttpRequest',
 				},
 				body: JSON.stringify({
 					query,
