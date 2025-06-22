@@ -23,4 +23,5 @@ urlpatterns = [
     path('event/', include('event.urls')),
     path('', include('user.urls')),
     path('case/', include('case.urls')),
+    path('chatbot/', include('chatbot.urls')),
 ]

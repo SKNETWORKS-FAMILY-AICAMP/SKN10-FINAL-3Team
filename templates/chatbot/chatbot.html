@@ -1,0 +1,113 @@
+<!-- prettier-ignore -->
+{% extends 'base/index.html' %} 
+{% load static %} 
+{% block title %}Chatbot{% endblock %}
+
+<!-- prettier-ignore -->
+<!-- {% block js %}
+<script src="{% static 'js/chatbot.js' %}"></script>
+{% endblock %} -->
+
+<!-- prettier-ignore -->
+{% block content %}
+<main class="flex-1 flex bg-gray-100">
+    <!-- 사이드바: 판례 목록 -->
+    <div class="w-64 bg-white border-r border-gray-200 p-4 hidden md:block flex flex-col">
+        <!-- 상단 슬라이드 컨트롤 -->
+        <div class="flex justify-between items-center mb-4">
+            <button class="text-gray-500 hover:text-law-blue">
+                <i class="fas fa-chevron-up"></i>
+            </button>
+            <span class="text-sm text-gray-500">1/5</span>
+            <button class="text-gray-500 hover:text-law-blue">
+                <i class="fas fa-chevron-down"></i>
+            </button>
+        </div>
+
+        <!-- 판례 목록 -->
+        <div class="flex-1 overflow-y-auto space-y-3">
+            <div class="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer group relative">
+                <div class="font-medium text-gray-800">2023도1234 - 계약금 반환 청구 사건</div>
+                <div class="text-xs text-gray-500 mt-1">#계약금 #반환 #민사</div>
+                <a href="/cases/2023도1234" target="_blank" class="absolute bottom-2 right-2 flex items-center text-gray-500 hover:text-law-blue transition-colors opacity-0 group-hover:opacity-100">
+                    <i class="fas fa-external-link-alt text-sm"></i>
+                    <span class="text-xs ml-1">전문 보기</span>
+                </a>
+            </div>
+            <div class="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer group relative">
+                <div class="font-medium text-gray-800">2023고5678 - 횡령 및 배임 사건</div>
+                <div class="text-xs text-gray-500 mt-1">#횡령 #배임 #형사</div>
+                <a href="/cases/2023고5678" target="_blank" class="absolute bottom-2 right-2 flex items-center text-gray-500 hover:text-law-blue transition-colors opacity-0 group-hover:opacity-100">
+                    <i class="fas fa-external-link-alt text-sm"></i>
+                    <span class="text-xs ml-1">전문 보기</span>
+                </a>
+            </div>
+            <div class="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer group relative">
+                <div class="font-medium text-gray-800">2023나9012 - 상속재산 분할 사건</div>
+                <div class="text-xs text-gray-500 mt-1">#상속 #재산분할 #가사</div>
+                <a href="/cases/2023나9012" target="_blank" class="absolute bottom-2 right-2 flex items-center text-gray-500 hover:text-law-blue transition-colors opacity-0 group-hover:opacity-100">
+                    <i class="fas fa-external-link-alt text-sm"></i>
+                    <span class="text-xs ml-1">전문 보기</span>
+                </a>
+            </div>
+            <div class="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer group relative">
+                <div class="font-medium text-gray-800">2023다3456 - 근로계약 해지 사건</div>
+                <div class="text-xs text-gray-500 mt-1">#근로계약 #해지 #노동</div>
+                <a href="/cases/2023다3456" target="_blank" class="absolute bottom-2 right-2 flex items-center text-gray-500 hover:text-law-blue transition-colors opacity-0 group-hover:opacity-100">
+                    <i class="fas fa-external-link-alt text-sm"></i>
+                    <span class="text-xs ml-1">전문 보기</span>
+                </a>
+            </div>
+            <div class="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer group relative">
+                <div class="font-medium text-gray-800">2023마7890 - 부동산 매매 사건</div>
+                <div class="text-xs text-gray-500 mt-1">#부동산 #매매 #민사</div>
+                <a href="/cases/2023마7890" target="_blank" class="absolute bottom-2 right-2 flex items-center text-gray-500 hover:text-law-blue transition-colors opacity-0 group-hover:opacity-100">
+                    <i class="fas fa-external-link-alt text-sm"></i>
+                    <span class="text-xs ml-1">전문 보기</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- 하단 슬라이드 컨트롤 -->
+        <div class="flex justify-between items-center mt-4">
+            <button class="text-gray-500 hover:text-law-blue">
+                <i class="fas fa-chevron-up"></i>
+            </button>
+            <span class="text-sm text-gray-500">1/5</span>
+            <button class="text-gray-500 hover:text-law-blue">
+                <i class="fas fa-chevron-down"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- 컨텐츠 영역 -->
+    <div class="flex-1 flex items-center justify-center px-4 md:px-8 lg:px-0 pt-4 pb-4">
+    <div class="w-full max-w-7xl mt-4 mb-4">
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 h-[650px] max-h-[90vh] flex flex-col">
+            <h3 class="text-xl font-semibold mb-4 text-gray-700 border-b pb-2 flex items-center">
+                <i class="fas fa-comments text-law-blue mr-2"></i> 챗봇
+            </h3>
+            <div class="flex flex-col flex-1 min-h-0">
+                <!-- 메시지 영역 -->
+                <div class="flex-1 overflow-y-auto p-6 space-y-6 bg-gray-50 rounded-lg mb-6 min-h-0">
+                    <div class="flex items-start">
+                        <div
+                            class="bg-law-lightblue text-white p-4 rounded-lg inline-block max-w-[70%] break-words">
+                            안녕하세요! 이 판례에 관련해 무엇이든 물어보세요. 도와드리겠습니다.
+                        </div>
+                    </div>
+                    <!-- JS로 메시지 추가 -->
+                </div>
+                <!-- 입력창 -->
+                <div class="flex items-center space-x-2">
+                    <input type="text" placeholder="메시지를 입력하세요..."
+                        class="flex-1 border border-gray-300 rounded-lg px-4 py-4 focus:outline-none focus:ring-2 focus:ring-law-blue focus:border-transparent">
+                    <button class="bg-law-blue hover:bg-law-darkblue text-white px-6 py-4 rounded-lg transition">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}
