@@ -12,3 +12,6 @@ mysqlclient
 # 데이터 처리 및 환경 설정
 pandas                      
 python-dotenv               
+
+# OpenAI
+openai

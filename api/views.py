@@ -3,6 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.exceptions import APIException
 from rest_framework.response import Response 
 from rest_framework import status
+from django.http import StreamingHttpResponse
 
 from rest_framework.permissions import IsAuthenticated
 from user.service.jwt_auth import JWTAuthentication
@@ -13,8 +14,14 @@ from user.service.token import (
 )
 from code_t.models import Code_T
 from event.models import Event
+from case.models import Case
+from django.shortcuts import get_list_or_404
 from django.contrib.auth import login, logout
 import random
+from pprint import pprint
+
+# OpenAI 클라이언트와 스트리밍 응답 함수
+from llm.openai_client import stream_chat_response
 
 # AI 팀 추천 API 뷰
 class RecommendTeamAPIView(APIView):
@@ -60,3 +67,54 @@ class RecommendTeamAPIView(APIView):
             "available_teams": available_team_names
         }
         return Response(response_data, status=status.HTTP_200_OK)
+
+class ChatLLMAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request):
+        query = request.data.get('query')
+        case_ids = request.data.get('case_ids', [])
+
+        if not query:
+            return Response({"error": "query는 필수입니다."}, status=status.HTTP_400_BAD_REQUEST)
+
+        print("[POST 요청 수신]")
+        print(f"사용자 쿼리: {query}")
+        print(f"선택된 판례 ID 목록: {case_ids}")
+
+        case_data_dict = {}
+
+        # case_ids가 있을 때만 판례 조회 수행
+        if case_ids:
+            cases = get_list_or_404(Case, case_id__in=case_ids)
+            for idx, case in enumerate(cases, start=1):
+                case_data_dict[f"case{idx}"] = {
+                    "case_num": case.case_num,
+                    "court_name": case.court_name,
+                    "case_name": case.case_name,
+                    "case_at": case.case_at.strftime("%Y-%m-%d"),
+                    "decision_summary": case.decision_summary,
+                    "case_full": case.case_full,
+                    "decision_issue": case.decision_issue,
+                    "case_result": case.case_result,
+                    "refer_cases": case.refer_cases,
+                    "refer_statutes": case.refer_statutes,
+                    "facts_summary": case.facts_summary,
+                    "facts_keywords": case.facts_keywords,
+                    "issue_summary": case.issue_summary,
+                    "issue_keywords": case.issue_keywords,
+                    "keywords": case.keywords,
+                }
+
+        # 쿼리는 항상 포함
+        case_data_dict["query"] = query
+
+        print("📦 [LLM 전달 JSON 구조]")
+        pprint(case_data_dict, indent=4, width=120)
+
+        return StreamingHttpResponse(
+            stream_chat_response(case_data_dict, query),
+            content_type='text/plain; charset=utf-8-sig'
+        )
+

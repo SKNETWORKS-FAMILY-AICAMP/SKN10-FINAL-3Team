@@ -4,6 +4,11 @@
 {% block title %}Chatbot{% endblock %}
 
 <!-- prettier-ignore -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/chatbot.css' %}" />
+{% endblock %}
+
+<!-- prettier-ignore -->
 {% block js %}
 <script src="{% static 'js/chatbot.js' %}"></script>
 {% endblock %}
@@ -121,10 +126,10 @@
 				<div class="flex flex-col flex-1 min-h-0">
 					<!-- 메시지 영역 -->
 					<div
-						class="flex-1 overflow-y-auto p-6 space-y-6 bg-gray-50 rounded-lg mb-6 min-h-0">
+						class="flex-1 overflow-y-auto hide-scrollbar p-6 space-y-6 bg-gray-50 rounded-lg mb-6 min-h-0">
 						<div class="flex items-start">
 							<div
-								class="bg-law-lightblue text-white p-4 rounded-lg inline-block max-w-[70%] break-words">
+								class="bg-gray-300 text-black p-4 rounded-lg inline-block max-w-[70%] break-words">
 								안녕하세요! 당신의 업무를 도와줄 챗봇입니다. 궁금한 점이 있으면
 								언제든지 물어보세요!
 							</div>
@@ -140,16 +145,19 @@
 					</div>
 
 					<!-- 입력창 -->
-					<div class="flex items-center space-x-2">
-						<input
-							type="text"
-							value="{{ query }}"
-							placeholder="메시지를 입력하세요..."
-							class="flex-1 border border-gray-300 rounded-lg px-4 py-4 focus:outline-none focus:ring-2 focus:ring-law-blue focus:border-transparent" />
-						<button
-							class="bg-law-blue hover:bg-law-darkblue text-white px-6 py-4 rounded-lg transition">
-							<i class="fas fa-paper-plane"></i>
-						</button>
+					<div class="flex items-center justify-center mt-2">
+						<form id="chat-form" class="w-[90vw] flex items-center space-x-2">
+							<input
+								type="text"
+								id="chat-input"
+								placeholder="메시지를 입력하세요..."
+								class="flex-1 border border-gray-300 rounded-lg px-4 py-4 focus:outline-none focus:ring-2 focus:ring-law-blue focus:border-transparent" />
+							<button
+								type="submit"
+								class="bg-law-blue hover:bg-law-darkblue text-white px-6 py-4 rounded-lg transition">
+								<i class="fas fa-paper-plane"></i>
+							</button>
+						</form>
 					</div>
 				</div>
 			</div>
