@@ -25,6 +25,8 @@ class Event(models.Model):
     
     event_num = models.CharField(
         max_length=60,
+        null=True,
+        blank=True,
         verbose_name="사건 번호"
     )
 
@@ -98,6 +100,13 @@ class Event(models.Model):
         null=True,
         blank=True,
         verbose_name="소송 재기일"
+    )
+    
+    ai_strategy = models.TextField(
+        null=True,
+        blank=True,
+        default='미지정',
+        verbose_name="ai 추천 전략"
     )
 
     # 8. 자동 생성 필드

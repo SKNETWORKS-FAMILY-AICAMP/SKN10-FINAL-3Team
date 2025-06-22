@@ -1,3 +1,5 @@
+console.log('write_event.js loaded!!');
+
 document.addEventListener('DOMContentLoaded', function () {
 	// --- DOM 요소 및 데이터 초기화 ---
 	const catSelect = document.getElementById('cat_cd');
@@ -159,15 +161,23 @@ document.addEventListener('DOMContentLoaded', function () {
 		if (!form.checkValidity()) return;
 		event.preventDefault();
 
+		// 디버깅용 출력
+		console.log("client_role", document.getElementById('client_role'));
+		console.log("event_num", document.getElementById('event_num'));
+		console.log("claim_summary", document.getElementById('claim_summary'));
+		console.log("event_file", document.getElementById('event_file'));	
+
 		// 폼 데이터를 상위 스코프의 formData 변수에 저장
-		// 클라이언트 원고/피고에 관한 정보 추가 + 사건 상세 페이지에서 입력 정보 있는지 확인
 		formData = {
 			caseTitle: document.getElementById('case_title').value,
+			eventNum: document.getElementById('event_num').value,	// 사건번호
 			clientName: document.getElementById('client_name').value,
+			clientRole: document.getElementById('client_role').value,	// 클라이언트 역할
 			catCd: document.getElementById('cat_cd').value,
 			catMid: document.getElementById('cat_mid').value,
-			catSub: document.getElementById('cat_sub').value,
 			caseBody: document.getElementById('case_body').value,
+			claimSummary: document.getElementById('claim_summary').value,	// 청구내용
+			eventFile: document.getElementById('event_file').value,	// 증거자료
 			estatCd: document.getElementById('estat_cd').value,
 			lstatCd: document.getElementById('lstat_cd').value,
 			estatFinalCd: document.getElementById('estat_final_cd').value,

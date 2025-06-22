@@ -60,7 +60,6 @@ def index(request):
     return render(request, 'main.html', context)
 
 
-
 def write_event(request):
     if request.method == 'POST':
         user = request.user
@@ -78,7 +77,11 @@ def write_event(request):
         retrial_date = request.POST.get('retrial_date') or None
         case_note = request.POST.get('case_note') or None
         team_name = request.POST.get('selected_team_name')  # ✅ form에서 넘어온 label 값
-        # ai_strategy = request.POST.get('ai_strategy') or None
+        ai_strategy = request.POST.get('ai_strategy') or None
+        
+        event_num = request.POST.get('event_num') or None
+        claim_summary = request.POST.get('claim_summary')
+        event_file = request.POST.get('event_file') or None
 
         # 2. 날짜 변환
         retrial_dt = None
@@ -95,7 +98,6 @@ def write_event(request):
             org_code = None  # 또는 예외처리
 
         # 4. Event 저장
-        # 'ai 추천 전략'
         Event.objects.create(
             user=user,
             creator_name=user.name,
@@ -111,7 +113,11 @@ def write_event(request):
             submit_at=retrial_dt,
             memo=case_note,
             org_cd=org_code,
-            # ai_strategy=ai_strategy,
+            ai_strategy=ai_strategy,
+            
+            event_num=event_num,
+            claim_summary=claim_summary,
+            event_file=event_file,
         )
 
         return redirect('/event')
@@ -195,6 +201,8 @@ def edit_event(request, event_id):
         estat_final_cd = request.POST.get('estat_final_cd') or None
         retrial_date = request.POST.get('retrial_date') or None
         case_note = request.POST.get('case_note') or None
+        
+        
 
         # 2. 날짜 변환
         retrial_dt = None
