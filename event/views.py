@@ -202,7 +202,9 @@ def edit_event(request, event_id):
         retrial_date = request.POST.get('retrial_date') or None
         case_note = request.POST.get('case_note') or None
         
-        
+        event_num = request.POST.get('event_num') or None
+        claim_summary = request.POST.get('claim_summary')
+        event_file = request.POST.get('event_file') or None
 
         # 2. 날짜 변환
         retrial_dt = None
@@ -220,6 +222,10 @@ def edit_event(request, event_id):
         event.estat_num_cd = estat_final_cd
         event.submit_at = retrial_dt
         event.memo = case_note
+        
+        event.event_num = event_num
+        event.claim_summary = claim_summary
+        event.event_file = event_file
 
         event.save()
 

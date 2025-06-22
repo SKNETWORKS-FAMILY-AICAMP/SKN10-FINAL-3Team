@@ -1,6 +1,6 @@
 <!-- prettier-ignore -->
-{% extends 'base/index.html' %} 
-{% load static %} 
+{% extends 'base/index.html' %}
+{% load static %}
 {% block title %}사건 상세{% endblock %}
 
 <!-- prettier-ignore -->
@@ -29,13 +29,17 @@
 							{{ event.client_role }}
 						</span>
 					</p>
+					<p class="text-gray-600">
+						사건 번호:
+						<span class="font-medium mr-2" id="case-client">{{ event.event_num }}</span>
+					</p>
 				</div>
 				<div class="mt-4 md:mt-0">
 					<p class="text-gray-500 text-sm">
 						등록일:
 						<span class="font-medium" id="case-created"
 							>{{ event.created_at|date:"Y-m-d" }}</span
-						>
+							>
 					</p>
 				</div>
 			</div>
@@ -102,6 +106,21 @@
 			</div>
 		</div>
 
+		<!-- 증거자료 카드 -->
+		<div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
+			<h3 class="text-xl font-semibold mb-4 text-gray-700 border-b pb-2 flex items-center">
+				<i class="fas fa-file-alt text-law-blue mr-2"></i> 증거자료
+			</h3>
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+				<div class="md:col-span-2">
+					<p class="text-gray-500 text-sm mb-1">내용</p>
+					<div class="bg-gray-50 p-3 rounded-lg min-h-[80px]">
+						<p class="whitespace-pre-line">{{ event.event_file }}</p>
+					</div>
+				</div>
+			</div>
+		</div>
+
 		<!-- 사건 상태 정보 카드 -->
 		<div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
 			<h3 class="text-xl font-semibold mb-4 text-gray-700 border-b pb-2 flex items-center">
@@ -120,11 +139,11 @@
 					<p class="text-gray-500 text-sm mb-1">종결상태</p>
 					<p class="font-medium" id="case-estatnum">
 						<!-- prettier-ignore -->
-						{% if event.estat_num_label and event.estat_num_label != "None" and event.estat_num_label != "nan" %} 
-                            {{ event.estat_num_label }} 
-                        {% else %}
-						    사건 진행중 
-                        {% endif %}
+						{% if event.estat_num_label and event.estat_num_label != "None" and event.estat_num_label != "nan" %}
+						{{ event.estat_num_label }}
+						{% else %}
+							사건 진행중
+						{% endif %}
 					</p>
 				</div>
 				<div class="md:col-span-3">
@@ -138,6 +157,25 @@
 				</div>
 			</div>
 		</div>
+
+		<!-- ai 추천 전략 카드 -->
+		<div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
+			<h3 class="text-xl font-semibold mb-4 text-gray-700 border-b pb-2 flex items-center">
+				<i class="fas fa-file-alt text-law-blue mr-2"></i> AI 추천 전략
+			</h3>
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+				<div class="md:col-span-2">
+					<p class="text-gray-500 text-sm mb-1">내용</p>
+					<div class="bg-gray-50 p-3 rounded-lg min-h-[80px]">
+						<!-- prettier-ignore -->
+						{% if event.ai_strategy and event.ai_strategy != "None" and event.ai_strategy != "nan" %}
+						<p class="whitespace-pre-line text-gray-700 text-start">{{ event.ai_strategy }}</p>
+						{% endif %}
+					</div>
+				</div>
+			</div>
+		</div>
+
 		<!-- 추가 정보 카드 -->
 		<div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
 			<h3 class="text-xl font-semibold mb-4 text-gray-700 border-b pb-2 flex items-center">
@@ -162,14 +200,14 @@
 			<button
 				type="button"
 				class="bg-law-blue hover:bg-law-darkblue text-white font-medium py-2 px-6 rounded-lg transition"
-				id="edit-btn"
+				id="edit-btn" 
 				data-event-id="{{ event.event_id }}">
 				<i class="fas fa-edit mr-2"></i>수정
 			</button>
 			<button
 				type="button"
 				class="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-6 rounded-lg transition"
-				id="delete-btn"
+				id="delete-btn" 
 				data-event-id="{{ event.event_id }}">
 				<i class="fas fa-trash-alt mr-2"></i>삭제
 			</button>

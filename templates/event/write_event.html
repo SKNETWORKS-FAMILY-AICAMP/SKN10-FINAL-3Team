@@ -97,17 +97,24 @@
 				<textarea id="case_body" name="case_body" rows="6" placeholder="본문을 입력하세요."
 					class="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
 					required></textarea>
+			</div>
 
-				<div>
-					<label class="block mb-2 text-gray-600">청구내용</label>
-					<input id="claim_summary" name="claim_summary" type="text" placeholder="예) 불법행위에 따른 손해배상 청구"
-						class="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500" />
-				</div>
-				<div>
-					<label class="block mb-2 text-gray-600">증거자료</label>
-					<input id="event_file" name="event_file" type="text" placeholder="증거자료(파일명, 요약 등)"
-						class="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500" />
-				</div>
+			<!-- 청구 내용 카드 -->
+			<div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+				<h3 class="text-xl font-semibold mb-4 text-gray-700">청구 내용</h3>
+				<label class="block mb-2 text-gray-600">본문</label>
+				<textarea id="claim_summary" name="claim_summary" rows="6" placeholder="예) 불법행위에 따른 손해배상 청구"
+					class="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+					required></textarea>
+			</div>
+
+			<!-- 증거자료 카드 -->
+			<div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+				<h3 class="text-xl font-semibold mb-4 text-gray-700">증거자료</h3>
+				<label class="block mb-2 text-gray-600">본문</label>
+				<textarea id="event_file" name="event_file" rows="6" placeholder="증거자료(파일명, 요약 등)"
+					class="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+					required></textarea>
 			</div>
 
 			<!-- 추가 정보 카드 -->
