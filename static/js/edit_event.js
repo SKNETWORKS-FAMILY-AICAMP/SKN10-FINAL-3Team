@@ -86,7 +86,6 @@ document.addEventListener('DOMContentLoaded', function () {
 		const caseTitle = document.getElementById('case_title').value;
 		const clientName = document.getElementById('client_name').value;
 		const catMid = document.getElementById('cat_mid').value;
-		const catSub = document.getElementById('cat_sub').value;
 
 		if (getUtf8Bytes(caseTitle) > 100) {
 			e.preventDefault();
