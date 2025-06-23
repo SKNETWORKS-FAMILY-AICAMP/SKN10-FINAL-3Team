@@ -24,7 +24,7 @@ def chatbot_view(request):
         })
 
     # 페이지네이션
-    paginator = Paginator(case_data, 6)
+    paginator = Paginator(case_data, 10)
     page_obj = paginator.get_page(page)
 
     context = {
