@@ -115,7 +115,7 @@
 				<div class="md:col-span-2">
 					<p class="text-gray-500 text-sm mb-1">내용</p>
 					<div class="bg-gray-50 p-3 rounded-lg min-h-[80px]">
-						<p class="whitespace-pre-line">{{ event.event_file }}</p>
+						<p class="whitespace-pre-line">{{ event.event_file|default_if_none:''|default:'' }}</p>
 					</div>
 				</div>
 			</div>
