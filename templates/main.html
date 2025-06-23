@@ -1,19 +1,17 @@
-<!-- template/user/main.html -->
-
 <!-- prettier-ignore -->
 {% extends 'base/index.html' %} 
 {% load static %} 
 {% block title %}LAW FIRM{% endblock %}
 
 <!-- prettier-ignore -->
-<!-- {% block css %}
+{% block css %}
 <link rel="stylesheet" href="{% static 'css/main.css' %}" />
-{% endblock %} -->
+{% endblock %}
 
 <!-- prettier-ignore -->
-<!-- {% block js %}
+{% block js %}
 <script src="{% static 'js/main.js' %}"></script>
-{% endblock %} -->
+{% endblock %}
 
 <!-- prettier-ignore -->
 {% block content %}
@@ -24,29 +22,32 @@
 			class="w-12 h-12 flex items-center justify-center rounded-full bg-blue-500 hover:bg-blue-600 text-white shadow-md">
 			<i class="fas fa-upload text-base"></i>
 		</button>
-		<div class="w-full max-w-6xl">
+		<form action="/chatbot/" method="GET" class="w-full max-w-6xl">
 			<div
 				class="flex items-center w-full bg-white rounded-full border border-gray-300 px-6 py-3 shadow-sm">
 				<i class="fas fa-search text-blue-500 text-lg mr-3"></i>
 				<input
 					type="text"
+					name="query"
 					placeholder="Search Text"
 					class="flex-grow focus:outline-none text-sm" />
 				<div
 					class="flex items-center space-x-2 bg-sky-100 text-sky-700 text-sm rounded-full px-6 py-2 ml-4">
 					<span class="font-semibold">플러그인</span>
 					<select
-						class="bg-white rounded-full px-4 py-2 focus:outline-none border border-gray-300">
-						<option>분석 및 요약</option>
-						<option>판례 검색</option>
+						class="bg-white rounded-full px-4 py-2 focus:outline-none border border-gray-300"
+						name="plugin">
+						<option value="summary">분석 및 요약</option>
+						<option value="search">판례 검색</option>
 					</select>
 				</div>
 				<button
+					type="submit"
 					class="ml-3 w-10 h-10 flex items-center justify-center rounded-full bg-white border border-blue-500 text-blue-500 hover:bg-blue-50 transition">
 					<i class="fas fa-paper-plane text-lg"></i>
 				</button>
 			</div>
-		</div>
+		</form>
 	</div>
 	<!-- 현황 카드 -->
 	<div class="grid grid-cols-1 md:grid-cols-2 gap-16 mb-16">
@@ -88,38 +89,99 @@
 	</div>
 
 	<!-- 사건 현황 테이블 -->
-	<div class="bg-white rounded-lg shadow-md p-4 min-h-[300px]">
-		<div class="flex items-center justify-between mb-8">
-			<h3 class="text-base font-semibold text-gray-700">사건 현황</h3>
-			<a
-				href="/event/write"
-				id="add_case_btn"
-				class="text-blue-500 hover:text-blue-700"
-				style="display: none">
-				<i class="fas fa-plus-circle text-2xl"></i>
-			</a>
+	<div class="bg-white rounded-lg shadow-md p-4 min-h-[600px] flex flex-col justify-between">
+		<div>
+			<div class="flex items-center justify-between mb-8">
+				<h3 class="text-base font-semibold text-gray-700">사건 현황</h3>
+				{% if user.is_authenticated and user.is_partner %}
+				<a href="/event/write" id="add_case_btn" class="text-blue-500 hover:text-blue-700">
+					<i class="fas fa-plus-circle text-2xl"></i>
+				</a>
+				{% endif %}
+			</div>
+
+			<div class="overflow-x-auto px-10 grow">
+				<table class="min-w-full text-left text-sm">
+					<thead>
+						<tr class="border-b text-gray-500 text-center">
+							<th class="pb-2 w-[5%]">번호</th>
+							<th class="pb-2 w-[30%]">사건명</th>
+							<th class="pb-2 w-[10%]">클라이언트</th>
+							<th class="pb-2 w-[20%]">사건 유형</th>
+							<th class="pb-2 w-[10%]">작성자</th>
+							<th class="pb-2 w-[15%]">진행상태</th>
+							<th class="pb-2 w-[10%]">생성일</th>
+						</tr>
+					</thead>
+					<tbody class="min-h-[440px]">
+						{% for row_number, item in page_with_numbers %}
+						<tr
+							class="border-t text-center h-12 align-middle cursor-pointer hover:bg-gray-50 transition"
+							data-id="{{ item.event_id }}">
+							<td class="py-0 truncate">{{ row_number }}</td>
+							<td class="py-0 truncate">{{ item.e_title }}</td>
+							<td class="py-0 truncate">{{ item.client }}</td>
+							<td class="py-0 truncate">{{ item.cat_02 }} / {{ item.cat_03 }}</td>
+							<td class="py-0 truncate">{{ item.creator_name }}</td>
+							<td class="py-0 truncate">{{ item.estat_label }}</td>
+							<td class="py-0">{{ item.created_at|date:"Y-m-d" }}</td>
+						</tr>
+						{% empty %}
+						<tr>
+							<td colspan="7">
+								<div
+									class="flex justify-center items-center h-[400px] text-gray-400 text-center">
+									배정된 사건이 없습니다.
+								</div>
+							</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
 		</div>
-		<div class="overflow-x-auto px-10">
-			<table class="min-w-full text-left text-sm">
-				<thead>
-					<tr class="border-b text-gray-500 text-center">
-						<th class="pb-2">번호</th>
-						<th class="pb-2">사건명</th>
-						<th class="pb-2">사건 유형</th>
-						<th class="pb-2">담당 부서</th>
-						<th class="pb-2">생성일</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr class="border-t">
-						<td class="py-2 text-center">1</td>
-						<td class="text-center">교통사고로 인한 손해배상</td>
-						<td class="text-center">손해배상 / 자</td>
-						<td class="text-center">민사 1팀</td>
-						<td class="text-center">2025-06-06</td>
-					</tr>
-				</tbody>
-			</table>
+
+		<!-- 페이지네이션 UI -->
+		<div class="mt-8 flex justify-center items-center space-x-2">
+			<!-- 이전 버튼 -->
+			{% if page_obj.has_previous %}
+			<a
+				href="?page={{ page_obj.previous_page_number }}"
+				class="px-3 py-1 border rounded text-sm text-gray-700 hover:bg-gray-100 transition">
+				◀ 이전
+			</a>
+			{% else %}
+			<span class="px-3 py-1 border rounded text-sm text-gray-300 cursor-not-allowed"
+				>◀ 이전</span
+			>
+			{% endif %}
+
+			<!-- 페이지 번호 -->
+			{% for num in page_obj.paginator.page_range %} {% if page_obj.number == num %}
+			<span
+				class="px-3 py-1 border rounded bg-blue-500 text-white text-sm font-semibold transition">
+				{{ num }}
+			</span>
+			{% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+			<a
+				href="?page={{ num }}"
+				class="px-3 py-1 border rounded text-sm text-gray-700 hover:bg-gray-100 transition">
+				{{ num }}
+			</a>
+			{% endif %} {% endfor %}
+
+			<!-- 다음 버튼 -->
+			{% if page_obj.has_next %}
+			<a
+				href="?page={{ page_obj.next_page_number }}"
+				class="px-3 py-1 border rounded text-sm text-gray-700 hover:bg-gray-100 transition">
+				다음 ▶
+			</a>
+			{% else %}
+			<span class="px-3 py-1 border rounded text-sm text-gray-300 cursor-not-allowed"
+				>다음 ▶</span
+			>
+			{% endif %}
 		</div>
 	</div>
 </main>

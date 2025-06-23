@@ -1,0 +1,169 @@
+<!-- prettier-ignore -->
+{% extends 'base/index.html' %} 
+{% load static %} 
+{% block title %}사건 상세페이지{% endblock %}
+
+<!-- prettier-ignore -->
+{% block js %}
+<script src="{% static 'js/detail_event.js' %}"></script>
+{% endblock %}
+
+<!-- prettier-ignore -->
+{% block content %}
+<main class="flex-1 overflow-y-auto px-6 md:px-20 py-8 bg-gray-100">
+	<div class="max-w-5xl mx-auto">
+		<h2 class="text-3xl font-bold text-center mb-12 text-gray-800">사건 내용</h2>
+		<!-- 상단 헤더 -->
+		<div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
+			<div class="flex flex-col md:flex-row md:items-center md:justify-between">
+				<div>
+					<h1 class="text-2xl font-bold text-gray-800 mb-1">
+						사건명:
+						<span class="text-law-blue" id="case-title">{{ event.e_title }}</span>
+					</h1>
+					<p class="text-gray-600">
+						클라이언트:
+						<span class="font-medium mr-2" id="case-client">{{ event.client }}</span>
+						<span
+							class="inline-block text-xs font-semibold px-2 py-1 rounded-full {% if event.client_role == '원고' %} bg-green-100 text-green-700 {% elif event.client_role == '피고' %} bg-red-100 text-red-700 {% else %} bg-gray-200 text-gray-700 {% endif %}">
+							{{ event.client_role }}
+						</span>
+					</p>
+				</div>
+				<div class="mt-4 md:mt-0">
+					<p class="text-gray-500 text-sm">
+						등록일:
+						<span class="font-medium" id="case-created"
+							>{{ event.created_at|date:"Y-m-d" }}</span
+						>
+					</p>
+				</div>
+			</div>
+		</div>
+		<!-- 담당자 정보 카드 -->
+		<div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
+			<h3 class="text-xl font-semibold mb-4 text-gray-700 border-b pb-2 flex items-center">
+				<i class="fas fa-user-tie text-law-blue mr-2"></i> 담당자 정보
+			</h3>
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+				<div>
+					<p class="text-gray-500 text-sm mb-1">담당 팀</p>
+					<p class="font-medium" id="case-org">{{ event.org_label }}</p>
+				</div>
+				<div>
+					<p class="text-gray-500 text-sm mb-1">작성자</p>
+					<p class="font-medium" id="case-creator">{{ event.creator_name }}</p>
+				</div>
+			</div>
+		</div>
+		<!-- 사건 기본 정보 카드 -->
+		<div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
+			<h3 class="text-xl font-semibold mb-4 text-gray-700 border-b pb-2 flex items-center">
+				<i class="fas fa-info-circle text-law-blue mr-2"></i> 사건 기본 정보
+			</h3>
+			<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+				<div>
+					<p class="text-gray-500 text-sm mb-1">대분류</p>
+					<p class="font-medium" id="case-catcd">{{ event.cat_label }}</p>
+				</div>
+				<div>
+					<p class="text-gray-500 text-sm mb-1">중분류</p>
+					<p class="font-medium" id="case-cat02">{{ event.cat_02 }}</p>
+				</div>
+				<div>
+					<p class="text-gray-500 text-sm mb-1">소분류</p>
+					<p class="font-medium" id="case-cat03">{{ event.cat_03 }}</p>
+				</div>
+			</div>
+		</div>
+		<!-- 사건 본문 카드 -->
+		<div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
+			<h3 class="text-xl font-semibold mb-4 text-gray-700 border-b pb-2 flex items-center">
+				<i class="fas fa-file-alt text-law-blue mr-2"></i> 사건 본문
+			</h3>
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+				<div class="md:col-span-2">
+					<p class="text-gray-500 text-sm mb-1">내용</p>
+					<div class="bg-gray-50 p-3 rounded-lg min-h-[80px]">
+						<p class="whitespace-pre-line">{{ event.e_description }}</p>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 사건 상태 정보 카드 -->
+		<div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
+			<h3 class="text-xl font-semibold mb-4 text-gray-700 border-b pb-2 flex items-center">
+				<i class="fas fa-chart-line text-law-blue mr-2"></i> 사건 상태 정보
+			</h3>
+			<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+				<div>
+					<p class="text-gray-500 text-sm mb-1">진행상태</p>
+					<p class="font-medium" id="case-estat">{{ event.estat_label }}</p>
+				</div>
+				<div>
+					<p class="text-gray-500 text-sm mb-1">심급</p>
+					<p class="font-medium" id="case-lstat">{{ event.lstat_label }}</p>
+				</div>
+				<div>
+					<p class="text-gray-500 text-sm mb-1">종결상태</p>
+					<p class="font-medium" id="case-estatnum">
+						<!-- prettier-ignore -->
+						{% if event.estat_num_label and event.estat_num_label != "None" and event.estat_num_label != "nan" %} 
+                            {{ event.estat_num_label }} 
+                        {% else %}
+						    사건 진행중 
+                        {% endif %}
+					</p>
+				</div>
+				<div class="md:col-span-3">
+					<p class="text-gray-500 text-sm mb-1">소송 재기일</p>
+					<!-- prettier-ignore -->
+					{% if event.submit_at and event.submit_at != "None" and event.submit_at != "nan" %}
+					<p class="font-medium" id="case-retrial">{{ event.submit_at|date:"Y-m-d" }}</p>
+					{% else %}
+					<p class="font-medium" id="case-retrial">소송 재기일 미정</p>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+		<!-- 추가 정보 카드 -->
+		<div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+			<h3 class="text-xl font-semibold mb-4 text-gray-700 border-b pb-2 flex items-center">
+				<i class="fas fa-ellipsis-h text-law-blue mr-2"></i> 추가 정보
+			</h3>
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+				<div class="md:col-span-2">
+					<p class="text-gray-500 text-sm mb-1">메모</p>
+					<div class="bg-gray-50 p-3 rounded-lg min-h-[80px]">
+						<!-- prettier-ignore -->
+						{% if event.memo and event.memo != "None" and event.memo != "nan" %}
+						<p class="whitespace-pre-line text-gray-700 text-start">{{ event.memo }}</p>
+						{% endif %}
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- 액션 버튼 -->
+		{% if user.is_authenticated and is_partner and user.id == event.user.id %}
+
+		<div class="flex justify-end space-x-4 mt-8">
+			<button
+				type="button"
+				class="bg-law-blue hover:bg-law-darkblue text-white font-medium py-2 px-6 rounded-lg transition"
+				id="edit-btn"
+				data-event-id="{{ event.event_id }}">
+				<i class="fas fa-edit mr-2"></i>수정
+			</button>
+			<button
+				type="button"
+				class="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-6 rounded-lg transition"
+				id="delete-btn"
+				data-event-id="{{ event.event_id }}">
+				<i class="fas fa-trash-alt mr-2"></i>삭제
+			</button>
+		</div>
+		{% endif %}
+	</div>
+</main>
+{% endblock %}
