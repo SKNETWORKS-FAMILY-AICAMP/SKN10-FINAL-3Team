@@ -26,7 +26,9 @@ def chatbot_view(request):
     # 페이지네이션
     paginator = Paginator(case_data, 10)
     page_obj = paginator.get_page(page)
-
+    
+    print(f"query: {query}, page: {page}, total cases: {paginator.count}")
+    
     context = {
         "user_name": user.name,
         "user_name_first": user.name[0],

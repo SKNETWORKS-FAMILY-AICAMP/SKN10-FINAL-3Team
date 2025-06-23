@@ -68,10 +68,8 @@ class RecommendTeamAPIView(APIView):
         }
         return Response(response_data, status=status.HTTP_200_OK)
 
+# AI 챗봇 API 뷰
 class ChatLLMAPIView(APIView):
-    # authentication_classes = [JWTAuthentication]
-    # permission_classes = [IsAuthenticated]
-    
     def post(self, request):
         query = request.data.get('query')
         case_ids = request.data.get('case_ids', [])
