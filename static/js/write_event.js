@@ -1,3 +1,5 @@
+console.log('write_event.js loaded!!');
+
 document.addEventListener('DOMContentLoaded', function () {
 	// --- DOM 요소 및 데이터 초기화 ---
 	const catSelect = document.getElementById('cat_cd');
@@ -159,14 +161,23 @@ document.addEventListener('DOMContentLoaded', function () {
 		if (!form.checkValidity()) return;
 		event.preventDefault();
 
+		// 디버깅용 출력
+		console.log("client_role", document.getElementById('client_role'));
+		console.log("event_num", document.getElementById('event_num'));
+		console.log("claim_summary", document.getElementById('claim_summary'));
+		console.log("event_file", document.getElementById('event_file'));	
+
 		// 폼 데이터를 상위 스코프의 formData 변수에 저장
 		formData = {
 			caseTitle: document.getElementById('case_title').value,
+			eventNum: document.getElementById('event_num').value,	// 사건번호
 			clientName: document.getElementById('client_name').value,
+			clientRole: document.getElementById('client_role').value,	// 클라이언트 역할
 			catCd: document.getElementById('cat_cd').value,
 			catMid: document.getElementById('cat_mid').value,
-			catSub: document.getElementById('cat_sub').value,
 			caseBody: document.getElementById('case_body').value,
+			claimSummary: document.getElementById('claim_summary').value,	// 청구내용
+			eventFile: document.getElementById('event_file').value,	// 증거자료
 			estatCd: document.getElementById('estat_cd').value,
 			lstatCd: document.getElementById('lstat_cd').value,
 			estatFinalCd: document.getElementById('estat_final_cd').value,
@@ -178,7 +189,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			alert('대분류를 선택해주세요.');
 			return;
 		}
-
+		// 위의 정보를 ai에게 요청
 		try {
 			const data = await fetch(`/api/recommend/?cat_cd=${formData.catCd}`, {
 				method: 'GET',
@@ -226,11 +237,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			return;
 		}
 		if (formData.catMid && getUtf8Bytes(formData.catMid) > 50) {
-			alert('중분류(catMid)는 한글 기준 약 16자, 영문 기준 50자 이하로 입력해주세요.');
-			return;
-		}
-		if (formData.catSub && getUtf8Bytes(formData.catSub) > 50) {
-			alert('소분류(catSub)는 한글 기준 약 16자, 영문 기준 50자 이하로 입력해주세요.');
+			alert('세부유형(catMid)는 한글 기준 약 16자, 영문 기준 50자 이하로 입력해주세요.');
 			return;
 		}
 

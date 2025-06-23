@@ -60,7 +60,6 @@ def index(request):
     return render(request, 'main.html', context)
 
 
-
 def write_event(request):
     if request.method == 'POST':
         user = request.user
@@ -71,7 +70,6 @@ def write_event(request):
         client_role = request.POST.get('client_role')
         cat_cd = request.POST.get('cat_cd')
         cat_mid = request.POST.get('cat_mid') or None
-        cat_sub = request.POST.get('cat_sub') or None
         case_body = request.POST.get('case_body')
         estat_cd = request.POST.get('estat_cd')
         lstat_cd = request.POST.get('lstat_cd') or None
@@ -79,6 +77,11 @@ def write_event(request):
         retrial_date = request.POST.get('retrial_date') or None
         case_note = request.POST.get('case_note') or None
         team_name = request.POST.get('selected_team_name')  # ✅ form에서 넘어온 label 값
+        ai_strategy = request.POST.get('ai_strategy') or None
+        
+        event_num = request.POST.get('event_num') or None
+        claim_summary = request.POST.get('claim_summary')
+        event_file = request.POST.get('event_file') or None
 
         # 2. 날짜 변환
         retrial_dt = None
@@ -103,7 +106,6 @@ def write_event(request):
             client_role = client_role,
             cat_cd=cat_cd,
             cat_02=cat_mid,
-            cat_03=cat_sub,
             e_description=case_body,
             estat_cd=estat_cd,
             lstat_cd=lstat_cd,
@@ -111,6 +113,11 @@ def write_event(request):
             submit_at=retrial_dt,
             memo=case_note,
             org_cd=org_code,
+            ai_strategy=ai_strategy,
+            
+            event_num=event_num,
+            claim_summary=claim_summary,
+            event_file=event_file,
         )
 
         return redirect('/event')
@@ -194,6 +201,10 @@ def edit_event(request, event_id):
         estat_final_cd = request.POST.get('estat_final_cd') or None
         retrial_date = request.POST.get('retrial_date') or None
         case_note = request.POST.get('case_note') or None
+        
+        event_num = request.POST.get('event_num') or None
+        claim_summary = request.POST.get('claim_summary')
+        event_file = request.POST.get('event_file') or None
 
         # 2. 날짜 변환
         retrial_dt = None
@@ -211,6 +222,10 @@ def edit_event(request, event_id):
         event.estat_num_cd = estat_final_cd
         event.submit_at = retrial_dt
         event.memo = case_note
+        
+        event.event_num = event_num
+        event.claim_summary = claim_summary
+        event.event_file = event_file
 
         event.save()
 
