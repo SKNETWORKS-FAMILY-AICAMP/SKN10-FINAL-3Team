@@ -7,6 +7,7 @@ database/
 
 # 마이그레이션 파일
 **/migrations/*.pyc
+**/migrations/*.py
 **/migrations/__pycache__/
 **/migrations/*initial.py
 
