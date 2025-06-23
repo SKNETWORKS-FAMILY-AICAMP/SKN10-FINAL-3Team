@@ -31,7 +31,7 @@
 					</p>
 					<p class="text-gray-600">
 						사건 번호:
-						<span class="font-medium mr-2" id="case-client">{{ event.event_num }}</span>
+						<span class="font-medium mr-2" id="case-client">{{ event.event_num|default_if_none:''|default:'' }}</span>
 					</p>
 				</div>
 				<div class="mt-4 md:mt-0">
