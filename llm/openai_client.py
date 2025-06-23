@@ -4,16 +4,16 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# client = OpenAI()
-
-client = OpenAI(
-    api_key=os.getenv("RUNPOD_API_KEY"),
-    base_url=os.getenv("RUNPOD_BASE_URL")
-)
+client = OpenAI()
 
 ######################################################################
 # RunPod OpenAI API 호출 예제
 ######################################################################
+# client = OpenAI(
+#     api_key=os.getenv("RUNPOD_API_KEY"),
+#     base_url=os.getenv("RUNPOD_BASE_URL")
+# )
+
 # response = client.chat.completions.create(
 #     model="khs2617/gemma-3-1b-it-merged_model_strategy",
 #     messages=[{"role": "user", "content": "안녕"}]
@@ -41,8 +41,8 @@ def stream_chat_response(case_data_dict: dict, query: str):
     # Chat Completions (Streaming)
     try:
         response = client.chat.completions.create(
-            # model="gpt-4o-mini",
-            model="khs2617/gemma-3-1b-it-merged_model_strategy",
+            model="gpt-4o-mini",
+            # model="khs2617/gemma-3-1b-it-merged_model_strategy",
             messages=[
                 {
                     "role": "system",
