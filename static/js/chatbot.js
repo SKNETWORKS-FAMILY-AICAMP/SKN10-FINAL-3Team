@@ -1,3 +1,16 @@
+// 자동 토큰 재발급 + 자동 재요청 함수
+async function fetchWithAutoRefresh(url, options, retry = true) {
+    let res = await fetch(url, { ...options, credentials: 'include' });
+
+    if ((res.status === 401 || res.status === 403) && retry) {
+        // 토큰 재발급 시도
+        await fetch('/api/refresh/', { method: 'POST', credentials: 'include' });
+        // 재요청(딱 1번만)
+        return fetchWithAutoRefresh(url, options, false);
+    }
+    return res;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
 	const selectedCases = new Set();
 	const maxSelections = 2;
@@ -5,6 +18,13 @@ document.addEventListener('DOMContentLoaded', () => {
 	const form = document.getElementById('chat-form');
 	const inputBox = document.getElementById('chat-input');
 	const chatArea = document.querySelector('.space-y-6');
+	// [여기에서 선언]
+	let sendBtn = null;
+
+	// 전송 버튼이 있다면 여기서 할당
+	if (form) {
+		sendBtn = form.querySelector('button[type="submit"]');
+	}
 
 	document.querySelectorAll('.case-item').forEach((item) => {
 		item.addEventListener('click', () => {
@@ -38,6 +58,17 @@ document.addEventListener('DOMContentLoaded', () => {
 		const query = inputBox.value.trim();
 		if (!query) return;
 
+		// --- [추가] 입력창/버튼 비활성화 ---
+		inputBox.disabled = true;
+		inputBox.classList.add(
+			'bg-gray-200',
+			'text-gray-500',
+			'cursor-not-allowed',
+			'placeholder:text-gray-400'
+		);
+		inputBox.classList.remove('focus:ring-2', 'focus:ring-law-blue', 'focus:border-transparent');
+		if (sendBtn) sendBtn.disabled = true;
+
 		inputBox.value = '';
 
 		const userMsg = document.createElement('div');
@@ -56,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		chatArea.appendChild(botMsg);
 
 		try {
-			const res = await fetch('/api/chat/ask/', {
+			const res = await fetchWithAutoRefresh('/api/chat/ask/', {
 				method: 'POST',
 				credentials: 'include',
 				headers: {
@@ -87,6 +118,18 @@ document.addEventListener('DOMContentLoaded', () => {
 		} catch (err) {
 			console.error('❌ 스트리밍 오류:', err);
 			botContent.innerText = '⚠️ 응답을 불러오는 중 오류가 발생했습니다.';
+		} finally {
+			// --- [중요: 답변 끝나면 입력창/버튼 다시 활성화] ---
+			inputBox.disabled = false;
+			inputBox.classList.remove(
+				'bg-gray-200',
+				'text-gray-500',
+				'cursor-not-allowed',
+				'placeholder:text-gray-400'
+			);
+			inputBox.classList.add('focus:ring-2', 'focus:ring-law-blue', 'focus:border-transparent');
+			if (sendBtn) sendBtn.disabled = false;
+			inputBox.focus();
 		}
 	});
 });
