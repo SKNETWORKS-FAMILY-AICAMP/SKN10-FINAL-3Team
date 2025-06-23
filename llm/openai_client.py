@@ -1,7 +1,28 @@
 from openai import OpenAI
+import os
+from dotenv import load_dotenv
 
-client = OpenAI()
+load_dotenv()
 
+# client = OpenAI()
+
+client = OpenAI(
+    api_key=os.getenv("RUNPOD_API_KEY"),
+    base_url=os.getenv("RUNPOD_BASE_URL")
+)
+
+######################################################################
+# RunPod OpenAI API 호출 예제
+######################################################################
+# response = client.chat.completions.create(
+#     model="khs2617/gemma-3-1b-it-merged_model_strategy",
+#     messages=[{"role": "user", "content": "안녕"}]
+# )
+
+# print(response.choices[0].message.content)
+
+######################################################################
+# 판례 데이터와 사용자 질문에 대한 응답을 생성
 def stream_chat_response(case_data_dict: dict, query: str):
     """
     판례 데이터와 사용자 질문을 받아 OpenAI 스트리밍 응답을 생성하는 제너레이터 함수
@@ -20,7 +41,8 @@ def stream_chat_response(case_data_dict: dict, query: str):
     # Chat Completions (Streaming)
     try:
         response = client.chat.completions.create(
-            model="gpt-4o-mini",
+            # model="gpt-4o-mini",
+            model="khs2617/gemma-3-1b-it-merged_model_strategy",
             messages=[
                 {
                     "role": "system",
