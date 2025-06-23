@@ -66,11 +66,10 @@
 				</div>
 			</div>
 
-			<!-- 분류 정보 카드 -->
 			<div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
 				<h3 class="text-xl font-semibold mb-4 text-gray-700">분류 정보</h3>
-				<div class="grid grid-cols-3 gap-4">
-					<div>
+				<div class="grid grid-cols-10 gap-6"> <!-- gap-4 → gap-6으로 약간 넓게 -->
+					<div class="col-span-3">
 						<label class="block text-gray-600">대분류</label>
 						<select id="cat_cd" name="cat_cd"
 							class="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
@@ -81,7 +80,7 @@
 							{% endfor %}
 						</select>
 					</div>
-					<div>
+					<div class="col-span-7">
 						<label class="block text-gray-600">세부 유형</label>
 						<input id="cat_mid" name="cat_mid" type="text" placeholder="세부 유형을 입력하세요."
 							class="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
@@ -89,6 +88,7 @@
 					</div>
 				</div>
 			</div>
+
 
 			<!-- 사건 내용 카드 -->
 			<div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
@@ -114,7 +114,7 @@
 				<label class="block mb-2 text-gray-600">본문</label>
 				<textarea id="event_file" name="event_file" rows="6" placeholder="증거자료(파일명, 요약 등)"
 					class="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
-					required></textarea>
+					></textarea>
 			</div>
 
 			<!-- 추가 정보 카드 -->

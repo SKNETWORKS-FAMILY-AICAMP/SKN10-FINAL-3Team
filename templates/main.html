@@ -11,15 +11,14 @@
 <!-- prettier-ignore -->
 {% block content %}
 <main class="flex-1 overflow-y-auto px-20 py-16 bg-gray-50">
-	<!-- 검색창 -->
-	<div class="flex justify-center items-center gap-4 mb-20">
+	<!-- 검색창-->
+	<div class="flex justify-center items-center gap-2 mb-20">
 		<button
-			class="w-12 h-12 flex items-center justify-center rounded-full bg-blue-500 hover:bg-blue-600 text-white shadow-md">
+			class="w-12 h-12 flex items-center justify-center rounded-full bg-blue-500 hover:bg-blue-600 text-white shadow-md transition">
 			<i class="fas fa-upload text-base"></i>
 		</button>
-		<!-- max-w-lg(약 32rem) 정도로 설정, w-full 제거 -->
-		<div class="max-w-lg w-full">
-			<div class="flex items-center bg-white rounded-full border border-gray-300 px-6 py-3 shadow-sm">
+		<div class="w-1/2">
+			<div class="flex items-center w-full bg-white rounded-full border border-gray-300 px-6 py-3 shadow-sm">
 				<i class="fas fa-search text-blue-500 text-lg mr-3"></i>
 				<input type="text" placeholder="Search Text" class="flex-grow focus:outline-none text-sm" />
 				<button
@@ -29,6 +28,8 @@
 			</div>
 		</div>
 	</div>
+
+
 	<!-- 현황 카드 -->
 	<div class="grid grid-cols-1 md:grid-cols-2 gap-16 mb-16">
 		<div class="bg-white rounded-lg shadow-md p-4 min-h-[180px]">
