@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	});
 
 	// 수정 폼 제출 시 유효성 검사 후 전송
-	form.addEventListener('submit', function (e) {
+	form.addEventListener('submit', async function (e) {
 		if (!form.checkValidity()) {
 			// HTML 기본 유효성 검사
 			return;
@@ -102,6 +102,53 @@ document.addEventListener('DOMContentLoaded', function () {
 			alert('세부유형은 한글 약 16자 또는 영문 50자 이하로 입력해주세요.');
 			return;
 		}
+
+		// ---------------------------
+		// RunPod 분석 API 호출 부분
+		// ---------------------------
+		// 1. 각 항목 값 추출
+		const caseDescription = document.getElementById('e_description').value;  // 사건내용(본문)
+		const claimSummary = document.getElementById('claim_summary').value;     // 청구내용
+		const eventFile = document.getElementById('event_file').value;           // 증거자료(텍스트)
+
+		// 2. 요청 데이터 객체 생성
+		const requestData = {
+			e_description: caseDescription,
+			claim_summary: claimSummary,
+			event_file: eventFile,
+		};
+
+		try {
+			// 3. 외부 분석 API 호출
+			const response = await fetch('https://e53btkyqn6ggcs-8000.proxy.runpod.net/analyze-case/', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(requestData),
+			});
+
+			if (!response.ok) {
+				const errorData = await response.json();
+				alert('분석 API 호출 실패: ' + (errorData.detail || errorData.error || response.status));
+				e.preventDefault();  // 실패 시 폼 제출 방지
+				return;
+			}
+
+			const result = await response.json();
+			console.log('분석 결과:', result);
+
+			// [선택] 결과를 활용하여 화면에 표시하거나 모달/알림 등을 띄울 수 있음
+
+			// 유효성 및 분석 문제 없으면 폼 전송 허용 (이벤트를 따로 막지 않음)
+			// form.submit(); // 필요하면 명시적으로 호출
+
+		} catch (error) {
+			alert('분석 요청 중 오류: ' + error.message);
+			e.preventDefault(); // 네트워크 등 오류 시 폼 제출 방지
+			return;
+		}
+
 		// 유효성 검사 통과 → 동기 form 제출 허용
 		form.submit();
 	});

@@ -70,13 +70,13 @@ def write_event(request):
         client_role = request.POST.get('client_role')
         cat_cd = request.POST.get('cat_cd')
         cat_mid = request.POST.get('cat_mid') or None
-        case_body = request.POST.get('case_body')
+        e_description = request.POST.get('e_description')
         estat_cd = request.POST.get('estat_cd')
         lstat_cd = request.POST.get('lstat_cd') or None
         estat_final_cd = request.POST.get('estat_final_cd') or None
         retrial_date = request.POST.get('retrial_date') or None
         case_note = request.POST.get('case_note') or None
-        team_name = request.POST.get('selected_team_name')  # ✅ form에서 넘어온 label 값
+        team_name = request.POST.get('selected_team_name')
         ai_strategy = request.POST.get('ai_strategy') or None
         
         event_num = request.POST.get('event_num') or None
@@ -106,7 +106,7 @@ def write_event(request):
             client_role = client_role,
             cat_cd=cat_cd,
             cat_02=cat_mid,
-            e_description=case_body,
+            e_description=e_description,
             estat_cd=estat_cd,
             lstat_cd=lstat_cd,
             estat_num_cd=estat_final_cd,
@@ -195,7 +195,7 @@ def edit_event(request, event_id):
     if request.method == 'POST':
         # 1. 데이터 수집
         client_name = request.POST.get('client_name')
-        case_body = request.POST.get('case_body')
+        e_description = request.POST.get('e_description')
         estat_cd = request.POST.get('estat_cd')
         lstat_cd = request.POST.get('lstat_cd') or None
         estat_final_cd = request.POST.get('estat_final_cd') or None
@@ -216,7 +216,7 @@ def edit_event(request, event_id):
 
         # 3. 필드 업데이트
         event.client = client_name
-        event.e_description = case_body
+        event.e_description = e_description
         event.estat_cd = estat_cd
         event.lstat_cd = lstat_cd
         event.estat_num_cd = estat_final_cd

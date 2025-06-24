@@ -17,7 +17,7 @@
 		ESTAT_02: JSON.parse(document.getElementById('estat02-data').textContent),
 	};
 </script>
-<script src="{% static 'js/write_event.js' %}"></script>
+<script  src="{% static 'js/write_event.js' %}"></script>
 {% endblock %}
 
 <!-- prettier-ignore -->
@@ -30,6 +30,8 @@
 			{% csrf_token %}
 			<!-- 모달창에서 선택한 팀 정보 -->
 			<input type="hidden" id="selected_team_name" name="selected_team_name" />
+			<!-- ai 추천 전략 정보 -->
+			<input type="hidden" id="ai_strategy" name="ai_strategy" />
 
 			<!-- 사건 정보 카드 -->
 			<div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
@@ -94,7 +96,7 @@
 			<div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
 				<h3 class="text-xl font-semibold mb-4 text-gray-700">사건 내용</h3>
 				<label class="block mb-2 text-gray-600">본문</label>
-				<textarea id="case_body" name="case_body" rows="6" placeholder="본문을 입력하세요."
+				<textarea id="e_description" name="e_description" rows="6" placeholder="본문을 입력하세요."
 					class="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
 					required></textarea>
 			</div>

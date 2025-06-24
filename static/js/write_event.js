@@ -161,12 +161,6 @@ document.addEventListener('DOMContentLoaded', function () {
 		if (!form.checkValidity()) return;
 		event.preventDefault();
 
-		// 디버깅용 출력
-		console.log("client_role", document.getElementById('client_role'));
-		console.log("event_num", document.getElementById('event_num'));
-		console.log("claim_summary", document.getElementById('claim_summary'));
-		console.log("event_file", document.getElementById('event_file'));	
-
 		// 폼 데이터를 상위 스코프의 formData 변수에 저장
 		formData = {
 			caseTitle: document.getElementById('case_title').value,
@@ -175,7 +169,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			clientRole: document.getElementById('client_role').value,	// 클라이언트 역할
 			catCd: document.getElementById('cat_cd').value,
 			catMid: document.getElementById('cat_mid').value,
-			caseBody: document.getElementById('case_body').value,
+			caseBody: document.getElementById('e_description').value,
 			claimSummary: document.getElementById('claim_summary').value,	// 청구내용
 			eventFile: document.getElementById('event_file').value,	// 증거자료
 			estatCd: document.getElementById('estat_cd').value,
@@ -189,7 +183,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			alert('대분류를 선택해주세요.');
 			return;
 		}
-		// 위의 정보를 ai에게 요청
+		// 위의 정보를 ai에게 요청 - 팀추천 로직
 		try {
 			const data = await fetch(`/api/recommend/?cat_cd=${formData.catCd}`, {
 				method: 'GET',
@@ -218,7 +212,15 @@ document.addEventListener('DOMContentLoaded', function () {
 	});
 
 	// [수정] 모달의 '선택' 버튼 클릭 시, 최종 데이터를 서버로 전송
-	modalSelect.addEventListener('click', function () {
+	modalSelect.addEventListener('click', async function () {
+		console.log(
+			'client_role:', document.getElementById('client_role'),
+			'| e_description:', document.getElementById('e_description'),
+			'| claim_summary:', document.getElementById('claim_summary'),
+			'| event_file:', document.getElementById('event_file')
+		);
+
+
 		const selectedBtn = modal.querySelector(`.team-btn[data-team-id="${selectedTeamId}"]`);
 		if (!selectedTeamId || !selectedBtn) {
 			alert('팀을 선택해주세요.');
@@ -245,6 +247,54 @@ document.addEventListener('DOMContentLoaded', function () {
 		const teamInput = document.getElementById('selected_team_name');
 		if (teamInput) {
 			teamInput.value = selectedTeamName;
+		}
+
+		// -------------------
+		// RunPod 분석 API 호출
+		// -------------------
+		// 1. 각 항목 값 추출
+		const clientRole = document.getElementById('client_role').value;         // 역할
+		const caseDescription = document.getElementById('e_description').value;  // 사건내용
+		const claimSummary = document.getElementById('claim_summary').value;     // 청구내용
+		const eventFile = document.getElementById('event_file').value;           // 증거자료(텍스트 기반이면 .value, 파일이면 .files[0])
+
+		// 2. 요청 데이터 객체 준비
+		const requestData = {
+			client_role: clientRole,
+			e_description: caseDescription,
+			claim_summary: claimSummary,
+			event_file: eventFile, // 텍스트 input/textarea라면 value 사용, 파일이면 별도 처리 필요!
+		};
+
+		let data = null;
+
+		try {
+			// 3. POST fetch 실행 (CORS 허용 필요!)
+			const response = await fetch('https://e53btkyqn6ggcs-8000.proxy.runpod.net/analyze-case/', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(requestData),
+			});
+
+			if (!response.ok) {
+				const errorData = await response.json();
+				alert('분석 API 호출 실패: ' + (errorData.detail || errorData.error || response.status));
+				return;
+			}
+
+			data = await response.json();
+			console.log('분석 결과:', data);
+
+			const ai_strategy = document.getElementById('ai_strategy');
+			if (ai_strategy) {
+				ai_strategy.value = data['result'];
+			}
+
+			// TODO: 결과를 화면에 반영하려면 여기에 코드 추가 (예: 모달/알림 등)
+		} catch (error) {
+			alert('분석 요청 중 오류: ' + error.message);
 		}
 
 		// 모달 닫고 form 동기 전송

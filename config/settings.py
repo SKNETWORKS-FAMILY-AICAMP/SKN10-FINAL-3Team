@@ -70,6 +70,18 @@ MIDDLEWARE = [
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
+CORS_ALLOW_METHODS = [  # 이 부분이 꼭 필요!
+    "DELETE",
+    "GET",
+    "OPTIONS",  # ← 이거 중요!
+    "PATCH",
+    "POST",
+    "PUT",
+]
+CORS_ALLOW_HEADERS = [
+    "*",
+]
+
 ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
