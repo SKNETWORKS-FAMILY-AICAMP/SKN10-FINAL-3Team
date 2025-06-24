@@ -126,6 +126,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			// 3. 외부 분석 API 호출
 			const response = await fetch('https://e53btkyqn6ggcs-8000.proxy.runpod.net/analyze-case/', {
 				method: 'POST',
+				credentials: 'include',
 				headers: {
 					'Content-Type': 'application/json',
 					'X-Requested-With': 'XMLHttpRequest', // CSRF 토큰을 위한 헤더
