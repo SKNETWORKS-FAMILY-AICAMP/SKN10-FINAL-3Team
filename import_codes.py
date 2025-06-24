@@ -42,7 +42,7 @@ for _, row in code_df.iterrows():
     )
     print(f"{'✔️ 추가됨' if created else '🔄 업데이트됨'}: {code} - {code_label}")
 
-# ========== 2. 사건(Event) 테이블 데이터 삽입 ==========
+# ========== 2. 사건(Event) 테이블 데이터 삽입 ========== #
 print("\n📥 [2] Event 테이블 데이터 삽입 시작...")
 
 event_file = './csv_data/event_table_data.csv'
@@ -53,23 +53,25 @@ for _, row in event_df.iterrows():
         Event.objects.create(
             e_title=row['e_title'],
             e_description=row['e_description'],
+            claim_summary=row['claim_summary'],
             client=row['client'],
+            client_role=row['client_role'],
             cat_cd=row['cat_cd'],
             cat_02=row['cat_02'],
-            cat_03=row['cat_03'],
-            memo=row.get('memo'),
             org_cd=row['org_cd'],
             estat_cd=row['estat_cd'],
-            lstat_cd=row['lstat_cd'],
-            estat_num_cd=row.get('estat_num_cd', ''),
-            submit_at=datetime.strptime(row['submit_at'], '%Y-%m-%d') if pd.notna(row['submit_at']) else None,
+            lstat_cd=row.get('lstat_cd') if pd.notna(row.get('lstat_cd')) else None,
+            estat_num_cd=row.get('estat_num_cd') if pd.notna(row.get('estat_num_cd')) else None,
+            memo=row.get('memo') if pd.notna(row.get('memo')) else None,
+            event_file=row.get('event_file') if pd.notna(row.get('event_file')) else None,
+            submit_at=pd.to_datetime(row['submit_at']) if pd.notna(row.get('submit_at')) else None,
             creator_name=row['creator_name'],
-            created_at=datetime.strptime(row['created_at'], '%Y-%m-%d'),
-            update_at=datetime.strptime(row['update_at'], '%Y-%m-%d'),
+            ai_strategy=row.get('ai_strategy') if pd.notna(row.get('ai_strategy')) else '미지정',
         )
         print(f"✅ 사건 추가됨: {row['e_title']}")
     except Exception as e:
-        print(f"❌ 에러 발생 ({row['e_title']}): {e}")
+        print(f"❌ 에러 발생 ({row.get('e_title', 'UNKNOWN')}): {e}")
+
         
 # ========== 3. 판례 테이블(CASE) 데이터 삽입 ========== 
 print("📥 [3] 판례 테이블(CASE) 데이터 삽입 시작...")

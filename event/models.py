@@ -99,7 +99,7 @@ class Event(models.Model):
     submit_at = models.DateTimeField(
         null=True,
         blank=True,
-        verbose_name="소송 재기일"
+        verbose_name="소송 제기일"
     )
     
     ai_strategy = models.TextField(
