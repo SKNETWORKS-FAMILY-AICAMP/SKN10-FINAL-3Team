@@ -128,6 +128,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
+					'X-Requested-With': 'XMLHttpRequest', // CSRF 토큰을 위한 헤더
 				},
 				body: JSON.stringify(requestData),
 			});
