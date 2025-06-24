@@ -205,6 +205,7 @@ def edit_event(request, event_id):
         event_num = request.POST.get('event_num') or None
         claim_summary = request.POST.get('claim_summary')
         event_file = request.POST.get('event_file') or None
+        ai_strategy = request.POST.get('ai_strategy') or None
 
         # 2. 날짜 변환
         retrial_dt = None
@@ -226,6 +227,7 @@ def edit_event(request, event_id):
         event.event_num = event_num
         event.claim_summary = claim_summary
         event.event_file = event_file
+        event.ai_strategy = ai_strategy
 
         event.save()
 

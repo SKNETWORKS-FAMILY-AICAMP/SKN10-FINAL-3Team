@@ -17,9 +17,11 @@
 <main class="flex-1 overflow-y-auto px-20 py-16 bg-gray-100">
 	<div class="max-w-5xl mx-auto">
 		<h2 class="text-3xl font-bold text-center mb-12 text-gray-800">사건 수정</h2>
-		<form id="caseForm" class="space-y-8" method="POST" action="">
+		<form id="caseForm" class="space-y-8" method="POST" action="/event/edit/{{ event.event_id }}/">
 			{% csrf_token %}
 			<input type="hidden" id="selected_team_name" name="selected_team_name" />
+			<!-- ai 추천 전략 정보 -->
+			<input type="hidden" id="ai_strategy" name="ai_strategy" />
 
 			<!-- 사건 정보 -->
 			<div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
@@ -104,16 +106,13 @@
 			<!-- ai 추천 전략 -->
 			<div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
 				<h3 class="text-xl font-semibold mb-4 text-gray-700">AI 추천 전략</h3>
-				<label class="block mb-2 text-gray-600 flex items-center">본문</label>
-				<textarea 
-					id="ai_strategy"
-					name="ai_strategy"
-					rows="6"
-					readonly
-					tabindex="-1"
-					class="w-full border border-gray-200 rounded-lg px-4 py-2 bg-gray-100 text-gray-500 cursor-not-allowed resize-none"
-					style="pointer-events: none;"
-				>{{ event.ai_strategy|default_if_none:''|default:'' }}</textarea>
+				<div class="bg-gray-50 rounded-xl border border-gray-200 p-5 min-h-[130px] text-gray-700 whitespace-pre-line leading-relaxed">
+					{% if event.ai_strategy %}
+						{{ event.ai_strategy|linebreaksbr }}
+					{% else %}
+						<span class="text-gray-400">AI가 추천한 전략이 없습니다.</span>
+					{% endif %}
+				</div>
 			</div>
 
 			<!-- 추가 정보 -->
