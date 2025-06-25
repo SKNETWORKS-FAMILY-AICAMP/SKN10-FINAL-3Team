@@ -16,3 +16,9 @@ python-dotenv
 
 # OpenAI
 openai
+
+# FastAPI
+fastapi
+
+# FastAPI 관련 라이브러리
+uvicorn
