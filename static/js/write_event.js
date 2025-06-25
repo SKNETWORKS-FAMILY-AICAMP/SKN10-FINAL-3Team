@@ -271,6 +271,29 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		let data = null;
 
+		Swal.fire({
+			title: '전략 생성 중입니다',
+			html: `
+				<div style="font-size: 1.2rem; color: #555;">
+					AI가 사건 내용을 분석 중입니다.<br />
+					약간의 시간이 소요될 수 있습니다...
+				</div>
+			`,
+			icon: 'info',
+			showConfirmButton: false,
+			allowOutsideClick: false,
+			allowEscapeKey: false,
+			background: '#f9fafb',
+			color: '#333',
+			didOpen: () => {
+				Swal.showLoading();
+			},
+			customClass: {
+				popup: 'swal-custom-height rounded-xl shadow-lg',
+				title: 'text-lg font-semibold',
+			},
+		});
+
 		try {
 			// 3. POST fetch 실행 (CORS 허용 필요!)
 			const response = await fetch(
@@ -288,6 +311,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			if (!response.ok) {
 				const errorData = await response.json();
+				Swal.close();
 				alert(
 					'분석 API 호출 실패: ' +
 						(errorData.detail || errorData.error || response.status)
@@ -305,10 +329,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			// TODO: 결과를 화면에 반영하려면 여기에 코드 추가 (예: 모달/알림 등)
 		} catch (error) {
-			alert('분석 요청 중 오류: ' + error.message);
+			Swal.close();
+			console.log('분석 요청 중 오류: ' + error.message);
 		}
 
 		// 모달 닫고 form 동기 전송
+		Swal.close();
 		modal.classList.add('hidden');
 		form.submit();
 	});
