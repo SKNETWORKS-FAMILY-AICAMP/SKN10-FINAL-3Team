@@ -21,7 +21,7 @@ import random
 from pprint import pprint
 
 # OpenAI 클라이언트와 스트리밍 응답 함수
-from llm.openai_client import stream_chat_response
+from llm.openai_client import stream_chat_response, get_chat_response
 
 # AI 팀 추천 API 뷰
 class RecommendTeamAPIView(APIView):
@@ -77,13 +77,7 @@ class ChatLLMAPIView(APIView):
         if not query:
             return Response({"error": "query는 필수입니다."}, status=status.HTTP_400_BAD_REQUEST)
 
-        print("[POST 요청 수신]")
-        print(f"사용자 쿼리: {query}")
-        print(f"선택된 판례 ID 목록: {case_ids}")
-
         case_data_dict = {}
-
-        # case_ids가 있을 때만 판례 조회 수행
         if case_ids:
             cases = get_list_or_404(Case, case_id__in=case_ids)
             for idx, case in enumerate(cases, start=1):
@@ -105,14 +99,8 @@ class ChatLLMAPIView(APIView):
                     "keywords": case.keywords,
                 }
 
-        # 쿼리는 항상 포함
         case_data_dict["query"] = query
 
-        print("📦 [LLM 전달 JSON 구조]")
-        pprint(case_data_dict, indent=4, width=120)
-
-        return StreamingHttpResponse(
-            stream_chat_response(case_data_dict, query),
-            content_type='text/plain; charset=utf-8-sig'
-        )
-
+        # ✅ 응답 생성 완료 후 반환
+        answer = get_chat_response(case_data_dict, query)
+        return Response({"answer": answer}, status=status.HTTP_200_OK)

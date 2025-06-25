@@ -12,6 +12,11 @@ async function fetchWithAutoRefresh(url, options, retry = true) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+	marked.setOptions({
+		breaks: false,
+		gfm: true,
+	});
+
 	const selectedCases = new Set();
 	const maxSelections = 2;
 	const summary = document.getElementById('selected-cases-summary');
@@ -87,20 +92,20 @@ document.addEventListener('DOMContentLoaded', () => {
 		const botContent = document.createElement('div');
 		botMsg.className = 'flex items-start';
 		botContent.className =
-			'bg-gray-300 text-black p-4 rounded-lg max-w-[70%] whitespace-pre-line';
-		botContent.innerText = '';
+			'markdown-body bg-gray-300 text-black p-4 rounded-lg max-w-[70%] whitespace-pre-wrap';
+
+		botContent.innerHTML = `<span class="typing-dots"></span>`;
 		botMsg.appendChild(botContent);
 		chatArea.appendChild(botMsg);
+		chatArea.scrollTop = chatArea.scrollHeight;
 
 		try {
 			let data = { query: queryText };
-
 			if (selectedIds.length > 0) {
 				data.case_ids = selectedIds;
 			}
 
 			console.log('[요청 데이터 확인]', data);
-			console.log('[case_ids만 출력]', data.case_ids);
 
 			const res = await fetchWithAutoRefresh('/api/chat/ask/', {
 				method: 'POST',
@@ -112,26 +117,21 @@ document.addEventListener('DOMContentLoaded', () => {
 				body: JSON.stringify(data),
 			});
 
-			if (!res.body) {
-				throw new Error('No response body');
+			const json = await res.json();
+			if (!res.ok) {
+				throw new Error(json.error || '서버 응답 실패');
 			}
 
-			const reader = res.body.getReader();
-			const decoder = new TextDecoder();
-			let done = false;
+			botContent.innerHTML = ''; // 기존 dots 제거
+			botContent.innerHTML = marked.parse(
+				json.answer || '⚠️ 응답을 불러오는 중 오류가 발생했습니다.'
+			);
 
-			while (!done) {
-				const { value, done: doneReading } = await reader.read();
-				done = doneReading;
-				const chunkValue = decoder.decode(value);
-				botContent.innerText += chunkValue;
-				chatArea.scrollTop = chatArea.scrollHeight;
-			}
+			chatArea.scrollTop = chatArea.scrollHeight;
 		} catch (err) {
-			console.error('❌ 스트리밍 오류:', err);
+			console.error('❌ 오류 발생:', err);
 			botContent.innerText = '⚠️ 응답을 불러오는 중 오류가 발생했습니다.';
 		} finally {
-			// --- [중요: 답변 끝나면 입력창/버튼 다시 활성화] ---
 			inputBox.disabled = false;
 			inputBox.classList.remove(
 				'bg-gray-200',
