@@ -1,14 +1,14 @@
 // 자동 토큰 재발급 + 자동 재요청 함수
 async function fetchWithAutoRefresh(url, options, retry = true) {
-    let res = await fetch(url, { ...options, credentials: 'include' });
+	let res = await fetch(url, { ...options, credentials: 'include' });
 
-    if ((res.status === 401 || res.status === 403) && retry) {
-        // 토큰 재발급 시도
-        await fetch('/api/refresh/', { method: 'POST', credentials: 'include' });
-        // 재요청(딱 1번만)
-        return fetchWithAutoRefresh(url, options, false);
-    }
-    return res;
+	if ((res.status === 401 || res.status === 403) && retry) {
+		// 토큰 재발급 시도
+		await fetch('/api/refresh/', { method: 'POST', credentials: 'include' });
+		// 재요청(딱 1번만)
+		return fetchWithAutoRefresh(url, options, false);
+	}
+	return res;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -55,8 +55,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	form.addEventListener('submit', async (event) => {
 		event.preventDefault();
-		const query = inputBox.value.trim();
-		if (!query) return;
+		const queryText = inputBox.value.trim();
+		const selectedIds = Array.from(selectedCases);
+
+		if (!queryText) return;
 
 		// --- [추가] 입력창/버튼 비활성화 ---
 		inputBox.disabled = true;
@@ -66,14 +68,18 @@ document.addEventListener('DOMContentLoaded', () => {
 			'cursor-not-allowed',
 			'placeholder:text-gray-400'
 		);
-		inputBox.classList.remove('focus:ring-2', 'focus:ring-law-blue', 'focus:border-transparent');
+		inputBox.classList.remove(
+			'focus:ring-2',
+			'focus:ring-law-blue',
+			'focus:border-transparent'
+		);
 		if (sendBtn) sendBtn.disabled = true;
 
 		inputBox.value = '';
 
 		const userMsg = document.createElement('div');
 		userMsg.className = 'flex justify-end';
-		userMsg.innerHTML = `<div class="bg-blue-500 text-white p-4 rounded-lg max-w-[70%]">${query}</div>`;
+		userMsg.innerHTML = `<div class="bg-blue-500 text-white p-4 rounded-lg max-w-[70%]">${queryText}</div>`;
 		chatArea.appendChild(userMsg);
 		chatArea.scrollTop = chatArea.scrollHeight;
 
@@ -87,6 +93,15 @@ document.addEventListener('DOMContentLoaded', () => {
 		chatArea.appendChild(botMsg);
 
 		try {
+			let data = { query: queryText };
+
+			if (selectedIds.length > 0) {
+				data.case_ids = selectedIds;
+			}
+
+			console.log('[요청 데이터 확인]', data);
+			console.log('[case_ids만 출력]', data.case_ids);
+
 			const res = await fetchWithAutoRefresh('/api/chat/ask/', {
 				method: 'POST',
 				credentials: 'include',
@@ -94,10 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
 					'Content-Type': 'application/json',
 					'X-Requested-With': 'XMLHttpRequest',
 				},
-				body: JSON.stringify({
-					query,
-					case_ids: Array.from(selectedCases),
-				}),
+				body: JSON.stringify(data),
 			});
 
 			if (!res.body) {
@@ -127,7 +139,11 @@ document.addEventListener('DOMContentLoaded', () => {
 				'cursor-not-allowed',
 				'placeholder:text-gray-400'
 			);
-			inputBox.classList.add('focus:ring-2', 'focus:ring-law-blue', 'focus:border-transparent');
+			inputBox.classList.add(
+				'focus:ring-2',
+				'focus:ring-law-blue',
+				'focus:border-transparent'
+			);
 			if (sendBtn) sendBtn.disabled = false;
 			inputBox.focus();
 		}
