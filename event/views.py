@@ -205,7 +205,7 @@ def edit_event(request, event_id):
         event_num = request.POST.get('event_num') or None
         claim_summary = request.POST.get('claim_summary')
         event_file = request.POST.get('event_file') or None
-        ai_strategy = request.POST.get('ai_strategy') or None
+        ai_strategy = "AI가 전략을 분석하고 있습니다. 잠시만 기다려주세요."
 
         # 2. 날짜 변환
         retrial_dt = None

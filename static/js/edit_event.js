@@ -105,17 +105,20 @@ document.addEventListener('DOMContentLoaded', function () {
 			return;
 		}
 
+		form.submit();
 		// ---------------------------
 		// RunPod 분석 API 호출 부분
 		// ---------------------------
 		// 1. 각 항목 값 추출
-		const clientRole = document.getElementById('client_role').value;         // 역할
-		const caseDescription = document.getElementById('e_description').value;  // 사건내용(본문)
-		const claimSummary = document.getElementById('claim_summary').value;     // 청구내용
-		const eventFile = document.getElementById('event_file').value;           // 증거자료(텍스트)
+		const clientRole = document.getElementById('client_role').value; // 역할
+		const caseDescription = document.getElementById('e_description').value; // 사건내용(본문)
+		const claimSummary = document.getElementById('claim_summary').value; // 청구내용
+		const eventFile = document.getElementById('event_file').value; // 증거자료(텍스트)
+		const eventId = document.getElementById('event_id').value; // 사건 ID
 
 		// 2. 요청 데이터 객체 생성
 		const requestData = {
+			event_id: eventId,
 			client_role: clientRole,
 			e_description: caseDescription,
 			claim_summary: claimSummary,
@@ -124,19 +127,25 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		try {
 			// 3. 외부 분석 API 호출
-			const response = await fetch('https://e53btkyqn6ggcs-8000.proxy.runpod.net/analyze-case/', {
-				method: 'POST',
-				credentials: 'include',
-				headers: {
-					'Content-Type': 'application/json',
-					'X-Requested-With': 'XMLHttpRequest', // CSRF 토큰을 위한 헤더
-				},
-				body: JSON.stringify(requestData),
-			});
+			const response = await fetch(
+				'https://e53btkyqn6ggcs-8000.proxy.runpod.net/analyze-case/',
+				{
+					method: 'POST',
+					// credentials: 'include',
+					headers: {
+						'Content-Type': 'application/json',
+						'X-Requested-With': 'XMLHttpRequest', // CSRF 토큰을 위한 헤더
+					},
+					body: JSON.stringify(requestData),
+				}
+			);
 
 			if (!response.ok) {
 				const errorData = await response.json();
-				alert('분석 API 호출 실패: ' + (errorData.detail || errorData.error || response.status));
+				alert(
+					'분석 API 호출 실패: ' +
+						(errorData.detail || errorData.error || response.status)
+				);
 				return;
 			}
 
@@ -149,13 +158,9 @@ document.addEventListener('DOMContentLoaded', function () {
 				ai_strategy.value = data['result'];
 			}
 			console.log('분석 결과:', data);
-
 		} catch (error) {
-			alert('분석 요청 중 오류: ' + error.message);
+			console.log('분석 요청 중 오류: ' + error.message);
 			return;
 		}
-
-		// 유효성 검사 통과 → 동기 form 제출 허용
-		form.submit();
 	});
 });
