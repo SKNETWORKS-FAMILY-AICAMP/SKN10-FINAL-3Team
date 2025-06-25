@@ -1,6 +1,7 @@
 <!-- prettier-ignore -->
 {% extends 'base/index.html' %} 
-{% load static %} 
+{% load static %}
+{% load markdownify %}
 {% block title %}사건 상세페이지{% endblock %}
 
 <!-- prettier-ignore -->
@@ -31,7 +32,9 @@
 					</p>
 					<p class="text-gray-600">
 						사건 번호:
-						<span class="font-medium mr-2" id="case-client">{{ event.event_num|default_if_none:''|default:'' }}</span>
+						<span class="font-medium mr-2" id="case-client"
+							>{{ event.event_num|default_if_none:''|default:'' }}</span
+						>
 					</p>
 				</div>
 				<div class="mt-4 md:mt-0">
@@ -39,7 +42,7 @@
 						등록일:
 						<span class="font-medium" id="case-created"
 							>{{ event.created_at|date:"Y-m-d" }}</span
-							>
+						>
 					</p>
 				</div>
 			</div>
@@ -115,7 +118,9 @@
 				<div class="md:col-span-2">
 					<p class="text-gray-500 text-sm mb-1">내용</p>
 					<div class="bg-gray-50 p-3 rounded-lg min-h-[80px]">
-						<p class="whitespace-pre-line">{{ event.event_file|default_if_none:''|default:'' }}</p>
+						<p class="whitespace-pre-line">
+							{{ event.event_file|default_if_none:''|default:'' }}
+						</p>
 					</div>
 				</div>
 			</div>
@@ -166,11 +171,8 @@
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 				<div class="md:col-span-2">
 					<p class="text-gray-500 text-sm mb-1">내용</p>
-					<div class="bg-gray-50 p-3 rounded-lg min-h-[80px]">
-						<!-- prettier-ignore -->
-						{% if event.ai_strategy and event.ai_strategy != "None" and event.ai_strategy != "nan" %}
-						<p class="whitespace-pre-line text-gray-700 text-start">{{ event.ai_strategy }}</p>
-						{% endif %}
+					<div class="prose max-w-full bg-gray-50 p-4 rounded-lg">
+						{{ event.ai_strategy|markdownify }}
 					</div>
 				</div>
 			</div>
@@ -200,14 +202,14 @@
 			<button
 				type="button"
 				class="bg-law-blue hover:bg-law-darkblue text-white font-medium py-2 px-6 rounded-lg transition"
-				id="edit-btn" 
+				id="edit-btn"
 				data-event-id="{{ event.event_id }}">
 				<i class="fas fa-edit mr-2"></i>수정
 			</button>
 			<button
 				type="button"
 				class="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-6 rounded-lg transition"
-				id="delete-btn" 
+				id="delete-btn"
 				data-event-id="{{ event.event_id }}">
 				<i class="fas fa-trash-alt mr-2"></i>삭제
 			</button>

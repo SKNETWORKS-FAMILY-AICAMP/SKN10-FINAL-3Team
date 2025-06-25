@@ -2,6 +2,7 @@
 django                      
 djangorestframework         
 django-cors-headers         
+django-markdownify
 
 # 인증 및 보안
 PyJWT                       

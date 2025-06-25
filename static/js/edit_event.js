@@ -79,88 +79,30 @@ document.addEventListener('DOMContentLoaded', function () {
 	form.addEventListener('submit', async function (e) {
 		e.preventDefault();
 
-		if (!form.checkValidity()) {
-			// HTML 기본 유효성 검사
-			return;
-		}
+		if (!form.checkValidity()) return;
 
-		// 추가 커스텀 검사
-		const caseTitle = document.getElementById('case_title').value;
-		const clientName = document.getElementById('client_name').value;
-		const catMid = document.getElementById('cat_mid').value;
-
-		if (getUtf8Bytes(caseTitle) > 100) {
-			e.preventDefault();
-			alert('사건명은 한글 약 33자 또는 영문 100자 이하로 입력해주세요.');
-			return;
-		}
-		if (getUtf8Bytes(clientName) > 20) {
-			e.preventDefault();
-			alert('클라이언트명은 한글 약 6자 또는 영문 20자 이하로 입력해주세요.');
-			return;
-		}
-		if (catMid && getUtf8Bytes(catMid) > 50) {
-			e.preventDefault();
-			alert('세부유형은 한글 약 16자 또는 영문 50자 이하로 입력해주세요.');
-			return;
-		}
-
-		form.submit();
-		// ---------------------------
-		// RunPod 분석 API 호출 부분
-		// ---------------------------
-		// 1. 각 항목 값 추출
-		const clientRole = document.getElementById('client_role').value; // 역할
-		const caseDescription = document.getElementById('e_description').value; // 사건내용(본문)
-		const claimSummary = document.getElementById('claim_summary').value; // 청구내용
-		const eventFile = document.getElementById('event_file').value; // 증거자료(텍스트)
-		const eventId = document.getElementById('event_id').value; // 사건 ID
-
-		// 2. 요청 데이터 객체 생성
+		// 입력값 준비
 		const requestData = {
-			event_id: eventId,
-			client_role: clientRole,
-			e_description: caseDescription,
-			claim_summary: claimSummary,
-			event_file: eventFile,
+			event_id: document.getElementById('event_id').value,
+			client_role: document.getElementById('client_role').value,
+			e_description: document.getElementById('e_description').value,
+			claim_summary: document.getElementById('claim_summary').value,
+			event_file: document.getElementById('event_file').value,
 		};
 
-		try {
-			// 3. 외부 분석 API 호출
-			const response = await fetch(
-				'https://e53btkyqn6ggcs-8000.proxy.runpod.net/analyze-case/',
-				{
-					method: 'POST',
-					// credentials: 'include',
-					headers: {
-						'Content-Type': 'application/json',
-						'X-Requested-With': 'XMLHttpRequest', // CSRF 토큰을 위한 헤더
-					},
-					body: JSON.stringify(requestData),
-				}
-			);
+		fetch('https://e53btkyqn6ggcs-8000.proxy.runpod.net/update-strategy/', {
+			method: 'POST',
+			// credentials: 'include',
+			headers: {
+				'Content-Type': 'application/json',
+				'X-Requested-With': 'XMLHttpRequest',
+			},
+			body: JSON.stringify(requestData),
+		}).catch((error) => {
+			console.warn('분석 요청 중 오류 발생 (무시하고 제출함):', error.message);
+		});
 
-			if (!response.ok) {
-				const errorData = await response.json();
-				alert(
-					'분석 API 호출 실패: ' +
-						(errorData.detail || errorData.error || response.status)
-				);
-				return;
-			}
-
-			data = await response.json();
-			console.log('분석 결과:', data);
-			// alert('분석 결과: ' + data['result']);
-
-			const ai_strategy = document.getElementById('ai_strategy');
-			if (ai_strategy) {
-				ai_strategy.value = data['result'];
-			}
-			console.log('분석 결과:', data);
-		} catch (error) {
-			console.log('분석 요청 중 오류: ' + error.message);
-			return;
-		}
+		// 요청 보낸 직후 form 제출
+		form.submit();
 	});
 });

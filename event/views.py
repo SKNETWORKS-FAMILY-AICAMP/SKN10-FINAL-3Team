@@ -77,12 +77,15 @@ def write_event(request):
         retrial_date = request.POST.get('retrial_date') or None
         case_note = request.POST.get('case_note') or None
         team_name = request.POST.get('selected_team_name')
-        ai_strategy = request.POST.get('ai_strategy') or None
+        ai_strategy = request.POST.get('ai_strategy') or ''
         
         event_num = request.POST.get('event_num') or None
         claim_summary = request.POST.get('claim_summary')
         event_file = request.POST.get('event_file') or None
 
+        # 줄바꿈을 마크다운 문단 구분용으로 변환
+        ai_strategy_cleaned = ai_strategy.replace('\r\n', '\n').replace('\r', '\n')
+        
         # 2. 날짜 변환
         retrial_dt = None
         if retrial_date:
@@ -113,7 +116,7 @@ def write_event(request):
             submit_at=retrial_dt,
             memo=case_note,
             org_cd=org_code,
-            ai_strategy=ai_strategy,
+            ai_strategy=ai_strategy_cleaned,
             
             event_num=event_num,
             claim_summary=claim_summary,

@@ -42,14 +42,30 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # 앱 추가
-    # "rest_framework", 
+    "rest_framework", 
     "corsheaders",
     'api',
     'code_t',
     'user',
     'event',
     'case',
+    'markdownify'
 ]
+
+# settings.py
+MARKDOWNIFY = {
+    "default": {
+        "WHITELIST_TAGS": [
+            "a", "abbr", "acronym", "b", "blockquote", "code",
+            "em", "i", "li", "ol", "strong", "ul", "h1", "h2", "h3", "p", "br"
+        ],
+        "MARKDOWN_EXTENSIONS": [
+            "markdown.extensions.fenced_code",
+            "markdown.extensions.tables",
+            "markdown.extensions.nl2br",  # ✅ 줄바꿈 자동 <br> 처리
+        ],
+    }
+}
 
 # 사용자 커스텀 모델 설정
 AUTH_USER_MODEL = "user.CustomUser"

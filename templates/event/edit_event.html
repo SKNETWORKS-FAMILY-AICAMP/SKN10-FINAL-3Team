@@ -1,6 +1,7 @@
 <!-- template/event/edit_event.html -->
 {% extends 'base/index.html' %}
 {% load static %}
+{% load markdownify %}
 {% block title %}사건 수정{% endblock %}
 
 {% block js %}
@@ -107,7 +108,14 @@
 			<!-- ai 추천 전략 -->
 			<div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
 				<h3 class="text-xl font-semibold mb-4 text-gray-700">AI 추천 전략</h3>
-				<div class="bg-gray-50 rounded-xl border border-gray-200 p-5 min-h-[130px] text-gray-700 whitespace-pre-line leading-relaxed">{% if event.ai_strategy %}{{ event.ai_strategy|linebreaksbr }}{% else %}<span class="text-gray-400">AI가 추천한 전략이 없습니다.</span>{% endif %}</div>
+				<div class="prose max-w-full bg-gray-50 rounded-xl border border-gray-200 p-5 min-h-[130px] text-gray-700 leading-relaxed">
+				{% if event.ai_strategy %}
+					{{ event.ai_strategy|markdownify }}
+				{% else %}
+					<span class="text-gray-400">AI가 추천한 전략이 없습니다.</span>
+				{% endif %}
+			</div>
+
 			</div>
 
 			<!-- 추가 정보 -->
