@@ -4,9 +4,9 @@ from case.models import Case
 
 def chatbot_view(request):
     user = request.user
-    query = request.GET.get('query', '')
     page = request.GET.get('page', 1)
-
+    print(f"request.data : {request.GET}")
+    
     # DB에서 판례 전체 조회
     case_objs = Case.objects.all()
 
@@ -27,12 +27,9 @@ def chatbot_view(request):
     paginator = Paginator(case_data, 10)
     page_obj = paginator.get_page(page)
     
-    print(f"query: {query}, page: {page}, total cases: {paginator.count}")
-    
     context = {
         "user_name": user.name,
         "user_name_first": user.name[0],
-        'query': query,
         'cases': page_obj.object_list,
         'page_obj': page_obj,
     }

@@ -29,7 +29,7 @@
 		<div class="flex justify-between items-center mb-4">
 			{% if page_obj.has_previous %}
 			<a
-				href="?page={{ page_obj.previous_page_number }}&query={{ query }}"
+				href="?page={{ page_obj.previous_page_number }}"
 				class="text-gray-500 hover:text-law-blue">
 				<i class="fas fa-chevron-up"></i>
 			</a>
@@ -45,7 +45,7 @@
 
 			{% if page_obj.has_next %}
 			<a
-				href="?page={{ page_obj.next_page_number }}&query={{ query }}"
+				href="?page={{ page_obj.next_page_number }}"
 				class="text-gray-500 hover:text-law-blue">
 				<i class="fas fa-chevron-down"></i>
 			</a>
@@ -95,7 +95,7 @@
 		<div class="flex justify-between items-center mt-4">
 			{% if page_obj.has_previous %}
 			<a
-				href="?page={{ page_obj.previous_page_number }}&query={{ query }}"
+				href="?page={{ page_obj.previous_page_number }}"
 				class="text-gray-500 hover:text-law-blue">
 				<i class="fas fa-chevron-up"></i>
 			</a>
@@ -111,7 +111,7 @@
 
 			{% if page_obj.has_next %}
 			<a
-				href="?page={{ page_obj.next_page_number }}&query={{ query }}"
+				href="?page={{ page_obj.next_page_number }}"
 				class="text-gray-500 hover:text-law-blue">
 				<i class="fas fa-chevron-down"></i>
 			</a>

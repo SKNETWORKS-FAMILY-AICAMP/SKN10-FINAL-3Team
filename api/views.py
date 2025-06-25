@@ -72,7 +72,7 @@ class RecommendTeamAPIView(APIView):
 class ChatLLMAPIView(APIView):
     def post(self, request):
         query = request.data.get('query')
-        case_ids = request.data.get('case_ids', [])
+        case_ids = request.data.get('case_ids')
 
         if not query:
             return Response({"error": "query는 필수입니다."}, status=status.HTTP_400_BAD_REQUEST)

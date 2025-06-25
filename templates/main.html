@@ -22,17 +22,23 @@
 			class="w-12 h-12 flex items-center justify-center rounded-full bg-blue-500 hover:bg-blue-600 text-white shadow-md transition">
 			<i class="fas fa-upload text-base"></i>
 		</button>
-		<form action="/chatbot/" method="GET" class="w-1/2">
+		<form action="/chatbot/" method="GET" class="w-1/2" id="main_form">
+			{% csrf_token %}
+			<input type="hidden" id="ai_answer" name="ai_answer" />
+			<input type="hidden" id="ai_case_ids" name="ai_case_ids" />
+
 			<div
 				class="flex items-center w-full bg-white rounded-full border border-gray-300 px-6 py-3 shadow-sm">
 				<i class="fas fa-search text-blue-500 text-lg mr-3"></i>
 				<input
 					type="text"
+					id="query"
 					name="query"
 					placeholder="Search Text"
 					class="flex-grow focus:outline-none text-sm" />
 				<button
 					type="submit"
+					id="send-btn"
 					class="ml-3 w-10 h-10 flex items-center justify-center rounded-full bg-white border border-blue-500 text-blue-500 hover:bg-blue-50 transition">
 					<i class="fas fa-paper-plane text-lg"></i>
 				</button>
