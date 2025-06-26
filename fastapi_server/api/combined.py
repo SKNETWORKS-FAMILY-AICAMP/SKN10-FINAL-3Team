@@ -36,7 +36,7 @@ class SimpleResponse(BaseModel):
     answer: str
 
 class DetailedResponse(BaseModel):
-    case_ids: List[str]
+    case_ids: Optional[List[str]] = None
     answer: str
 
 class CaseResult(BaseModel):
@@ -47,7 +47,7 @@ class CaseResult(BaseModel):
 
 class CombinedQueryResponse(BaseModel):
     search_type: str  # "조건기반" | "유사도기반" | "일반질문" | "판례비교" | "판례질문"
-    case_ids: List[str]
+    case_ids: Optional[List[str]] = None
     answer: str
     similar_cases: Optional[List[CaseResult]] = None
 
@@ -67,6 +67,7 @@ async def handle_case_query(request: CaseIdQueryRequest, raw_request: Request):
     
     query = request.query
     case_id = request.case_id
+    case_id = int(case_id)
     logger.info(f"CaseIdQueryRequest: {request}")
 
     # RDS에서 판례 정보 가져오기
@@ -96,7 +97,7 @@ async def handle_case_query(request: CaseIdQueryRequest, raw_request: Request):
         logger.info(f"Answer: {answer}")
 
         return DetailedResponse(
-            case_ids=[str(case_id)],
+            # case_ids=[str(case_id)],
             answer=answer
         )
     
@@ -109,17 +110,20 @@ async def handle_case_query(request: CaseIdQueryRequest, raw_request: Request):
         )
         raw_results = search_similar_cases(contents)
         
-        filtered = [r for r in raw_results if r["similarity"] >= 0.5]
+        threshold = 1.95
+
+        filtered = [r for r in raw_results if r["similarity"] <= threshold]
         sorted_results = sorted(filtered, key=lambda x: x["similarity"], reverse=True)
         
         if not sorted_results:
             return DetailedResponse(
-                case_ids=[str(case_id)],
-                answer="유사도가 0.5 이상인 판례가 없습니다."
+                # case_ids=[str(case_id)],
+                answer=f"유사한 판례가 없습니다."
             )
         
         case_ids = [str(r.get("case_id", f"CASE-{i}")) for i, r in enumerate(sorted_results)]
-        
+        print(f"DEBUG: Similar case ids: {case_ids}")
+
         return DetailedResponse(
             case_ids=case_ids,
             answer=f"유사한 판례 {len(case_ids)}건을 찾았습니다."
@@ -141,7 +145,7 @@ async def handle_case_query(request: CaseIdQueryRequest, raw_request: Request):
         answer = generate_markdown_answer(prompt)
         
         return DetailedResponse(
-            case_ids=[str(case_id)],
+            # case_ids=[str(case_id)],
             answer=answer
         )
 
@@ -150,6 +154,7 @@ async def handle_cases_query(request: CaseIdsQueryRequest):
     """case_ids 배열로 여러 판례 정보를 가져와서 질문에 답변"""
     query = request.query
     case_ids = request.case_ids
+    case_ids = [int(case_id) for case_id in case_ids]
     
     print(f"DEBUG: Received query: {query}")
     print(f"DEBUG: Received case_ids: {case_ids}")
@@ -193,7 +198,7 @@ async def handle_cases_query(request: CaseIdsQueryRequest):
         answer = generate_markdown_answer(prompt)
         
         return DetailedResponse(
-            case_ids=[str(case_id) for case_id in case_ids],
+            # case_ids=[str(case_id) for case_id in case_ids],
             answer=answer
         )
     
@@ -217,7 +222,7 @@ async def handle_cases_query(request: CaseIdsQueryRequest):
         print(f"DEBUG: Generated answer: {answer[:100]}...")
         
         return DetailedResponse(
-            case_ids=[str(case_ids[0])],
+            # case_ids=[str(case_ids[0])],
             answer=answer
         )
     
@@ -231,13 +236,14 @@ async def handle_cases_query(request: CaseIdsQueryRequest):
         )
         raw_results = search_similar_cases(contents)
         
-        filtered = [r for r in raw_results if r["similarity"] >= 0.5]
+        threshold = 1.95
+        filtered = [r for r in raw_results if r["similarity"] <= threshold]
         sorted_results = sorted(filtered, key=lambda x: x["similarity"], reverse=True)
         
         if not sorted_results:
             return DetailedResponse(
-                case_ids=[str(case_ids[0])],
-                answer="유사도가 0.5 이상인 판례가 없습니다."
+                # case_ids=[str(case_ids[0])],
+                answer="유사한 판례가 없습니다."
             )
         
         similar_case_ids = [str(r.get("case_id", f"CASE-{i}")) for i, r in enumerate(sorted_results)]
@@ -267,16 +273,24 @@ async def handle_cases_query(request: CaseIdsQueryRequest):
         print(f"DEBUG: Generated answer: {answer[:100]}...")
         
         return DetailedResponse(
-            case_ids=[str(case_id) for case_id in case_ids],
+            # case_ids=[str(case_id) for case_id in case_ids],
             answer=answer
         )
 
 @router.post("/combined/", response_model=Union[SimpleResponse, DetailedResponse, CombinedQueryResponse])
 async def handle_combined_query(request: CombinedQueryRequest):
+    logger.info(f"Received request data: {request}")
+    logger.info(f"Request query: {request.query}")
+    logger.info(f"Request case1: {request.case1}")
+    logger.info(f"Request case2: {request.case2}")
+    logger.info(f"Request case_ids: {request.case_ids}")
+    
     query = request.query
     case1 = request.case1
     case2 = request.case2
     case_ids = request.case_ids
+    if case_ids:
+        case_ids = [int(case_id) for case_id in case_ids]
 
     # case_ids가 제공된 경우 RDS에서 케이스 데이터 가져오기
     if case_ids:
@@ -315,7 +329,7 @@ async def handle_combined_query(request: CombinedQueryRequest):
             answer = generate_markdown_answer(prompt)
             
             return DetailedResponse(
-                case_ids=[str(case_id) for case_id in case_ids],
+                # case_ids=[str(case_id) for case_id in case_ids],
                 answer=answer
             )
         
@@ -339,7 +353,7 @@ async def handle_combined_query(request: CombinedQueryRequest):
             print(f"DEBUG: Generated answer: {answer[:100]}...")
             
             return DetailedResponse(
-                case_ids=[str(case_ids[0])],
+                # case_ids=[str(case_ids[0])],
                 answer=answer
             )
         
@@ -353,17 +367,19 @@ async def handle_combined_query(request: CombinedQueryRequest):
             )
             raw_results = search_similar_cases(contents)
             
-            filtered = [r for r in raw_results if r["similarity"] >= 0.5]
+            threshold = 1.95
+            filtered = [r for r in raw_results if r["similarity"] <= threshold]
             sorted_results = sorted(filtered, key=lambda x: x["similarity"], reverse=True)
             
             if not sorted_results:
                 return DetailedResponse(
-                    case_ids=[str(case_ids[0])],
-                    answer="유사도가 0.5 이상인 판례가 없습니다."
+                    # case_ids=[str(case_ids[0])],
+                    answer="유사한 판례가 없습니다."
                 )
             
             similar_case_ids = [str(r.get("case_id", f"CASE-{i}")) for i, r in enumerate(sorted_results)]
-            
+            print(f"DEBUG: Similar case ids: {similar_case_ids}")
+
             return DetailedResponse(
                 case_ids=similar_case_ids,
                 answer=f"유사한 판례 {len(similar_case_ids)}건을 찾았습니다."
@@ -389,7 +405,7 @@ async def handle_combined_query(request: CombinedQueryRequest):
             print(f"DEBUG: Generated answer: {answer[:100]}...")
             
             return DetailedResponse(
-                case_ids=[str(case_id) for case_id in case_ids],
+                # case_ids=[str(case_id) for case_id in case_ids],
                 answer=answer
             )
 
@@ -431,13 +447,13 @@ async def handle_combined_query(request: CombinedQueryRequest):
             # ex3 형태 응답
             if input_type == "ex3":
                 return DetailedResponse(
-                    case_ids=[],
+                    # case_ids=[],
                     answer=answer
                 )
             else:
                 return CombinedQueryResponse(
                     search_type="판례비교",
-                    case_ids=[],
+                    # case_ids=[],
                     answer=answer,
                     similar_cases=None
                 )
@@ -453,28 +469,31 @@ async def handle_combined_query(request: CombinedQueryRequest):
                     case1.get("decision_summary", "")
                 )
                 raw_results = search_similar_cases(contents)
-
-            filtered = [r for r in raw_results if r["similarity"] >= 0.5]
+            logger.info(f"Raw results: {raw_results}")
+            threshold = 1.95
+            filtered = [r for r in raw_results if r["similarity"] <= threshold]
             sorted_results = sorted(filtered, key=lambda x: x["similarity"], reverse=True)
 
             if not sorted_results:
                 if input_type == "ex1":
-                    return SimpleResponse(answer="유사도가 0.5 이상인 판례가 없습니다.")
+                    return SimpleResponse(answer="유사한 판례가 없습니다.")
                 else:
                     return DetailedResponse(
-                        case_ids=[],
-                        answer="유사도가 0.5 이상인 판례가 없습니다."
+                        # case_ids=[],
+                        answer="유사한 판례가 없습니다."
                     )
 
             case_ids = [str(r.get("case_id", f"CASE-{i}")) for i, r in enumerate(sorted_results)]
             
             # 유사도 검색은 항상 case_ids를 포함한 응답 반환
             if input_type == "ex1":
+                print(f"DEBUG: Similar case ids: {case_ids}")
                 return DetailedResponse(
                     case_ids=case_ids,
                     answer=f"유사한 판례 {len(case_ids)}건을 찾았습니다."
                 )
             elif input_type in ["ex2", "ex3"]:
+                print(f"DEBUG: Similar case ids: {case_ids}")
                 return DetailedResponse(
                     case_ids=case_ids,
                     answer=f"유사한 판례 {len(case_ids)}건을 찾았습니다."
@@ -489,6 +508,7 @@ async def handle_combined_query(request: CombinedQueryRequest):
                     )
                     for i, r in enumerate(sorted_results)
                 ]
+                print(f"DEBUG: Similar cases: {similar_cases}")
                 return CombinedQueryResponse(
                     search_type="유사도기반",
                     case_ids=case_ids,
@@ -509,16 +529,16 @@ async def handle_combined_query(request: CombinedQueryRequest):
 {case1_info}
 """
             answer = generate_markdown_answer(prompt)
-            
+            logger.info(f"Answer: {answer}")
             if input_type == "ex2":
                 return DetailedResponse(
-                    case_ids=[],
+                    # case_ids=[],
                     answer=answer
                 )
             else:
                 return CombinedQueryResponse(
                     search_type="판례질문",
-                    case_ids=[],
+                    # case_ids=[],
                     answer=answer,
                     similar_cases=None
                 )
@@ -551,6 +571,7 @@ async def handle_combined_query(request: CombinedQueryRequest):
         try:
             sim_results = search_similar_cases(query)
             case_ids = [str(r["case_id"]) for r in sim_results]
+            print(f"DEBUG: Similar case ids: {case_ids}")
 
             return DetailedResponse(
                 case_ids=case_ids,
@@ -572,7 +593,8 @@ async def handle_combined_query(request: CombinedQueryRequest):
 답변:
 """
             gpt_answer = ask_openai(prompt)
-            
+
+            logger.info(f"GPT Answer: {gpt_answer}")
             # 빈 답변이나 None 처리
             if not gpt_answer or not gpt_answer.strip():
                 gpt_answer = "해당 질문에 대한 답변을 찾지 못했습니다. 좀 더 구체적으로 질문해 주시면 도움을 드릴 수 있습니다."
@@ -584,13 +606,13 @@ async def handle_combined_query(request: CombinedQueryRequest):
             return SimpleResponse(answer=gpt_answer)
         elif input_type in ["ex2", "ex3"]:
             return DetailedResponse(
-                case_ids=[],
+                # case_ids=[],
                 answer=gpt_answer
             )
         else:
             return CombinedQueryResponse(
                 search_type="일반질문",
-                case_ids=[],
+                # case_ids=[],
                 answer=gpt_answer,
                 similar_cases=None
             )

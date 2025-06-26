@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from database import get_db, engine
 from models import Event, Base, EventRequest, EventResponse
 from agent.strategy import generate_strategy
+import pymysql
 
 # API 라우터 추가
 from api import ask, combined
@@ -15,11 +16,61 @@ from api import ask, combined
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+def test_mysql_connection():
+    """MySQL 연결 테스트"""
+    try:
+        logger.info("MySQL 연결 테스트 시작...")
+        
+        # 환경변수 확인
+        mysql_host = os.getenv("MYSQL_HOST")
+        mysql_port = os.getenv("MYSQL_PORT")
+        mysql_user = os.getenv("MYSQL_USER")
+        mysql_pwd = os.getenv("MYSQL_PWD")
+        mysql_db = os.getenv("MYSQL_DB")
+        
+        logger.info(f"MySQL 설정 확인:")
+        logger.info(f"  HOST: {mysql_host}")
+        logger.info(f"  PORT: {mysql_port}")
+        logger.info(f"  USER: {mysql_user}")
+        logger.info(f"  DB: {mysql_db}")
+        
+        if not all([mysql_host, mysql_port, mysql_user, mysql_pwd, mysql_db]):
+            logger.error("MySQL 환경변수가 완전히 설정되지 않았습니다.")
+            return False
+        
+        # 연결 테스트
+        conn = pymysql.connect(
+            host=mysql_host,
+            port=int(mysql_port),
+            user=mysql_user,
+            password=mysql_pwd,
+            database=mysql_db,
+            charset='utf8mb4',
+            cursorclass=pymysql.cursors.DictCursor
+        )
+        
+        # 간단한 쿼리 테스트
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT 1 as test")
+            result = cursor.fetchone()
+            logger.info(f"MySQL 연결 테스트 성공: {result}")
+        
+        conn.close()
+        logger.info("MySQL 연결 테스트 완료 - 정상 작동")
+        return True
+        
+    except Exception as e:
+        logger.error(f"MySQL 연결 테스트 실패: {str(e)}")
+        return False
+
 app = FastAPI()
 router = APIRouter()
 
 # 데이터베이스 테이블 생성
 Base.metadata.create_all(bind=engine)
+
+# MySQL 연결 테스트 실행
+test_mysql_connection()
 
 app.add_middleware(
     CORSMiddleware,

@@ -1,0 +1,4 @@
+test_api
+.env
+__pycache__
+.dockerignore
