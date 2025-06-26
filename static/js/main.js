@@ -27,17 +27,14 @@ document.addEventListener('DOMContentLoaded', function () {
 				query: queryText,
 			};
 
-			const response = await fetch(
-				'https://e53btkyqn6ggcs-8000.proxy.runpod.net/analyze-case/',
-				{
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-						'X-Requested-With': 'XMLHttpRequest',
-					},
-					body: JSON.stringify(data),
-				}
-			);
+			const response = await fetch('https://e53btkyqn6ggcs-8000.proxy.runpod.net/combined/', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'X-Requested-With': 'XMLHttpRequest',
+				},
+				body: JSON.stringify(data),
+			});
 
 			if (!response.ok) {
 				const errorData = await response.json();

@@ -295,7 +295,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		});
 
 		try {
-			// 3. POST fetch 실행 (CORS 허용 필요!)
+			// 3. POST fetch 실행
 			const response = await fetch(
 				'https://e53btkyqn6ggcs-8000.proxy.runpod.net/analyze-case/',
 				{

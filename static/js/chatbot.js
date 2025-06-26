@@ -17,12 +17,37 @@ document.addEventListener('DOMContentLoaded', () => {
 		gfm: true,
 	});
 
+	// query 파라미터가 있으면 첫 사용자 메시지로 삽입
+	const urlParams = new URLSearchParams(window.location.search);
+	const initialQuery = urlParams.get('query');
+	const aiAnswer = urlParams.get('ai_answer');
+	const chatArea = document.querySelector('.space-y-6');
+
+	// 초기 query가 있다면 사용자 메시지로 삽입
+	if (initialQuery) {
+		const userMsg = document.createElement('div');
+		userMsg.className = 'flex justify-end';
+		userMsg.innerHTML = `<div class="bg-blue-500 text-white p-4 rounded-lg max-w-[70%] whitespace-pre-wrap">${initialQuery}</div>`;
+		chatArea.appendChild(userMsg);
+	}
+
+	// 초기 ai_answer가 있다면 바로 bot 메시지로 삽입
+	if (aiAnswer) {
+		const botMsg = document.createElement('div');
+		const botContent = document.createElement('div');
+		botMsg.className = 'flex items-start';
+		botContent.className =
+			'markdown-body bg-gray-300 text-black p-4 rounded-lg max-w-[70%] whitespace-pre-wrap';
+		botContent.innerHTML = marked.parse(aiAnswer);
+		botMsg.appendChild(botContent);
+		chatArea.appendChild(botMsg);
+	}
+
 	const selectedCases = new Set();
 	const maxSelections = 2;
 	const summary = document.getElementById('selected-cases-summary');
 	const form = document.getElementById('chat-form');
 	const inputBox = document.getElementById('chat-input');
-	const chatArea = document.querySelector('.space-y-6');
 	// [여기에서 선언]
 	let sendBtn = null;
 
@@ -107,9 +132,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 			console.log('[요청 데이터 확인]', data);
 
-			const res = await fetchWithAutoRefresh('/api/chat/ask/', {
+			const res = await fetch('https://e53btkyqn6ggcs-8000.proxy.runpod.net/combined/', {
 				method: 'POST',
-				credentials: 'include',
 				headers: {
 					'Content-Type': 'application/json',
 					'X-Requested-With': 'XMLHttpRequest',
@@ -122,7 +146,20 @@ document.addEventListener('DOMContentLoaded', () => {
 				throw new Error(json.error || '서버 응답 실패');
 			}
 
-			botContent.innerHTML = ''; // 기존 dots 제거
+			console.log('[응답 데이터 확인]', json);
+
+			// 판례 리스트 존재 시 → 페이지 이동
+			if ('case_ids' in json && Array.isArray(json.case_ids) && json.case_ids.length > 0) {
+				const params = new URLSearchParams();
+				params.append('query', queryText);
+				params.append('ai_answer', json.answer || '');
+				params.append('ai_case_ids', json.case_ids.join(','));
+
+				window.location.href = `/chatbot/?${params.toString()}`;
+				return; // 이후 로직 실행 막기
+			}
+
+			// 판례 없을 경우 → 현재 채팅창에 그대로 출력
 			botContent.innerHTML = marked.parse(
 				json.answer || '⚠️ 응답을 불러오는 중 오류가 발생했습니다.'
 			);
