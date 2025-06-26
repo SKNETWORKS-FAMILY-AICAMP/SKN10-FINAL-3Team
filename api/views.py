@@ -20,9 +20,6 @@ from django.contrib.auth import login, logout
 import random
 from pprint import pprint
 
-# OpenAI 클라이언트와 스트리밍 응답 함수
-from llm.openai_client import stream_chat_response, get_chat_response
-
 # AI 팀 추천 API 뷰
 class RecommendTeamAPIView(APIView):
     authentication_classes = [JWTAuthentication]
