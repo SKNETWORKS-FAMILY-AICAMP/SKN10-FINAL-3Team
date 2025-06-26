@@ -1,9 +1,9 @@
 # models.py
-from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, Text, DateTime
 from sqlalchemy.sql import func
 from database import Base
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, Dict, List
 
 # RDB 테이블
 ## Event 테이블
@@ -12,7 +12,6 @@ class Event(Base):
 
     event_id = Column(Integer, primary_key=True, autoincrement=True, index=True)
     # 사건 기본 정보
-    e_title = Column(String(100), nullable=False)
     e_description = Column(Text, nullable=False)
     claim_summary = Column(Text, nullable=False)
     client_role = Column(String(10), nullable=False)
@@ -49,6 +48,7 @@ class Case(Base):
 # class VectorDB(Base):
 
 # Request / Response 모델
+## Event
 class EventRequest(BaseModel): 
     event_id: Optional[str] = None
     client_role: str
@@ -59,13 +59,37 @@ class EventRequest(BaseModel):
 class EventResponse(BaseModel):
     result: str
 
-class CaseRequest(BaseModel):
+## Case
+class CombinedQueryRequest(BaseModel):
     query: str
-    case_ids: list[str]
+    case1: Optional[Dict] = None
+    case2: Optional[Dict] = None
+    case_ids: Optional[List[int]] = None
 
-class CaseResponse_1(BaseModel):
+class CaseIdQueryRequest(BaseModel):
+    query: str
+    case_id: int
+
+class CaseIdsQueryRequest(BaseModel):
+    query: str
+    case_ids: List[int]
+
+# 응답 스키마들
+class SimpleResponse(BaseModel):
     answer: str
 
-class CaseResponse_2(BaseModel):
+class DetailedResponse(BaseModel):
+    case_ids: List[str]
     answer: str
-    case_ids: list[str]
+
+class CaseResult(BaseModel):
+    case_id: str
+    title: str
+    summary: str
+    similarity: float
+
+class CombinedQueryResponse(BaseModel):
+    search_type: str  # "조건기반" | "유사도기반" | "일반질문" | "판례비교" | "판례질문"
+    case_ids: List[str]
+    answer: str
+    similar_cases: Optional[List[CaseResult]] = None

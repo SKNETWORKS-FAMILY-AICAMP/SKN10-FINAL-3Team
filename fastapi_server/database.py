@@ -5,6 +5,7 @@ import os
 from fastapi import HTTPException
 import logging
 
+# 로그 설정
 logger = logging.getLogger(__name__)
 
 # 환경 변수에서 RDS 접속 정보 불러오기
