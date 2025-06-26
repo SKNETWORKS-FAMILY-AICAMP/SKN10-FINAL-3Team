@@ -1,5 +1,36 @@
 console.log('write_event.js loaded!!');
 
+// [최상단] 공통 API 호출 함수: access token 만료 시 1회 자동 재시도!
+async function apiRequest(url, options = {}, retry = true) {
+    let res = await fetch(url, { ...options, credentials: 'include' });
+
+    if ((res.status === 401 || res.status === 403) && retry) {
+        // 서버가 refresh token으로 access token을 재발급해줬으니, 1회 더 재요청!
+        await new Promise(r => setTimeout(r, 150));
+        res = await fetch(url, { ...options, credentials: 'include' });
+
+        if (res.status === 401 || res.status === 403) {
+            window.location.href = '/';
+            return;
+        }
+    } else if ((res.status === 401 || res.status === 403) && !retry) {
+        window.location.href = '/';
+        return;
+    }
+
+    if (!res.ok) {
+        let error;
+        try {
+            error = await res.json();
+        } catch {
+            error = { error: 'API Error' };
+        }
+        throw new Error(error.error || 'API Error');
+    }
+    return res.json();
+}
+
+
 document.addEventListener('DOMContentLoaded', function () {
 	// --- DOM 요소 및 데이터 초기화 ---
 	const catSelect = document.getElementById('cat_cd');
@@ -83,6 +114,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		aiTeamListDiv.innerHTML = '';
 		availableTeamsListDiv.innerHTML = '';
+
+		// [추가] 방어 코드
+		if (!availableTeams || !Array.isArray(availableTeams)) {
+			alert('해당 사건 분류에 가용한 팀이 없습니다.');
+			return;
+		}
 
 		if (recommendedTeam) {
 			const aiBtn = createTeamButton(recommendedTeam, true);
@@ -185,10 +222,16 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 		// 위의 정보를 ai에게 요청 - 팀추천 로직
 		try {
-			const data = await fetch(`/api/recommend/?cat_cd=${formData.catCd}`, {
+			const data = await apiRequest(`/api/recommend/?cat_cd=${formData.catCd}`, {
 				method: 'GET',
-				credentials: 'include',
-			}).then((response) => response.json());
+			});
+			
+			// [추가] 에러 응답 처리
+			if (data.error) {
+				alert(data.error);
+				return;
+			}
+
 			populateModalWithTeams(data.recommended_team, data.available_teams);
 			modal.classList.remove('hidden');
 		} catch (error) {
@@ -314,7 +357,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				Swal.close();
 				alert(
 					'분석 API 호출 실패: ' +
-						(errorData.detail || errorData.error || response.status)
+					(errorData.detail || errorData.error || response.status)
 				);
 				return;
 			}
