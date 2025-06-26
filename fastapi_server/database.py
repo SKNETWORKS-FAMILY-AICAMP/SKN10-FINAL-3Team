@@ -4,7 +4,6 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 import os
 from fastapi import HTTPException
 import logging
-
 # 로그 설정
 logger = logging.getLogger(__name__)
 
