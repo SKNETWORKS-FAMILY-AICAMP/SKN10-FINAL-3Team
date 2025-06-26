@@ -50,6 +50,7 @@ event_df = pd.read_csv(event_file, encoding='utf-8-sig')
 
 total_rows = len(event_df)
 inserted_rows = 0
+updated_rows = 0
 skipped_rows = 0
 
 # ✅ 필수 항목 정의 → submit_at도 포함
@@ -63,7 +64,6 @@ for _, row in event_df.iterrows():
         continue
 
     try:
-        # ✅ 여기까지 온 경우, submit_at은 무조건 값이 있음
         try:
             submit_at = pd.to_datetime(row['submit_at'], errors='raise')
         except Exception as e:
@@ -93,15 +93,23 @@ for _, row in event_df.iterrows():
             }
         )
 
-        print(f"{'✔️ 추가됨' if created else '🔄 업데이트됨'}: {row['event_num']} - {row['e_title']}")
-        inserted_rows += 1
+        if created:
+            inserted_rows += 1
+            print(f"✔️ 추가됨: {row['event_num']} - {row['e_title']}")
+        else:
+            updated_rows += 1
+            print(f"🔄 업데이트됨: {row['event_num']} - {row['e_title']}")
 
     except Exception as e:
         print(f"❌ 에러 발생 ({row.get('event_num', 'UNKNOWN')}): {e}")
         skipped_rows += 1
 
+print(f"\n📊 전체 {total_rows}건 중")
+print(f"   ✔️ 삽입됨: {inserted_rows}건")
+print(f"   🔄 업데이트됨: {updated_rows}건")
+print(f"   ⛔ 생략됨: {skipped_rows}건")
+print(f"   ✅ 처리된 총 행 수: {inserted_rows + updated_rows}")
 
-print(f"\n📊 전체 {total_rows}건 중 {inserted_rows}건 삽입 완료, {skipped_rows}건 생략됨.")
 
 # ========== 3. 판례 테이블(CASE) 데이터 삽입 ========== 
 print("📥 [3] 판례 테이블(CASE) 데이터 삽입 시작...")

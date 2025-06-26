@@ -96,44 +96,67 @@
 				{% endif %}
 			</div>
 
-			<div class="overflow-x-auto px-10 grow">
-				<table class="min-w-full text-left text-sm">
-					<thead>
-						<tr class="border-b text-gray-500 text-center">
-							<th class="pb-2 w-[5%]">번호</th>
-							<th class="pb-2 w-[30%]">사건명</th>
-							<th class="pb-2 w-[10%]">클라이언트</th>
-							<th class="pb-2 w-[20%]">사건 유형</th>
-							<th class="pb-2 w-[10%]">작성자</th>
-							<th class="pb-2 w-[15%]">진행상태</th>
-							<th class="pb-2 w-[10%]">생성일</th>
-						</tr>
-					</thead>
-					<tbody class="min-h-[440px]">
-						{% for row_number, item in page_with_numbers %}
-						<tr
-							class="border-t text-center h-12 align-middle cursor-pointer hover:bg-gray-50 transition"
-							data-id="{{ item.event_id }}">
-							<td class="py-0 truncate">{{ row_number }}</td>
-							<td class="py-0 truncate">{{ item.e_title }}</td>
-							<td class="py-0 truncate">{{ item.client }}</td>
-							<td class="py-0 truncate">{{ item.cat_02 }}</td>
-							<td class="py-0 truncate">{{ item.creator_name }}</td>
-							<td class="py-0 truncate">{{ item.estat_label }}</td>
-							<td class="py-0">{{ item.created_at|date:"Y-m-d" }}</td>
-						</tr>
-						{% empty %}
-						<tr>
-							<td colspan="7">
-								<div
-									class="flex justify-center items-center h-[400px] text-gray-400 text-center">
-									배정된 사건이 없습니다.
-								</div>
-							</td>
-						</tr>
-						{% endfor %}
-					</tbody>
-				</table>
+			<div class="overflow-x-auto grow px-10">
+				<div class="w-[80vw] mx-auto">
+					<!-- 기준 너비 설정 -->
+					<table class="min-w-full text-left text-sm">
+						<thead>
+							<tr class="border-b text-gray-500 text-center">
+								<th class="pb-2 w-[5%]">번호</th>
+								<th class="pb-2 w-[30%]">사건명</th>
+								<th class="pb-2 w-[10%]">클라이언트</th>
+								<th class="pb-2 w-[20%]">사건 유형</th>
+								<th class="pb-2 w-[10%]">작성자</th>
+								<th class="pb-2 w-[15%]">진행상태</th>
+								<th class="pb-2 w-[10%]">생성일</th>
+							</tr>
+						</thead>
+						<tbody class="min-h-[440px]">
+							{% for row_number, item in page_with_numbers %}
+							<tr
+								class="border-t text-center h-12 align-middle cursor-pointer hover:bg-gray-50 transition"
+								data-id="{{ item.event_id }}">
+								<td
+									class="py-0 px-3 max-w-[4vw] truncate overflow-hidden whitespace-nowrap">
+									{{ row_number }}
+								</td>
+								<td
+									class="py-0 px-3 max-w-[20vw] truncate overflow-hidden whitespace-nowrap">
+									{{ item.e_title }}
+								</td>
+								<td
+									class="py-0 px-3 max-w-[8vw] truncate overflow-hidden whitespace-nowrap">
+									{{ item.client }}
+								</td>
+								<td
+									class="py-0 px-3 max-w-[12vw] truncate overflow-hidden whitespace-nowrap">
+									{{ item.cat_02 }}
+								</td>
+								<td
+									class="py-0 px-3 max-w-[8vw] truncate overflow-hidden whitespace-nowrap">
+									{{ item.creator_name }}
+								</td>
+								<td
+									class="py-0 px-3 max-w-[10vw] truncate overflow-hidden whitespace-nowrap">
+									{{ item.estat_label }}
+								</td>
+								<td class="py-0 px-3 text-nowrap">
+									{{ item.created_at|date:"Y-m-d" }}
+								</td>
+							</tr>
+							{% empty %}
+							<tr>
+								<td colspan="7">
+									<div
+										class="flex justify-center items-center h-[400px] text-gray-400 text-center">
+										배정된 사건이 없습니다.
+									</div>
+								</td>
+							</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
 			</div>
 		</div>
 
