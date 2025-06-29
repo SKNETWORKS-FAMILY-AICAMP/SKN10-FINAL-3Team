@@ -6,10 +6,14 @@ from langgraph_graph.nodes import vectorSearch_node, SQLSearch_node, scoreCalc_n
 def build_langgraph():
     graph = StateGraph(GraphState)
     
+    graph.add_node("VectorSearch", vectorSearch_node)
+    graph.add_node("SQLSearch", SQLSearch_node)
     graph.add_node("ScoreCalc", scoreCalc_node)
     graph.add_node("Explain", explain_node)
 
-    graph.set_entry_point("ScoreCalc")
+    graph.set_entry_point("VectorSearch")   # 첫 시작 노드
+    graph.add_edge("VectorSearch", "SQLSearch")
+    graph.add_edge( "SQLSearch", "ScoreCalc")
     graph.add_edge("ScoreCalc", "Explain")
     graph.add_edge("Explain", END)
 

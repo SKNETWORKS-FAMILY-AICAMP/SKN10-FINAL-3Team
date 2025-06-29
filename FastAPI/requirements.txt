@@ -12,3 +12,7 @@ uvicorn
 
 # LangGraph
 langgraph
+
+FAISS
+OpenAIEmbeddings
+sqlalchemy
