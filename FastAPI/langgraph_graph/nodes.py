@@ -10,8 +10,8 @@ async def vectorSearch_node(state: dict):
         res = await client.post(
             os.environ['FASTAPI_BASE_URL'] + os.environ['VECTORSEARCH_URL'],
             json={
-                "query": state.get("e_description", "더미 사건 설명"),
-                "cat_cd": state.get("cat_cd", "민사"),
+                "query": state["e_description"],
+                "cat_cd": state["cat_cd"],
             }
         )
     result = res.json()
@@ -23,8 +23,7 @@ async def SQLSearch_node(state: dict):
         res = await client.post(
             os.environ['FASTAPI_BASE_URL'] + os.environ['SQLSEARCH_URL'],
             json={
-                "query": state.get("e_description", "더미 사건 설명"),
-                "cat_cd": state.get("cat_cd", "민사"),
+                "top_event_ids": state["top_event_ids"],
             }
         )
     result = res.json()
