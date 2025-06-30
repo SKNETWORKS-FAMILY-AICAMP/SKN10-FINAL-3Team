@@ -1,8 +1,24 @@
-django
-djangorestframework
-django-cors-headers
-PyJWT
+# Django 웹 프레임워크 및 API
+django                      
+djangorestframework         
+django-cors-headers         
+django-markdownify
 
-mysqlclient
+# 인증 및 보안
+PyJWT                       
 
-pandas
+# 데이터베이스 연동
+mysqlclient                 
+
+# 데이터 처리 및 환경 설정
+pandas                      
+python-dotenv               
+
+# OpenAI
+openai
+
+# FastAPI
+fastapi
+
+# FastAPI 관련 라이브러리
+uvicorn

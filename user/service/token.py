@@ -6,12 +6,13 @@ import enum
 from rest_framework.exceptions import AuthenticationFailed
 from user.models import RefreshToken, CustomUser
 from django.utils import timezone
+
 # 토큰 설정 Enum 클래스
 # - access token: 2분 (단기 사용)
-# - refresh token: 2일 (장기 사용)
-class JWT_KEY(enum.Enum): # 에세스토큰 시간 재설정해야함
-    RANDOM_OF_ACCESS_KEY = (enum.auto(), 'access_secret', datetime.timedelta(seconds=1800), 'HS256', '랜덤한 조합의 키')
-    RANDOM_OF_REFRESH_KEY = (enum.auto(), 'refresh_secret', datetime.timedelta(days=2), 'HS256', '랜덤한 조합의 키')
+# - refresh token: 1일 (장기 사용)
+class JWT_KEY(enum.Enum):
+    RANDOM_OF_ACCESS_KEY = (enum.auto(), 'access_secret', datetime.timedelta(seconds=120), 'HS256', '랜덤한 조합의 키')
+    RANDOM_OF_REFRESH_KEY = (enum.auto(), 'refresh_secret', datetime.timedelta(days=1), 'HS256', '랜덤한 조합의 키')
 
 # 토큰 생성 공통 함수
 # - 사용자 ID를 기반으로 payload 생성 후 서명하여 토큰 발급
@@ -47,9 +48,10 @@ def __decode_token(token, key):
         payload = jwt.decode(token, random_key, algorithms=alg)  # 복호화 시 위조 여부 자동 검증
         print(f"[JWT] Decoded payload: {payload}")
         return payload['user_id']
-    except Exception as e:
-        print(f"[JWT] Token decoding failed: {e}")
-        raise AuthenticationFailed(e)
+    except jwt.ExpiredSignatureError:
+        raise AuthenticationFailed("토큰이 만료되었습니다.")
+    except jwt.InvalidTokenError as e:
+        raise AuthenticationFailed("유효하지 않은 토큰입니다.")
 
 # 액세스 토큰 복호화 함수
 def decode_access_token(token):
@@ -63,37 +65,55 @@ def decode_refresh_token(token):
 
 # DB에 리프레시 토큰 저장
 def save_refresh_token(user, token):
+    expiration = timezone.now() + JWT_KEY.RANDOM_OF_REFRESH_KEY.value[2]  # 즉, 1일 후
     print(f"[토큰DB] refresh_token 저장 - user={user.email}, token={token[:10]}...")
-    RefreshToken.objects.create(user=user, token=token)
-
-# DB에서 리프레시 토큰 유효성 체크
-def check_refresh_token(token):
-    """
-    DB에서 유효한 리프레시 토큰만 리턴.
-    만료되었으면 is_valid를 False로 바꾸고 None 리턴.
-    """
-    print(f"[토큰DB] refresh_token 유효성 검사 - token={token[:10]}...")
-    db_token = RefreshToken.objects.filter(token=token, is_valid=True).first()
-    if db_token:
-        # 만료일(expired_at)이 있고, 만료됐다면 무효화
-        if db_token.expired_at and db_token.expired_at < timezone.now():
-            db_token.is_valid = False
-            db_token.save()
-            return None
-        print(f"[토큰DB] refresh_token 유효함")
-        return db_token
-    print(f"[토큰DB] 유효하지 않거나 존재하지 않음")
-    return None
+    RefreshToken.objects.create(user=user, token=token, expired_at=expiration)
 
 # DB에서 리프레시 토큰 삭제 (또는 무효화)
 def delete_refresh_token(token):
     print(f"[토큰DB] refresh_token 삭제 - token={token[:10]}...")
     RefreshToken.objects.filter(token=token).delete()
-    # 또는 .update(is_valid=False)로 무효화만 할 수도 있음
 
-# 인증 및 인가 흐름에서 사용:
-# - 로그인 성공 시: 액세스 및 리프레시 토큰 발급
-# - 요청 시: 액세스 토큰 유효성 검사
-# - 토큰 만료 시: 리프레시 토큰을 사용하여 새 액세스 토큰 발급
-# - 토큰 위조 시: 예외 발생 → 사용자 요청 거절
+# DB에서 리프레시 토큰 유효성 체크
+def check_refresh_token(token):
+    """
+    DB에서 유효한 리프레시 토큰만 리턴.
+    만료되었으면 is_valid=False 처리 + 로그 남기고 삭제 예약.
+    """
+    print(f"[토큰DB] refresh_token 유효성 검사 - token={token[:10]}...")
+    db_token = RefreshToken.objects.filter(token=token, is_valid=True).first()
+    if not db_token:
+        print(f"[토큰DB] 유효하지 않음 or 존재하지 않음")
+        return None
 
+    now = timezone.now()
+    remaining = db_token.expired_at - now
+
+    if remaining.total_seconds() <= 0:
+        # 만료된 토큰 → is_valid=False 처리 후 로그 기록
+        db_token.is_valid = False
+        db_token.save()
+        print(f"[토큰DB] 만료된 refresh_token → is_valid=False로 무효화")
+        print(f"[토큰DB] 로그: 사용자={db_token.user.email}, 만료시각={db_token.expired_at}, 삭제예정")
+
+        # 만료된 토큰은 DB에서 삭제
+        delete_refresh_token(token)
+        return None
+
+    print(f"[토큰DB] 유효한 refresh_token - 남은 시간: {remaining.total_seconds():.0f}초")
+    return db_token
+
+# access_token 재발급 로직을 캡슐화한 함수
+def try_refresh_access_token(refresh_token):
+    # 먼저 DB에서 유효성 체크 및 삭제/무효화 처리
+    db_token = check_refresh_token(refresh_token)
+    if not db_token:
+        return None, None
+
+    try:
+        user_id = decode_refresh_token(refresh_token)
+    except AuthenticationFailed:
+        return None, None
+
+    new_token = create_access_token(user_id)
+    return new_token, user_id

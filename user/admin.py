@@ -46,7 +46,7 @@ class CustomUserAdmin(UserAdmin):
     
     list_display = [
         'id', 'email', 'name', 'phone',
-        'org_label', 'role_label', 'cat_label',
+        'org_label', 'role_label', 'cat_label', 'is_partner',
         'is_staff', 'is_superuser', 'created_dt', 'updated_dt'
     ]
     ordering = ['id']

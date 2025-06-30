@@ -88,7 +88,7 @@ class RefreshToken(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='refresh_tokens')
     token = models.CharField(max_length=255, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    expired_at = models.DateTimeField(null=True, blank=True)
+    expired_at = models.DateTimeField()
     is_valid = models.BooleanField(default=True)  # 토큰 무효화(로그아웃 등) 시 사용
 
     def __str__(self):

@@ -1,22 +1,62 @@
-// static / js / main.js;
 document.addEventListener('DOMContentLoaded', function () {
-	// 로그인 상태 확인 및 사용자 정보 가져오기
-	fetch('/api/jwt/', {
-		method: 'GET',
-		credentials: 'include',
-	})
-		.then((res) => {
-			if (res.ok) return res.json();
-			else throw new Error('로그인 필요');
-		})
-		.then((data) => {
-			console.log('main.js의 data : ', data);
-			const is_partner = data.is_partner;
-			if (is_partner) {
-				document.getElementById('add_case_btn').style.display = 'block';
+	const rows = document.querySelectorAll('table tbody tr[data-id]');
+	const form = document.getElementById('main_form');
+
+	rows.forEach((row) => {
+		row.addEventListener('click', () => {
+			const eventId = row.getAttribute('data-id');
+			if (eventId) {
+				window.location.href = `/event/detail/${eventId}/`;
 			}
-		})
-		.catch((e) => {
-			window.location.href = '/';
 		});
+	});
+
+	form.addEventListener('submit', async function (event) {
+		event.preventDefault();
+
+		const queryInput = document.getElementById('query');
+		const queryText = queryInput.value.trim();
+
+		if (!queryText) {
+			queryInput.focus();
+			return;
+		}
+
+		try {
+			const data = {
+				query: queryText,
+			};
+
+			const response = await fetch('https://e53btkyqn6ggcs-8000.proxy.runpod.net/combined/', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'X-Requested-With': 'XMLHttpRequest',
+				},
+				body: JSON.stringify(data),
+			});
+
+			if (!response.ok) {
+				const errorData = await response.json();
+				alert(
+					'GPT 슈퍼파이저 노드 API 호출 실패: ' +
+						(errorData.detail || errorData.error || response.status)
+				);
+				return;
+			}
+
+			const result = await response.json();
+			console.log('GPT 슈퍼파이저 노드 API 호출 결과:', result);
+
+			const ai_answer = document.getElementById('ai_answer');
+			const ai_case_ids = document.getElementById('ai_case_ids');
+
+			if (ai_answer) ai_answer.value = result['answer'] || '';
+			if (ai_case_ids) ai_case_ids.value = result['case_ids'] || '';
+
+			form.submit();
+		} catch (error) {
+			alert('GPT 슈퍼파이저 노드 API 호출 중 오류: ' + error.message);
+		}
+	});
 });
