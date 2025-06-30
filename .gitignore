@@ -15,6 +15,3 @@ database/
 __pycache__/
 *.pyc
 *.pyo
-
-# fastapi 관련 파일
-FastAPI/
