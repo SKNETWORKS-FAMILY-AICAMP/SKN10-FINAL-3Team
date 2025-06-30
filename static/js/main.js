@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		});
 	});
 
-	form.addEventListener('submit', async function (event) {
+	form.addEventListener('submit', function (event) {
 		event.preventDefault();
 
 		const queryInput = document.getElementById('query');
@@ -22,41 +22,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			return;
 		}
 
-		try {
-			const data = {
-				query: queryText,
-			};
-
-			const response = await fetch('https://e53btkyqn6ggcs-8000.proxy.runpod.net/combined/', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					'X-Requested-With': 'XMLHttpRequest',
-				},
-				body: JSON.stringify(data),
-			});
-
-			if (!response.ok) {
-				const errorData = await response.json();
-				alert(
-					'GPT 슈퍼파이저 노드 API 호출 실패: ' +
-						(errorData.detail || errorData.error || response.status)
-				);
-				return;
-			}
-
-			const result = await response.json();
-			console.log('GPT 슈퍼파이저 노드 API 호출 결과:', result);
-
-			const ai_answer = document.getElementById('ai_answer');
-			const ai_case_ids = document.getElementById('ai_case_ids');
-
-			if (ai_answer) ai_answer.value = result['answer'] || '';
-			if (ai_case_ids) ai_case_ids.value = result['case_ids'] || '';
-
-			form.submit();
-		} catch (error) {
-			alert('GPT 슈퍼파이저 노드 API 호출 중 오류: ' + error.message);
-		}
+		// GET 파라미터로 chatbot 페이지로 이동
+		window.location.href = `/chatbot/?query=${encodeURIComponent(queryText)}`;
 	});
 });

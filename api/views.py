@@ -65,39 +65,34 @@ class RecommendTeamAPIView(APIView):
         }
         return Response(response_data, status=status.HTTP_200_OK)
 
-# AI 챗봇 API 뷰
-class ChatLLMAPIView(APIView):
+# 판례 목록 API 뷰
+class CaseListAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def post(self, request):
-        query = request.data.get('query')
-        case_ids = request.data.get('case_ids')
+        case_ids = request.data.get('case_ids', [])
+        if not isinstance(case_ids, list) or not case_ids:
+            return Response([], status=200)  # 빈 목록 반환(필수)
 
-        if not query:
-            return Response({"error": "query는 필수입니다."}, status=status.HTTP_400_BAD_REQUEST)
+        # DB에서 판례 목록 조회 (IN 쿼리)
+        queryset = Case.objects.filter(case_id__in=case_ids)
+        # dict로 만들어 순서 보장(입력 순서대로)
+        case_map = {c.case_id: c for c in queryset}
 
-        case_data_dict = {}
-        if case_ids:
-            cases = get_list_or_404(Case, case_id__in=case_ids)
-            for idx, case in enumerate(cases, start=1):
-                case_data_dict[f"case{idx}"] = {
-                    "case_num": case.case_num,
-                    "court_name": case.court_name,
-                    "case_name": case.case_name,
-                    "case_at": case.case_at.strftime("%Y-%m-%d"),
-                    "decision_summary": case.decision_summary,
-                    "case_full": case.case_full,
-                    "decision_issue": case.decision_issue,
-                    "case_result": case.case_result,
-                    "refer_cases": case.refer_cases,
-                    "refer_statutes": case.refer_statutes,
-                    "facts_summary": case.facts_summary,
-                    "facts_keywords": case.facts_keywords,
-                    "issue_summary": case.issue_summary,
-                    "issue_keywords": case.issue_keywords,
-                    "keywords": case.keywords,
-                }
+        # 순서대로 직렬화
+        results = []
+        for cid in case_ids:
+            case = case_map.get(cid)
+            if case is None:
+                continue
+            # keywords(쉼표구분) 파싱
+            keywords = [kw.strip() for kw in (case.keywords or '').split(',') if kw.strip()]
+            results.append({
+                'case_id': case.case_id,
+                'case_num': case.case_num,
+                'case_name': case.case_name,
+                'keywords': keywords,
+            })
 
-        case_data_dict["query"] = query
-
-        # ✅ 응답 생성 완료 후 반환
-        answer = get_chat_response(case_data_dict, query)
-        return Response({"answer": answer}, status=status.HTTP_200_OK)
+        return Response(results, status=200)

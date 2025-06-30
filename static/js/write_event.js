@@ -183,17 +183,54 @@ document.addEventListener('DOMContentLoaded', function () {
 			alert('대분류를 선택해주세요.');
 			return;
 		}
+		// ---------------------------------
+		// Django Rest Framework API 호출
+		// ---------------------------------
 		// 위의 정보를 ai에게 요청 - 팀추천 로직
+		// try {
+		// 	const data = await fetch(`/api/recommend/?cat_cd=${formData.catCd}`, {
+		// 		method: 'GET',
+		// 		credentials: 'include',
+		// 	}).then((response) => response.json());
+		// 	populateModalWithTeams(data.recommended_team, data.available_teams);
+		// 	modal.classList.remove('hidden');
+		// } catch (error) {
+		// 	console.error('API 호출 또는 처리 중 오류 발생:', error);
+		// 	alert(error.message);
+		// }
+
+		// ---------------------------------
+		// RunPod 추천 API 호출
+		// ---------------------------------
 		try {
-			const data = await fetch(`/api/recommend/?cat_cd=${formData.catCd}`, {
-				method: 'GET',
-				credentials: 'include',
-			}).then((response) => response.json());
-			populateModalWithTeams(data.recommended_team, data.available_teams);
-			modal.classList.remove('hidden');
+			const response = await fetch(
+				'https://e53btkyqn6ggcs-8000.proxy.runpod.net/run-recommend/',
+				{
+					method: 'POST',
+					credentials: 'include',
+					headers: {
+						'Content-Type': 'application/json',
+						'X-Requested-With': 'XMLHttpRequest',
+					},
+					body: JSON.stringify(requestData),
+				}
+			);
+
+			if (!response.ok) {
+				const errorData = await response.json();
+				Swal.close();
+				alert(
+					'LangGraph API 호출 실패: ' +
+						(errorData.detail || errorData.error || response.status)
+				);
+				return;
+			}
+
+			data = await response.json();
+			console.log('LangGraph 결과:', data);
 		} catch (error) {
-			console.error('API 호출 또는 처리 중 오류 발생:', error);
-			alert(error.message);
+			Swal.close();
+			console.log('LangGraph 요청 중 오류: ' + error.message);
 		}
 	});
 
