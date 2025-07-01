@@ -77,16 +77,25 @@ document.addEventListener('DOMContentLoaded', function () {
 	let formData = {};
 
 	// API로부터 받은 팀 데이터를 사용하여 모달 내부의 버튼들을 동적으로 생성하고 화면을 갱신함.
-	function populateModalWithTeams(recommendedTeam, availableTeams) {
+	function populateModalWithTeams(recommendedTeam, availableTeams, explanation) {
 		const aiTeamListDiv = document.getElementById('ai-team-list');
 		const availableTeamsListDiv = document.getElementById('available-teams-list');
+		const explanationDiv = document.getElementById('ai-explanation');
 
 		aiTeamListDiv.innerHTML = '';
 		availableTeamsListDiv.innerHTML = '';
+		explanationDiv.textContent = explanation || '';
 
 		if (recommendedTeam) {
-			const aiBtn = createTeamButton(recommendedTeam, true);
-			aiTeamListDiv.appendChild(aiBtn);
+			if (Array.isArray(recommendedTeam)) {
+				recommendedTeam.forEach((teamName) => {
+					const aiBtn = createTeamButton(teamName, true);
+					aiTeamListDiv.appendChild(aiBtn);
+				});
+			} else {
+				const aiBtn = createTeamButton(recommendedTeam, true);
+				aiTeamListDiv.appendChild(aiBtn);
+			}
 		}
 
 		availableTeams.forEach((teamName) => {
@@ -94,7 +103,12 @@ document.addEventListener('DOMContentLoaded', function () {
 			availableTeamsListDiv.appendChild(btn);
 		});
 
-		selectedTeamId = recommendedTeam ? `ai_team_${recommendedTeam}` : null;
+		if (Array.isArray(recommendedTeam)) {
+			selectedTeamId = `ai_team_${recommendedTeam[0]}`;
+		} else {
+			selectedTeamId = recommendedTeam ? `ai_team_${recommendedTeam}` : null;
+		}
+
 		updateModalStyles();
 	}
 
@@ -183,36 +197,47 @@ document.addEventListener('DOMContentLoaded', function () {
 			alert('대분류를 선택해주세요.');
 			return;
 		}
-		// ---------------------------------
-		// Django Rest Framework API 호출
-		// ---------------------------------
-		// 위의 정보를 ai에게 요청 - 팀추천 로직
-		// try {
-		// 	const data = await fetch(`/api/recommend/?cat_cd=${formData.catCd}`, {
-		// 		method: 'GET',
-		// 		credentials: 'include',
-		// 	}).then((response) => response.json());
-		// 	populateModalWithTeams(data.recommended_team, data.available_teams);
-		// 	modal.classList.remove('hidden');
-		// } catch (error) {
-		// 	console.error('API 호출 또는 처리 중 오류 발생:', error);
-		// 	alert(error.message);
-		// }
 
-		// ---------------------------------
-		// RunPod 추천 API 호출
-		// ---------------------------------
+		Swal.fire({
+			title: 'AI 팀 추천 진행 중',
+			html: `
+				<div style="font-size: 1.2rem; color: #555;">
+					AI가 유사 사건 데이터를 검색하여<br />
+					가장 적합한 담당 팀을 분석하고 있습니다.<br />
+					최적의 추천을 위해 잠시만 기다려주세요.
+				</div>
+			`,
+			icon: 'info',
+			showConfirmButton: false,
+			allowOutsideClick: false,
+			allowEscapeKey: false,
+			background: '#f9fafb',
+			color: '#333',
+			didOpen: () => {
+				Swal.showLoading();
+			},
+			customClass: {
+				popup: 'swal-custom-height rounded-xl shadow-lg',
+				title: 'text-lg font-semibold',
+			},
+		});
+
+		data = {
+			cat_cd: formData.catCd,
+			e_description: formData.caseBody,
+		};
+
 		try {
 			const response = await fetch(
-				'https://e53btkyqn6ggcs-8000.proxy.runpod.net/run-recommend/',
+				'https://p0w8kuyq46ijoh-8000.proxy.runpod.net/run-recommend',
 				{
 					method: 'POST',
-					credentials: 'include',
+					// credentials: 'include',
 					headers: {
 						'Content-Type': 'application/json',
 						'X-Requested-With': 'XMLHttpRequest',
 					},
-					body: JSON.stringify(requestData),
+					body: JSON.stringify(data),
 				}
 			);
 
@@ -228,10 +253,22 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			data = await response.json();
 			console.log('LangGraph 결과:', data);
+
+			const recommendedTeam = data.recommended_team;
+			const availableTeams = Object.keys(data.score_by_team);
+			const explanation = data.explanation;
+
+			console.log('추천팀:', recommendedTeam);
+			console.log('가용팀:', availableTeams);
+			console.log('설명:', explanation);
+
+			populateModalWithTeams(recommendedTeam, availableTeams, explanation);
+			modal.classList.remove('hidden');
 		} catch (error) {
 			Swal.close();
 			console.log('LangGraph 요청 중 오류: ' + error.message);
 		}
+		Swal.close();
 	});
 
 	// 모달 내 클릭 이벤트 처리
@@ -293,17 +330,17 @@ document.addEventListener('DOMContentLoaded', function () {
 		// RunPod 분석 API 호출
 		// -------------------
 		// 1. 각 항목 값 추출
-		const clientRole = document.getElementById('client_role').value; // 역할
-		const caseDescription = document.getElementById('e_description').value; // 사건내용
-		const claimSummary = document.getElementById('claim_summary').value; // 청구내용
-		const eventFile = document.getElementById('event_file').value; // 증거자료(텍스트 기반이면 .value, 파일이면 .files[0])
+		const clientRole = document.getElementById('client_role').value;
+		const caseDescription = document.getElementById('e_description').value;
+		const claimSummary = document.getElementById('claim_summary').value;
+		const eventFile = document.getElementById('event_file').value;
 
 		// 2. 요청 데이터 객체 준비
 		const requestData = {
 			client_role: clientRole,
 			e_description: caseDescription,
 			claim_summary: claimSummary,
-			event_file: eventFile, // 텍스트 input/textarea라면 value 사용, 파일이면 별도 처리 필요!
+			event_file: eventFile,
 		};
 
 		let data = null;
