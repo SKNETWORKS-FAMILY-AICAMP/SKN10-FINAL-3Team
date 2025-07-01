@@ -11,127 +11,76 @@ async function fetchWithAutoRefresh(url, options, retry = true) {
 	return res;
 }
 
+// chatbot.js
 document.addEventListener('DOMContentLoaded', () => {
 	marked.setOptions({
 		breaks: false,
 		gfm: true,
 	});
 
-	// query 파라미터가 있으면 첫 사용자 메시지로 삽입
-	const urlParams = new URLSearchParams(window.location.search);
-	const initialQuery = urlParams.get('query');
-	const aiAnswer = urlParams.get('ai_answer');
-	const chatArea = document.querySelector('.space-y-6');
-
-	// 초기 query가 있다면 사용자 메시지로 삽입
-	if (initialQuery) {
-		const userMsg = document.createElement('div');
-		userMsg.className = 'flex justify-end';
-		userMsg.innerHTML = `<div class="bg-blue-500 text-white p-4 rounded-lg max-w-[70%] whitespace-pre-wrap">${initialQuery}</div>`;
-		chatArea.appendChild(userMsg);
-	}
-
-	// 초기 ai_answer가 있다면 바로 bot 메시지로 삽입
-	if (aiAnswer) {
-		const botMsg = document.createElement('div');
-		const botContent = document.createElement('div');
-		botMsg.className = 'flex items-start';
-		botContent.className =
-			'markdown-body bg-gray-300 text-black p-4 rounded-lg max-w-[70%] whitespace-pre-wrap';
-		botContent.innerHTML = marked.parse(aiAnswer);
-		botMsg.appendChild(botContent);
-		chatArea.appendChild(botMsg);
-	}
-
-	const selectedCases = new Set();
-	const maxSelections = 2;
-	const summary = document.getElementById('selected-cases-summary');
+	// 영역 및 엘리먼트 정의
+	const chatArea = document.querySelector('.chat-message-area');
 	const form = document.getElementById('chat-form');
 	const inputBox = document.getElementById('chat-input');
-	// [여기에서 선언]
-	let sendBtn = null;
+	const selectedCasesSummary = document.getElementById('selected-cases-summary');
+	const caseListDiv = document.querySelector('.case-list-container');
+	let selectedCases = new Set();
 
-	// 전송 버튼이 있다면 여기서 할당
-	if (form) {
-		sendBtn = form.querySelector('button[type="submit"]');
+	// 1. 최초 진입 시 query 파라미터로 첫 메시지 출력
+	const urlParams = new URLSearchParams(window.location.search);
+	const initialQuery = urlParams.get('query');
+
+	if (initialQuery) {
+		addUserMessage(initialQuery);
+		sendToServer(initialQuery);
 	}
 
-	document.querySelectorAll('.case-item').forEach((item) => {
-		item.addEventListener('click', () => {
-			const caseId = item.dataset.caseId;
-			const caseNum = item.dataset.caseNum;
-			const isSelected = item.classList.contains('bg-blue-50');
-
-			if (isSelected) {
-				item.classList.remove('bg-blue-50', 'border-blue-500', 'shadow');
-				item.classList.add('border-gray-200');
-				selectedCases.delete(caseId);
-			} else {
-				if (selectedCases.size >= maxSelections) return;
-				item.classList.add('bg-blue-50', 'border-blue-500', 'shadow');
-				item.classList.remove('border-gray-200');
-				selectedCases.add(caseId);
-			}
-
-			const selectedNames = Array.from(selectedCases).map((id) => {
-				const el = document.querySelector(`[data-case-id="${id}"]`);
-				return el ? el.dataset.caseNum : '';
-			});
-			summary.textContent = selectedNames.length
-				? `선택된 판례: ${selectedNames.join(', ')}`
-				: '선택된 판례: 없음';
+	// 2. 입력창 이벤트(엔터/전송) 등록
+	if (form) {
+		form.addEventListener('submit', (e) => {
+			e.preventDefault();
+			const text = inputBox.value.trim();
+			if (!text) return;
+			addUserMessage(text);
+			sendToServer(text);
+			inputBox.value = '';
 		});
-	});
+	}
 
-	form.addEventListener('submit', async (event) => {
-		event.preventDefault();
-		const queryText = inputBox.value.trim();
-		const selectedIds = Array.from(selectedCases);
-
-		if (!queryText) return;
-
-		// --- [추가] 입력창/버튼 비활성화 ---
-		inputBox.disabled = true;
-		inputBox.classList.add(
-			'bg-gray-200',
-			'text-gray-500',
-			'cursor-not-allowed',
-			'placeholder:text-gray-400'
-		);
-		inputBox.classList.remove(
-			'focus:ring-2',
-			'focus:ring-law-blue',
-			'focus:border-transparent'
-		);
-		if (sendBtn) sendBtn.disabled = true;
-
-		inputBox.value = '';
-
+	// 3. 사용자 메시지 추가 함수
+	function addUserMessage(text) {
 		const userMsg = document.createElement('div');
 		userMsg.className = 'flex justify-end';
-		userMsg.innerHTML = `<div class="bg-blue-500 text-white p-4 rounded-lg max-w-[70%]">${queryText}</div>`;
+		userMsg.innerHTML = `
+            <div class="bg-blue-500 text-white p-4 rounded-lg max-w-[70%] whitespace-pre-wrap">${text}</div>
+        `;
 		chatArea.appendChild(userMsg);
 		chatArea.scrollTop = chatArea.scrollHeight;
+	}
 
+	// 4. 챗봇 메시지(로딩) 추가 함수
+	function addBotLoading() {
 		const botMsg = document.createElement('div');
 		const botContent = document.createElement('div');
 		botMsg.className = 'flex items-start';
 		botContent.className =
 			'markdown-body bg-gray-300 text-black p-4 rounded-lg max-w-[70%] whitespace-pre-wrap';
-
 		botContent.innerHTML = `<span class="typing-dots"></span>`;
 		botMsg.appendChild(botContent);
 		chatArea.appendChild(botMsg);
 		chatArea.scrollTop = chatArea.scrollHeight;
+		return botContent;
+	}
 
+	// 5. 서버 호출 함수 (FastAPI)
+	async function sendToServer(query) {
+		const botContent = addBotLoading();
 		try {
-			let data = { query: queryText };
-			if (selectedIds.length > 0) {
-				data.case_ids = selectedIds;
+			// 선택된 판례(case_ids)도 함께 전달 (선택 기능 확장 가능)
+			let data = { query };
+			if (selectedCases.size > 0) {
+				data.case_ids = Array.from(selectedCases);
 			}
-
-			console.log('[요청 데이터 확인]', data);
-
 			const res = await fetch('https://e53btkyqn6ggcs-8000.proxy.runpod.net/combined/', {
 				method: 'POST',
 				headers: {
@@ -140,49 +89,81 @@ document.addEventListener('DOMContentLoaded', () => {
 				},
 				body: JSON.stringify(data),
 			});
-
 			const json = await res.json();
-			if (!res.ok) {
-				throw new Error(json.error || '서버 응답 실패');
-			}
+			console.log('[RAG 응답]', json);
 
-			console.log('[응답 데이터 확인]', json);
+			if (!res.ok) throw new Error(json.error || '서버 오류');
 
-			// 판례 리스트 존재 시 → 페이지 이동
-			if ('case_ids' in json && Array.isArray(json.case_ids) && json.case_ids.length > 0) {
-				const params = new URLSearchParams();
-				params.append('query', queryText);
-				params.append('ai_answer', json.answer || '');
-				params.append('ai_case_ids', json.case_ids.join(','));
-
-				window.location.href = `/chatbot/?${params.toString()}`;
-				return; // 이후 로직 실행 막기
-			}
-
-			// 판례 없을 경우 → 현재 채팅창에 그대로 출력
-			botContent.innerHTML = marked.parse(
-				json.answer || '⚠️ 응답을 불러오는 중 오류가 발생했습니다.'
-			);
-
+			botContent.innerHTML = marked.parse(json.answer || '⚠️ 응답 오류');
 			chatArea.scrollTop = chatArea.scrollHeight;
+
+			// 판례 목록 동적 갱신
+			if (json.case_ids && Array.isArray(json.case_ids) && json.case_ids.length > 0) {
+				updateCaseSidebar(json.case_ids);
+			}
 		} catch (err) {
-			console.error('❌ 오류 발생:', err);
-			botContent.innerText = '⚠️ 응답을 불러오는 중 오류가 발생했습니다.';
-		} finally {
-			inputBox.disabled = false;
-			inputBox.classList.remove(
-				'bg-gray-200',
-				'text-gray-500',
-				'cursor-not-allowed',
-				'placeholder:text-gray-400'
-			);
-			inputBox.classList.add(
-				'focus:ring-2',
-				'focus:ring-law-blue',
-				'focus:border-transparent'
-			);
-			if (sendBtn) sendBtn.disabled = false;
-			inputBox.focus();
+			botContent.innerText = '⚠️ 응답 오류: ' + err.message;
 		}
-	});
+	}
+
+	// 6. 좌측 판례 목록 동적 갱신 함수
+	async function updateCaseSidebar(caseIds) {
+		if (!caseListDiv) return;
+		caseListDiv.innerHTML = '<div class="text-gray-400 text-center py-10">불러오는 중...</div>';
+
+		try {
+			// ✅ 반드시 판례 다건 조회용 API가 필요!
+			const res = await fetch('/api/case/list/', {
+				method: 'POST',
+				credentials: 'include',
+				headers: {
+					'Content-Type': 'application/json',
+					'X-Requested-With': 'XMLHttpRequest',
+				},
+				body: JSON.stringify({ case_ids: caseIds }),
+			});
+			const cases = await res.json();
+
+			// 에러 처리
+			if (!res.ok || !Array.isArray(cases)) throw new Error(cases.error || '목록 오류');
+
+			// 목록 렌더링
+			caseListDiv.innerHTML = '';
+			cases.forEach((caseItem) => {
+				const div = document.createElement('div');
+				div.className =
+					'case-item p-3 h-[100px] border border-gray-200 rounded-lg hover:bg-blue-100 cursor-pointer group relative flex flex-col justify-between transition-colors duration-150';
+				div.setAttribute('data-case-id', caseItem.case_id);
+				div.setAttribute('data-case-num', caseItem.case_num);
+
+				div.innerHTML = `
+                    <div>
+                        <div class="flex space-x-1">
+                            <div class="w-1/2 text-sm font-medium text-gray-800 truncate">
+                                ${caseItem.case_num}
+                            </div>
+                            <div class="w-1/2 text-sm font-medium text-gray-800 truncate">
+                                ${caseItem.case_name}
+                            </div>
+                        </div>
+                        <div class="mt-1">
+                            <div class="text-xs text-gray-500 leading-snug w-1/2 break-words overflow-hidden line-clamp-2">
+                                ${caseItem.keywords.map((kw) => `<span>#${kw}</span>`).join(' ')}
+                            </div>
+                        </div>
+                    </div>
+                    <a href="/case/detail/${caseItem.case_id}/" target="_blank"
+                        class="flex items-center text-gray-500 hover:text-law-blue text-xs absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition">
+                        <i class="fas fa-external-link-alt text-sm"></i>
+                        <span class="ml-1">전문 보기</span>
+                    </a>
+                `;
+				caseListDiv.appendChild(div);
+			});
+
+			// 선택 이벤트 등 필요한 로직 여기에 추가 (선택된 판례 반영, summary 갱신 등)
+		} catch (err) {
+			caseListDiv.innerHTML = `<div class="text-red-400 text-center py-10">목록 오류: ${err.message}</div>`;
+		}
+	}
 });

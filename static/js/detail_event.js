@@ -3,10 +3,26 @@ document.addEventListener('DOMContentLoaded', function () {
 	if (deleteBtn) {
 		deleteBtn.addEventListener('click', function () {
 			const eventId = deleteBtn.getAttribute('data-event-id');
-			if (confirm('정말 삭제하시겠습니까?')) {
-				// GET 요청으로 삭제 (동기)
-				window.location.href = `/event/delete/${eventId}/`;
+			if (!eventId) {
+				Swal.fire('오류', '사건 ID가 존재하지 않습니다.', 'error');
+				return;
 			}
+
+			Swal.fire({
+				title: '해당 사건을 삭제하시겠습니까?',
+				// text: '삭제하면 복구할 수 없습니다.',
+				icon: 'warning',
+				showCancelButton: true,
+				confirmButtonText: '삭제',
+				cancelButtonText: '취소',
+				confirmButtonColor: '#EF4444',
+				cancelButtonColor: '#2563DB',
+			}).then((result) => {
+				if (result.isConfirmed) {
+					// GET 요청으로 삭제 (동기)
+					window.location.href = `/event/delete/${eventId}/`;
+				}
+			});
 		});
 	}
 
@@ -15,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		editBtn.addEventListener('click', function () {
 			const eventId = editBtn.getAttribute('data-event-id');
 			if (!eventId) {
-				alert('사건 ID가 존재하지 않습니다.');
+				Swal.fire('오류', '사건 ID가 존재하지 않습니다.', 'error');
 				return;
 			}
 
