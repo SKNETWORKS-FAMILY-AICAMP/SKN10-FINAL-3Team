@@ -1,15 +1,20 @@
-fastapi==0.104.1
-uvicorn==0.24.0
-openai==1.12.0
-pydantic==2.5.0
-requests==2.31.0
-httpx==0.25.2
-jwt
-sqlalchemy
-pymysql
-faiss-cpu==1.7.4
-numpy==1.24.3
-langchain_community
-langchain_openai
+# 환경설정
+python-dotenv
+
+# OpenAI
+openai
+
+# FastAPI
+fastapi
+
+# FastAPI 관련 라이브러리
+uvicorn
+
+# LangGraph
 langgraph
+faiss-cpu
+langchain_openai
+sqlalchemy
+langchain_community
 pandas
+pymysql

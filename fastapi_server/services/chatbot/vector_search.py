@@ -25,7 +25,7 @@ except Exception as e:
     faiss_index = None
     metadata = []
 
-def search_similar_cases(query: str, similarity_threshold: float = 1.93) -> list:
+def search_similar_cases(query: str, similarity_threshold: float = 1.95) -> list:
     """OpenAI 임베딩 기반 FAISS 유사 판례 검색 (유사도 임계값 기준 필터링)"""
     try:
         if faiss_index is None or not metadata:
@@ -52,32 +52,34 @@ def search_similar_cases(query: str, similarity_threshold: float = 1.93) -> list
         print(f"DEBUG: 최저 유사도 점수: {scores[0][-1]:.4f}")
 
         results = []
+        results_dict = {}
+
         for i, idx in enumerate(indices[0]):
             if 0 <= idx < len(metadata):
+                # case: 특정 판례 메타 데이터 (case_id, case_num)
                 case = metadata[idx]
-                meta = case.get("meta", {})
-                contents = case.get("contents", "")
-                
+
                 # case_id가 있으면 사용, 없으면 사건번호 사용
-                case_id = meta.get("case_id")
+                case_id = case.get("case_id")
                 if case_id is None:
-                    case_id = meta.get("사건번호", f"CASE-{idx}")
+                    case_id = case.get("사건번호", f"{idx}")
                 
                 similarity_score = float(scores[0][i])
                 
                 # 유사도 임계값 이하인 결과만 포함 (FAISS는 거리 기반이므로 낮은 값이 더 유사함)
                 if similarity_score <= similarity_threshold:
                     # 상위 10개 결과에 대해 상세 정보 출력
-                    if len(results) < 10:
-                        print(f"DEBUG: [{len(results)+1}] case_id: {case_id}, 유사도: {similarity_score:.4f}, 제목: {meta.get('사건명', 'N/A')}")
+                    if len(results_dict) < 10:
+                        print(f"DEBUG: [{len(results_dict)+1}] case_id: {case_id}, 유사도: {similarity_score:.4f}")
+                    if case_id not in results_dict.keys():
+                        results_dict[case_id] = similarity_score
                     
-                    results.append({
-                        "case_id": str(case_id),
-                        "title": meta.get("사건명", ""),
-                        "summary": contents[:300],  # 요약 일부만
-                        "similarity": similarity_score
-                    })
+                        # results.append({
+                        #     "case_id": str(case_id),
+                        #     "similarity": similarity_score
+                        # })
         
+        results = [{"case_id": k, "similarity": v} for k, v in list(results_dict.items())]
         print(f"DEBUG: 임계값 {similarity_threshold} 이하 결과 수: {len(results)}")
         return results
         

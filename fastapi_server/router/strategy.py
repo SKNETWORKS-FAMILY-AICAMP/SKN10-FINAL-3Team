@@ -57,6 +57,9 @@ async def update_ai_strategy(event: EventRequest, db: Session = Depends(get_db))
         system_prompt, user_prompt = get_request_prompt(event)
         # LLM 모델을 통해 전략 생성
         strategy = generate_strategy(system_prompt, user_prompt)
+        print(f"DEBUG: 전략 생성 결과: {strategy}")
+        # 후처리
+        strategy = strategy.replace("\n ", "\n")
         # 사건 정보 업데이트
         event = db.query(Event).filter(Event.event_id == event.event_id).first()
         event.ai_strategy = strategy
