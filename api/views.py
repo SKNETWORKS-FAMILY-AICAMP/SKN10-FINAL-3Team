@@ -22,8 +22,8 @@ from pprint import pprint
 
 # AI 팀 추천 API 뷰
 class RecommendTeamAPIView(APIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [JWTAuthentication]
+    # permission_classes = [IsAuthenticated]
 
     def get(self, request):
         category_code = request.GET.get('cat_cd', None)
