@@ -9,4 +9,7 @@ sqlalchemy
 pymysql
 faiss-cpu==1.7.4
 numpy==1.24.3
+langchain_community
+langchain_openai
+langgraph
 pandas

@@ -2,3 +2,4 @@ test_api
 .env
 __pycache__
 .dockerignore
+runpod_restart.sh

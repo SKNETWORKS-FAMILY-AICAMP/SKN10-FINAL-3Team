@@ -1,12 +1,12 @@
 import logging
 import os
 from openai import OpenAI
-from fastapi import FastAPI, HTTPException, Depends, APIRouter
+from fastapi import FastAPI, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from database import get_db, engine
 from database import Base
 import pymysql
-from router import strategy, case
+from router import vectorsearch, sqlsearch, scorecalc, explain, graph_runner
 
 logging.basicConfig(level=logging.INFO)
 
@@ -96,11 +96,11 @@ except Exception as e:
 def read_root():
     return {"message": "법률 자문 API 서버"}
 
-# services/strategy
-app.include_router(strategy.router, prefix="", tags=["전략 생성"])
-
-# services/case
-app.include_router(case.router, prefix="", tags=["통합 검색 처리"])
+app.include_router(vectorsearch.router)
+app.include_router(sqlsearch.router)
+app.include_router(scorecalc.router)
+app.include_router(explain.router)
+app.include_router(graph_runner.router)
 
 if __name__ == "__main__":
     import uvicorn
