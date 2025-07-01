@@ -4,7 +4,7 @@ import faiss
 import numpy as np
 import pickle
 from pathlib import Path
-from models.gpt import get_embedding
+from models.gpt import ask_gpt, get_embedding
 import logging
 
 # 로그 설정
@@ -25,7 +25,7 @@ except Exception as e:
     faiss_index = None
     metadata = []
 
-def search_similar_cases(query: str, similarity_threshold: float = 1.95) -> list:
+def search_similar_cases(query: str, similarity_threshold: float = 1.1) -> list:
     """OpenAI 임베딩 기반 FAISS 유사 판례 검색 (유사도 임계값 기준 필터링)"""
     try:
         if faiss_index is None or not metadata:
@@ -54,6 +54,22 @@ def search_similar_cases(query: str, similarity_threshold: float = 1.95) -> list
         results = []
         results_dict = {}
 
+        # OpenAI를 통해 최고 유사도 점수인 결과와 임베딩 된 쿼리가 유사한지에 대한 판단
+        # 유사하다 판단되는 경우 최고 유사도 점수를 similarity_threshold의 기준으로 설정
+        system_prompt = """
+질문과 내용이 유사한 경우 정수형으로 1, 아닌 경우 0을 반환하세요.
+        """
+        user_prompt = f"""질문: {query}
+내용: {indices}
+        """
+        test = ask_gpt(model="gpt-4o-mini",system_prompt=system_prompt, user_prompt=user_prompt)
+        print(f"DEBUG: OpenAI 결과: {test}")
+
+        if test == 1:
+            similarity_threshold = scores[0][0]+0.2
+        else:
+            similarity_threshold = 1.1
+
         for i, idx in enumerate(indices[0]):
             if 0 <= idx < len(metadata):
                 # case: 특정 판례 메타 데이터 (case_id, case_num)
@@ -74,11 +90,6 @@ def search_similar_cases(query: str, similarity_threshold: float = 1.95) -> list
                     if case_id not in results_dict.keys():
                         results_dict[case_id] = similarity_score
                     
-                        # results.append({
-                        #     "case_id": str(case_id),
-                        #     "similarity": similarity_score
-                        # })
-        
         results = [{"case_id": k, "similarity": v} for k, v in list(results_dict.items())]
         print(f"DEBUG: 임계값 {similarity_threshold} 이하 결과 수: {len(results)}")
         return results

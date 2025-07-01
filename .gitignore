@@ -3,3 +3,11 @@ fastapi_server_backup
 .env
 .dockerignore
 vectordb
+
+*.pyc
+*.pyo
+*.pyd
+*.pyw
+*.pyz
+*.pywz
+*.pyzw
