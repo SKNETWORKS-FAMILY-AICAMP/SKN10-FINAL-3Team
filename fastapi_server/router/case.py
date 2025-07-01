@@ -49,7 +49,6 @@ async def handle_case_query(request: CaseIdQueryRequest):
         logger.info(f"Answer: {answer}")
 
         return DetailedResponse(
-            # case_ids=[str(case_id)],
             answer=answer
         )
     
@@ -62,7 +61,7 @@ async def handle_case_query(request: CaseIdQueryRequest):
         )
         raw_results = search_similar_cases(contents)
         
-        threshold = 1.95
+        threshold = 1.9
 
         filtered = [r for r in raw_results if r["similarity"] <= threshold]
         sorted_results = sorted(filtered, key=lambda x: x["similarity"], reverse=True)
@@ -73,7 +72,7 @@ async def handle_case_query(request: CaseIdQueryRequest):
                 answer=f"유사한 판례가 없습니다."
             )
         
-        case_ids = [str(r.get("case_id", f"CASE-{i}")) for i, r in enumerate(sorted_results)]
+        case_ids = [str(r.get("case_id", f"{i}")) for i, r in enumerate(sorted_results)]
         print(f"DEBUG: Similar case ids: {case_ids}")
 
         return DetailedResponse(
@@ -188,7 +187,7 @@ async def handle_cases_query(request: CaseIdsQueryRequest):
         )
         raw_results = search_similar_cases(contents)
         
-        threshold = 1.95
+        threshold = 1.9
         filtered = [r for r in raw_results if r["similarity"] <= threshold]
         sorted_results = sorted(filtered, key=lambda x: x["similarity"], reverse=True)
         
@@ -198,7 +197,7 @@ async def handle_cases_query(request: CaseIdsQueryRequest):
                 answer="유사한 판례가 없습니다."
             )
         
-        similar_case_ids = [str(r.get("case_id", f"CASE-{i}")) for i, r in enumerate(sorted_results)]
+        similar_case_ids = [str(r.get("case_id", f"{i}")) for i, r in enumerate(sorted_results)]
         
         return DetailedResponse(
             case_ids=similar_case_ids,
@@ -333,7 +332,7 @@ async def handle_combined_query(request: CombinedQueryRequest):
             )
             raw_results = search_similar_cases(contents)
             
-            threshold = 1.95
+            threshold = 1.9
             filtered = [r for r in raw_results if r["similarity"] <= threshold]
             sorted_results = sorted(filtered, key=lambda x: x["similarity"], reverse=True)
             
@@ -343,7 +342,7 @@ async def handle_combined_query(request: CombinedQueryRequest):
                     answer="유사한 판례가 없습니다."
                 )
             
-            similar_case_ids = [str(r.get("case_id", f"CASE-{i}")) for i, r in enumerate(sorted_results)]
+            similar_case_ids = [str(r.get("case_id", f"{i}")) for i, r in enumerate(sorted_results)]
             print(f"DEBUG: Similar case ids: {similar_case_ids}")
 
             return DetailedResponse(
@@ -436,7 +435,7 @@ async def handle_combined_query(request: CombinedQueryRequest):
                 )
                 raw_results = search_similar_cases(contents)
             logger.info(f"Raw results: {raw_results}")
-            threshold = 1.95
+            threshold = 1.9
             filtered = [r for r in raw_results if r["similarity"] <= threshold]
             sorted_results = sorted(filtered, key=lambda x: x["similarity"], reverse=True)
 
@@ -449,7 +448,7 @@ async def handle_combined_query(request: CombinedQueryRequest):
                         answer="유사한 판례가 없습니다."
                     )
 
-            case_ids = [str(r.get("case_id", f"CASE-{i}")) for i, r in enumerate(sorted_results)]
+            case_ids = [str(r.get("case_id", f"{i}")) for i, r in enumerate(sorted_results)]
             
             # 유사도 검색은 항상 case_ids를 포함한 응답 반환
             if input_type == "ex1":
@@ -467,7 +466,7 @@ async def handle_combined_query(request: CombinedQueryRequest):
             else:
                 similar_cases = [
                     CaseResult(
-                        case_id=str(r.get("case_id", f"CASE-{i}")),
+                        case_id=str(r.get("case_id", f"{i}")),
                         title=r.get("title", ""),
                         summary=r.get("summary", ""),
                         similarity=r.get("similarity", 0.0)
