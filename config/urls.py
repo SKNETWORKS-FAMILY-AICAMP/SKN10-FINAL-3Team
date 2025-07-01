@@ -25,4 +25,5 @@ urlpatterns = [
     path('case/', include('case.urls')),
     path('chatbot/', include('chatbot.urls')),
     path('api/', include('api.urls')),
+    path("cases/", include("cases.urls")),
 ]

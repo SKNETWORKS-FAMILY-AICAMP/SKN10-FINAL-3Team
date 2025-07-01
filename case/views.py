@@ -1,5 +1,8 @@
+# cases/views.py
+
 import re
 from django.shortcuts import render, get_object_or_404
+from django.http import JsonResponse
 from .models import Case
 
 def detail_case(request, case_id):
@@ -28,3 +31,32 @@ def detail_case(request, case_id):
         'case_full_list': case_full_list,
     }
     return render(request, 'case/detail_case.html', context)
+
+# FastAPI와 연동되는 JSON 응답용 API
+def search_cases(request):
+    filters = {}
+    if court := request.GET.get("법원명"):
+        filters["법원명__icontains"] = court
+    if name := request.GET.get("사건명"):
+        filters["사건명__icontains"] = name
+    if result := request.GET.get("판례결과"):
+        filters["판례결과__icontains"] = result
+    if clause := request.GET.get("참조조문"):
+        filters["참조조문__icontains"] = clause
+    if keyword := request.GET.get("키워드"):
+        filters["키워드__icontains"] = keyword
+
+    queryset = Case.objects.filter(**filters)
+    data = [
+        {
+            "사건번호": obj.사건번호,
+            "사건명": obj.사건명,
+            "법원명": obj.법원명,
+            "판례결과": obj.판례결과,
+            "참조조문": obj.참조조문,
+            "키워드": obj.키워드,
+            "요약": obj.case_full[:150] if hasattr(obj, 'case_full') else ""
+        }
+        for obj in queryset
+    ]
+    return JsonResponse(data, safe=False)

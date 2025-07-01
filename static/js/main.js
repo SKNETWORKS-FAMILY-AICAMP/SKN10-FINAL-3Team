@@ -9,3 +9,5 @@ document.addEventListener('DOMContentLoaded', function () {
 		});
 	});
 });
+
+// 비동기 처리 코드 넣기 
