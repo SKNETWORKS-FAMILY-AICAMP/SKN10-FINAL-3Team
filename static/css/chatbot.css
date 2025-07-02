@@ -11,7 +11,7 @@
 /* ============================= */
 .case-list-container {
 	width: 100%;
-	padding: 0 10px; /* 좌우 넉넉한 여백 */
+	padding: 0 10px;
 	box-sizing: border-box;
 }
 
@@ -58,6 +58,22 @@
 .case-item:focus-within a {
 	opacity: 1;
 }
+
+#case-pagination {
+	position: sticky;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	background: #fff;
+	z-index: 10;
+	padding-top: 0.75rem;
+	border-top: 1px solid #f1f5f9;
+	min-height: 3.2rem; /* or height: 52px; */
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
 /* ============================= */
 
 /* 타이핑 애니메이션 */

@@ -22,17 +22,20 @@
 {% block content %}
 <main class="flex flex-row bg-gray-100 w-full h-[90vh]">
 	<!-- 사이드바: 판례 목록 -->
-	<div class="w-[25vw] bg-white border-r border-gray-200 p-4 hidden md:flex flex-col h-full">
-		<!-- 사용 안내 문구 -->
+	<div class="w-[25vw] bg-white border-r border-gray-200 p-4 hidden md:flex flex-col h-[90vh]">
+		<!-- 안내문구: 높이 고정 (예: 48~56px) -->
 		<div
-			class="text-sm text-gray-700 font-medium bg-blue-50 border border-blue-200 px-3 py-2 rounded-lg mb-4 flex items-center justify-center space-x-2">
+			class="text-sm text-gray-700 font-medium bg-blue-50 border border-blue-200 px-3 py-2 rounded-lg mb-4 flex items-center justify-center space-x-2 flex-shrink-0"
+			style="height: 48px">
 			<i class="fas fa-info-circle text-blue-500"></i>
 			<span>최대 2개의 판례를 선택할 수 있습니다.</span>
 		</div>
-
-		<!-- 판례 목록 동적 삽입 컨테이너 -->
-		<div class="flex-1 overflow-y-auto space-y-3 case-list-container">
-			<!-- JS로 동적으로 삽입 -->
+		<!-- 판례목록+페이지네이션 Flex-Column 분리 -->
+		<div class="flex flex-col flex-1 min-h-0 w-full">
+			<!-- 목록: 스크롤, 하단 패딩 X, flex-1로 남은 공간 채움 -->
+			<div class="flex-1 overflow-y-auto space-y-3 case-list-container"></div>
+			<!-- 페이지네이션: 고정 높이, sticky or flex-shrink-0 -->
+			<div id="case-pagination" class="pt-2 flex-shrink-0"></div>
 		</div>
 	</div>
 
