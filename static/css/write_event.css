@@ -1,0 +1,19 @@
+/* 모달창 높이 커스터마이징 */
+.swal-custom-height {
+	min-width: 15vw;
+	min-height: 40vh;
+	overflow: hidden; /* 내부 스크롤 막기 */
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+/* SweetAlert2 로딩 애니메이션 커스터마이징 */
+.swal2-loader {
+	width: 50px !important;
+	height: 50px !important;
+	margin-top: 1.2rem !important;
+	margin-bottom: 1.2rem !important;
+	display: block !important;
+}

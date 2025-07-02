@@ -1,0 +1,205 @@
+<!-- prettier-ignore -->
+{% extends 'base/index.html' %} 
+{% load static %} 
+{% block title %}LAW FIRM{% endblock %}
+
+<!-- prettier-ignore -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/main.css' %}" />
+{% endblock %}
+
+<!-- prettier-ignore -->
+{% block js %}
+<script src="{% static 'js/main.js' %}"></script>
+{% endblock %}
+
+<!-- prettier-ignore -->
+{% block content %}
+<main class="flex-1 overflow-y-auto px-20 py-16 bg-gray-50">
+	<!-- 검색창 -->
+	<div class="flex justify-center items-center gap-2 mb-20">
+		<button
+			class="w-12 h-12 flex items-center justify-center rounded-full bg-blue-500 hover:bg-blue-600 text-white shadow-md transition">
+			<i class="fas fa-upload text-base"></i>
+		</button>
+		<form action="/chatbot/" method="GET" class="w-1/2" id="main_form">
+			{% csrf_token %}
+
+			<div
+				class="flex items-center w-full bg-white rounded-full border border-gray-300 px-6 py-3 shadow-sm">
+				<i class="fas fa-search text-blue-500 text-lg mr-3"></i>
+				<input
+					type="text"
+					id="query"
+					name="query"
+					placeholder="Search Text"
+					class="flex-grow focus:outline-none text-sm" />
+				<button
+					type="submit"
+					id="send-btn"
+					class="ml-3 w-10 h-10 flex items-center justify-center rounded-full bg-white border border-blue-500 text-blue-500 hover:bg-blue-50 transition">
+					<i class="fas fa-paper-plane text-lg"></i>
+				</button>
+			</div>
+		</form>
+	</div>
+	<!-- 현황 카드 -->
+	<div class="grid grid-cols-1 md:grid-cols-2 gap-16 mb-16">
+		<div class="bg-white rounded-lg shadow-md p-4 min-h-[180px]">
+			<h3 class="text-base font-semibold text-gray-700 mb-4">결재 대기 현황</h3>
+			<div class="grid grid-cols-3 gap-5 mt-8 text-center">
+				<div>
+					<div class="text-2xl font-bold text-blue-700">1 건</div>
+					<div class="text-sm text-gray-500">결재 대기</div>
+				</div>
+				<div>
+					<div class="text-2xl font-bold text-gray-600">0 건</div>
+					<div class="text-sm text-gray-500">결재 완료</div>
+				</div>
+				<div>
+					<div class="text-2xl font-bold text-red-600">1 건</div>
+					<div class="text-sm text-gray-500">반려</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="bg-white rounded-lg shadow-md p-4 min-h-[180px]">
+			<h3 class="text-base font-semibold text-gray-700 mb-4">업무 배정 현황</h3>
+			<div class="grid grid-cols-3 gap-5 mt-8 text-center">
+				<div>
+					<div class="text-2xl font-bold text-blue-700">1 건</div>
+					<div class="text-sm text-gray-500">확인 대기</div>
+				</div>
+				<div>
+					<div class="text-2xl font-bold text-gray-600">0 건</div>
+					<div class="text-sm text-gray-500">확인 완료</div>
+				</div>
+				<div>
+					<div class="text-2xl font-bold text-gray-400">0 건</div>
+					<div class="text-sm text-gray-500">진행 불가</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- 사건 현황 테이블 -->
+	<div class="bg-white rounded-lg shadow-md p-4 min-h-[600px] flex flex-col justify-between">
+		<div>
+			<div class="flex items-center justify-between mb-8">
+				<h3 class="text-base font-semibold text-gray-700">사건 현황</h3>
+				{% if user.is_authenticated and user.is_partner %}
+				<a href="/event/write" id="add_case_btn" class="text-blue-500 hover:text-blue-700">
+					<i class="fas fa-plus-circle text-2xl"></i>
+				</a>
+				{% endif %}
+			</div>
+
+			<div class="overflow-x-auto grow px-10">
+				<div class="w-[80vw] mx-auto">
+					<!-- 기준 너비 설정 -->
+					<table class="min-w-full text-left text-sm">
+						<thead>
+							<tr class="border-b text-gray-500 text-center">
+								<th class="pb-2 w-[5%]">번호</th>
+								<th class="pb-2 w-[30%]">사건명</th>
+								<th class="pb-2 w-[10%]">클라이언트</th>
+								<th class="pb-2 w-[20%]">사건 유형</th>
+								<th class="pb-2 w-[10%]">작성자</th>
+								<th class="pb-2 w-[15%]">진행상태</th>
+								<th class="pb-2 w-[10%]">생성일</th>
+							</tr>
+						</thead>
+						<tbody class="min-h-[440px]">
+							{% for row_number, item in page_with_numbers %}
+							<tr
+								class="border-t text-center h-12 align-middle cursor-pointer hover:bg-gray-50 transition"
+								data-id="{{ item.event_id }}">
+								<td
+									class="py-0 px-3 max-w-[4vw] truncate overflow-hidden whitespace-nowrap">
+									{{ row_number }}
+								</td>
+								<td
+									class="py-0 px-3 max-w-[20vw] truncate overflow-hidden whitespace-nowrap">
+									{{ item.e_title }}
+								</td>
+								<td
+									class="py-0 px-3 max-w-[8vw] truncate overflow-hidden whitespace-nowrap">
+									{{ item.client }}
+								</td>
+								<td
+									class="py-0 px-3 max-w-[12vw] truncate overflow-hidden whitespace-nowrap">
+									{{ item.cat_02 }}
+								</td>
+								<td
+									class="py-0 px-3 max-w-[8vw] truncate overflow-hidden whitespace-nowrap">
+									{{ item.creator_name }}
+								</td>
+								<td
+									class="py-0 px-3 max-w-[10vw] truncate overflow-hidden whitespace-nowrap">
+									{{ item.estat_label }}
+								</td>
+								<td class="py-0 px-3 text-nowrap">
+									{{ item.created_at|date:"Y-m-d" }}
+								</td>
+							</tr>
+							{% empty %}
+							<tr>
+								<td colspan="7">
+									<div
+										class="flex justify-center items-center h-[400px] text-gray-400 text-center">
+										배정된 사건이 없습니다.
+									</div>
+								</td>
+							</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+
+		<!-- 페이지네이션 UI -->
+		<div class="mt-8 flex justify-center items-center space-x-2">
+			<!-- 이전 버튼 -->
+			{% if page_obj.has_previous %}
+			<a
+				href="?page={{ page_obj.previous_page_number }}"
+				class="px-3 py-1 border rounded text-sm text-gray-700 hover:bg-gray-100 transition">
+				◀ 이전
+			</a>
+			{% else %}
+			<span class="px-3 py-1 border rounded text-sm text-gray-300 cursor-not-allowed"
+				>◀ 이전</span
+			>
+			{% endif %}
+
+			<!-- 페이지 번호 -->
+			{% for num in page_obj.paginator.page_range %} {% if page_obj.number == num %}
+			<span
+				class="px-3 py-1 border rounded bg-blue-500 text-white text-sm font-semibold transition">
+				{{ num }}
+			</span>
+			{% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+			<a
+				href="?page={{ num }}"
+				class="px-3 py-1 border rounded text-sm text-gray-700 hover:bg-gray-100 transition">
+				{{ num }}
+			</a>
+			{% endif %} {% endfor %}
+
+			<!-- 다음 버튼 -->
+			{% if page_obj.has_next %}
+			<a
+				href="?page={{ page_obj.next_page_number }}"
+				class="px-3 py-1 border rounded text-sm text-gray-700 hover:bg-gray-100 transition">
+				다음 ▶
+			</a>
+			{% else %}
+			<span class="px-3 py-1 border rounded text-sm text-gray-300 cursor-not-allowed"
+				>다음 ▶</span
+			>
+			{% endif %}
+		</div>
+	</div>
+</main>
+{% endblock %}

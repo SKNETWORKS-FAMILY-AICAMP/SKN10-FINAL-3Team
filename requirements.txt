@@ -1,7 +1,24 @@
-transformers==4.40.1
-datasets==2.19.0
-pandas
-scikit-learn
-torch==2.1.0
-sentence-transformers
-python-dotenv
+# Django 웹 프레임워크 및 API
+django                      
+djangorestframework         
+django-cors-headers         
+django-markdownify
+
+# 인증 및 보안
+PyJWT                       
+
+# 데이터베이스 연동
+mysqlclient                 
+
+# 데이터 처리 및 환경 설정
+pandas                      
+python-dotenv               
+
+# OpenAI
+openai
+
+# FastAPI
+fastapi
+
+# FastAPI 관련 라이브러리
+uvicorn

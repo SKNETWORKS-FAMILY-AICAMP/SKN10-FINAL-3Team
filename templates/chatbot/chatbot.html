@@ -1,0 +1,78 @@
+<!-- prettier-ignore -->
+{% extends 'base/index.html' %}
+{% load static %}
+{% block title %}Chatbot{% endblock %}
+
+<!-- prettier-ignore -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/chatbot.css' %}" />
+{% endblock %}
+
+<!-- prettier-ignore -->
+{% block js %}
+<script src="{% static 'js/chatbot.js' %}"></script>
+{% endblock %}
+
+<!-- prettier-ignore -->
+{% block markedjs %}
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+{% endblock %}
+
+<!-- prettier-ignore -->
+{% block content %}
+<main class="flex flex-row bg-gray-100 w-full h-[90vh]">
+	<!-- 사이드바: 판례 목록 -->
+	<div class="w-[25vw] bg-white border-r border-gray-200 p-4 hidden md:flex flex-col h-full">
+		<!-- 사용 안내 문구 -->
+		<div
+			class="text-sm text-gray-700 font-medium bg-blue-50 border border-blue-200 px-3 py-2 rounded-lg mb-4 flex items-center justify-center space-x-2">
+			<i class="fas fa-info-circle text-blue-500"></i>
+			<span>최대 2개의 판례를 선택할 수 있습니다.</span>
+		</div>
+
+		<!-- 판례 목록 동적 삽입 컨테이너 -->
+		<div class="flex-1 overflow-y-auto space-y-3 case-list-container">
+			<!-- JS로 동적으로 삽입 -->
+		</div>
+	</div>
+
+	<!-- 메인 챗봇 영역 -->
+	<div class="w-[75vw] flex items-center justify-center px-4 md:px-8 lg:px-0 h-full">
+		<div class="w-full h-full flex flex-col">
+			<div
+				class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 w-full h-full flex flex-col">
+				<div class="flex flex-col flex-1 min-h-0">
+					<!-- 메시지 출력 영역 -->
+					<div
+						class="flex-1 overflow-y-auto hide-scrollbar p-6 space-y-6 bg-gray-50 rounded-lg mb-2 min-h-0 chat-message-area">
+						<!-- JS로 메시지 추가 -->
+					</div>
+					<!-- 선택된 판례 표시 영역 -->
+					<div
+						id="selected-cases-summary"
+						class="text-sm text-blue-600 font-sans font-normal"
+						style="font-family: Noto Sans KR, sans-serif">
+						선택된 판례: 없음
+					</div>
+
+					<!-- 입력창 -->
+					<div class="flex items-center justify-center mt-2">
+						<form id="chat-form" class="w-full flex items-center space-x-2">
+							<input
+								type="text"
+								id="chat-input"
+								placeholder="메시지를 입력하세요..."
+								class="flex-1 border border-gray-300 rounded-lg px-4 py-4 focus:outline-none focus:ring-2 focus:ring-law-blue focus:border-transparent" />
+							<button
+								type="submit"
+								class="bg-law-blue hover:bg-law-darkblue text-white px-6 py-4 rounded-lg transition">
+								<i class="fas fa-paper-plane"></i>
+							</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</main>
+{% endblock %}
