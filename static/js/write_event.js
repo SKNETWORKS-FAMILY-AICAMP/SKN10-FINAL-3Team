@@ -2,34 +2,33 @@ console.log('write_event.js loaded!!');
 
 // [최상단] 공통 API 호출 함수: access token 만료 시 1회 자동 재시도!
 async function apiRequest(url, options = {}, retry = true) {
-    let res = await fetch(url, { ...options, credentials: 'include' });
+	let res = await fetch(url, { ...options, credentials: 'include' });
 
-    if ((res.status === 401 || res.status === 403) && retry) {
-        // 서버가 refresh token으로 access token을 재발급해줬으니, 1회 더 재요청!
-        await new Promise(r => setTimeout(r, 150));
-        res = await fetch(url, { ...options, credentials: 'include' });
+	if ((res.status === 401 || res.status === 403) && retry) {
+		// 서버가 refresh token으로 access token을 재발급해줬으니, 1회 더 재요청!
+		await new Promise((r) => setTimeout(r, 150));
+		res = await fetch(url, { ...options, credentials: 'include' });
 
-        if (res.status === 401 || res.status === 403) {
-            window.location.href = '/';
-            return;
-        }
-    } else if ((res.status === 401 || res.status === 403) && !retry) {
-        window.location.href = '/';
-        return;
-    }
+		if (res.status === 401 || res.status === 403) {
+			window.location.href = '/';
+			return;
+		}
+	} else if ((res.status === 401 || res.status === 403) && !retry) {
+		window.location.href = '/';
+		return;
+	}
 
-    if (!res.ok) {
-        let error;
-        try {
-            error = await res.json();
-        } catch {
-            error = { error: 'API Error' };
-        }
-        throw new Error(error.error || 'API Error');
-    }
-    return res.json();
+	if (!res.ok) {
+		let error;
+		try {
+			error = await res.json();
+		} catch {
+			error = { error: 'API Error' };
+		}
+		throw new Error(error.error || 'API Error');
+	}
+	return res.json();
 }
-
 
 document.addEventListener('DOMContentLoaded', function () {
 	// --- DOM 요소 및 데이터 초기화 ---
@@ -425,7 +424,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				Swal.close();
 				alert(
 					'분석 API 호출 실패: ' +
-					(errorData.detail || errorData.error || response.status)
+						(errorData.detail || errorData.error || response.status)
 				);
 				return;
 			}
