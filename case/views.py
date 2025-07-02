@@ -6,15 +6,35 @@ def detail_case(request, case_id):
     user = request.user
     case = get_object_or_404(Case, case_id=case_id)
 
-    refer_cases_list = case.refer_cases.split('/') if case.refer_cases else []
-    refer_statutes_list = case.refer_statutes.split('/') if case.refer_statutes else []
+    refer_cases_list = []
+    if case.refer_cases and case.refer_cases.strip().lower() != 'nan':
+        refer_cases_list = [
+            x for x in case.refer_cases.split('/') if x.strip().lower() != 'nan'
+        ]
 
-    # [1], [2], ... 형식 분리
-    decision_summary_list = re.split(r'(?=\[\d+\])', case.decision_summary) if case.decision_summary else []
-    decision_issue_list = re.split(r'(?=\[\d+\])', case.decision_issue) if case.decision_issue else []
+    refer_statutes_list = []
+    if case.refer_statutes and case.refer_statutes.strip().lower() != 'nan':
+        refer_statutes_list = [
+            x for x in case.refer_statutes.split('/') if x.strip().lower() != 'nan'
+        ]
 
-    # 판례 내용에서 '【' 기호 기준으로 단락 분리
-    case_full_list = re.split(r'(?=【)', case.case_full) if case.case_full else []
+    decision_summary_list = []
+    if case.decision_summary and case.decision_summary.strip().lower() != 'nan':
+        decision_summary_list = [
+            x for x in re.split(r'(?=\[\d+\])', case.decision_summary) if x.strip().lower() != 'nan'
+        ]
+
+    decision_issue_list = []
+    if case.decision_issue and case.decision_issue.strip().lower() != 'nan':
+        decision_issue_list = [
+            x for x in re.split(r'(?=\[\d+\])', case.decision_issue) if x.strip().lower() != 'nan'
+        ]
+
+    case_full_list = []
+    if case.case_full and case.case_full.strip().lower() != 'nan':
+        case_full_list = [
+            x for x in re.split(r'(?=【)', case.case_full) if x.strip().lower() != 'nan'
+        ]
 
     context = {
         'user': user,
