@@ -11,14 +11,12 @@ async function fetchWithAutoRefresh(url, options, retry = true) {
 	return res;
 }
 
-// chatbot.js
 document.addEventListener('DOMContentLoaded', () => {
 	marked.setOptions({
 		breaks: false,
 		gfm: true,
 	});
 
-	// 영역 및 엘리먼트 정의
 	const chatArea = document.querySelector('.chat-message-area');
 	const form = document.getElementById('chat-form');
 	const inputBox = document.getElementById('chat-input');
@@ -26,16 +24,19 @@ document.addEventListener('DOMContentLoaded', () => {
 	const caseListDiv = document.querySelector('.case-list-container');
 	let selectedCases = new Set();
 
-	// 1. 최초 진입 시 query 파라미터로 첫 메시지 출력
+	// --- 페이지네이션용 전역 변수 ---
+	let caseIdsAll = []; // 전체 case_ids
+	let currentPage = 1;
+	const itemsPerPage = 10; // 한 페이지에 보여줄 판례 개수
+
+	// --- 초기 쿼리 입력/응답 표시 ---
 	const urlParams = new URLSearchParams(window.location.search);
 	const initialQuery = urlParams.get('query');
-
 	if (initialQuery) {
 		addUserMessage(initialQuery);
 		sendToServer(initialQuery);
 	}
 
-	// 2. 입력창 이벤트(엔터/전송) 등록
 	if (form) {
 		form.addEventListener('submit', (e) => {
 			e.preventDefault();
@@ -47,18 +48,16 @@ document.addEventListener('DOMContentLoaded', () => {
 		});
 	}
 
-	// 3. 사용자 메시지 추가 함수
 	function addUserMessage(text) {
 		const userMsg = document.createElement('div');
 		userMsg.className = 'flex justify-end';
 		userMsg.innerHTML = `
-            <div class="bg-blue-500 text-white p-4 rounded-lg max-w-[70%] whitespace-pre-wrap">${text}</div>
-        `;
+			<div class="bg-blue-500 text-white p-4 rounded-lg max-w-[70%] whitespace-pre-wrap">${text}</div>
+		`;
 		chatArea.appendChild(userMsg);
 		chatArea.scrollTop = chatArea.scrollHeight;
 	}
 
-	// 4. 챗봇 메시지(로딩) 추가 함수
 	function addBotLoading() {
 		const botMsg = document.createElement('div');
 		const botContent = document.createElement('div');
@@ -72,11 +71,9 @@ document.addEventListener('DOMContentLoaded', () => {
 		return botContent;
 	}
 
-	// 5. 서버 호출 함수 (FastAPI)
 	async function sendToServer(query) {
 		const botContent = addBotLoading();
 		try {
-			// 선택된 판례(case_ids)도 함께 전달 (선택 기능 확장 가능)
 			let data = { query };
 			if (selectedCases.size > 0) {
 				data.case_ids = Array.from(selectedCases);
@@ -97,71 +94,135 @@ document.addEventListener('DOMContentLoaded', () => {
 			botContent.innerHTML = marked.parse(json.answer || '⚠️ 응답 오류');
 			chatArea.scrollTop = chatArea.scrollHeight;
 
-			// 판례 목록 동적 갱신
 			if (json.case_ids && Array.isArray(json.case_ids) && json.case_ids.length > 0) {
-				updateCaseSidebar(json.case_ids);
+				updateCaseSidebarWithPaging(json.case_ids, 1);
 			}
 		} catch (err) {
 			botContent.innerText = '⚠️ 응답 오류: ' + err.message;
 		}
 	}
 
-	// 6. 좌측 판례 목록 동적 갱신 함수
-	async function updateCaseSidebar(caseIds) {
-		if (!caseListDiv) return;
-		caseListDiv.innerHTML = '<div class="text-gray-400 text-center py-10">불러오는 중...</div>';
+	// --- summary 갱신 ---
+	function updateSelectedCasesSummary() {
+		if (!selectedCasesSummary) return;
+		if (selectedCases.size === 0) {
+			selectedCasesSummary.textContent = '선택된 판례: 없음';
+		} else {
+			const selectedNames = Array.from(selectedCases).map((id) => {
+				const el = document.querySelector(`[data-case-id="${id}"]`);
+				return el ? el.getAttribute('data-case-num') : id;
+			});
+			selectedCasesSummary.textContent = '선택된 판례: ' + selectedNames.join(', ');
+		}
+	}
 
+	// --- 동적 페이지네이션 + 렌더링 ---
+	function renderCasePagination(totalCount) {
+		const totalPages = Math.ceil(totalCount / itemsPerPage);
+		const paginationDiv = document.createElement('div');
+		paginationDiv.className = 'flex justify-between items-center mt-2 px-2';
+
+		paginationDiv.innerHTML = `
+			<button class="case-prev-btn text-sm px-2 py-1 rounded border ${
+				currentPage === 1 ? 'opacity-40 cursor-not-allowed' : ''
+			}" ${currentPage === 1 ? 'disabled' : ''}>◀ 이전</button>
+			<span class="text-xs text-gray-500">${currentPage} / ${totalPages}</span>
+			<button class="case-next-btn text-sm px-2 py-1 rounded border ${
+				currentPage === totalPages ? 'opacity-40 cursor-not-allowed' : ''
+			}" ${currentPage === totalPages ? 'disabled' : ''}>다음 ▶</button>
+		`;
+		return paginationDiv;
+	}
+
+	async function updateCaseSidebarWithPaging(caseIds, gotoPage = 1) {
+		if (!caseListDiv) return;
+
+		// 검색 결과/목록이 바뀔 때는 선택된 판례 초기화(비움)
+		selectedCases.clear();
+		updateSelectedCasesSummary();
+
+		caseIdsAll = caseIds;
+		currentPage = gotoPage;
+		const totalCount = caseIdsAll.length;
+
+		const startIdx = (currentPage - 1) * itemsPerPage;
+		const endIdx = startIdx + itemsPerPage;
+		const pageCaseIds = caseIdsAll.slice(startIdx, endIdx);
+
+		caseListDiv.innerHTML = '<div class="text-gray-400 text-center py-10">불러오는 중...</div>';
 		try {
-			// ✅ 반드시 판례 다건 조회용 API가 필요!
-			const res = await fetch('/api/case/list/', {
+			const res = await fetchWithAutoRefresh('/api/case/list/', {
 				method: 'POST',
 				credentials: 'include',
 				headers: {
 					'Content-Type': 'application/json',
 					'X-Requested-With': 'XMLHttpRequest',
 				},
-				body: JSON.stringify({ case_ids: caseIds }),
+				body: JSON.stringify({ case_ids: pageCaseIds }),
 			});
 			const cases = await res.json();
-
-			// 에러 처리
 			if (!res.ok || !Array.isArray(cases)) throw new Error(cases.error || '목록 오류');
-
-			// 목록 렌더링
 			caseListDiv.innerHTML = '';
 			cases.forEach((caseItem) => {
+				const caseIdStr = caseItem.case_id.toString();
 				const div = document.createElement('div');
 				div.className =
-					'case-item p-3 h-[100px] border border-gray-200 rounded-lg hover:bg-blue-100 cursor-pointer group relative flex flex-col justify-between transition-colors duration-150';
+					'case-item p-3 h-[100px] border border-gray-200 rounded-lg cursor-pointer group relative flex flex-col justify-between transition-colors duration-150';
+				if (selectedCases.has(caseIdStr)) {
+					div.classList.add('bg-blue-50', 'border-blue-500', 'shadow');
+					div.classList.remove('border-gray-200');
+				}
 				div.setAttribute('data-case-id', caseItem.case_id);
 				div.setAttribute('data-case-num', caseItem.case_num);
-
 				div.innerHTML = `
-                    <div>
-                        <div class="flex space-x-1">
-                            <div class="w-1/2 text-sm font-medium text-gray-800 truncate">
-                                ${caseItem.case_num}
-                            </div>
-                            <div class="w-1/2 text-sm font-medium text-gray-800 truncate">
-                                ${caseItem.case_name}
-                            </div>
-                        </div>
-                        <div class="mt-1">
-                            <div class="text-xs text-gray-500 leading-snug w-1/2 break-words overflow-hidden line-clamp-2">
-                                ${caseItem.keywords.map((kw) => `<span>#${kw}</span>`).join(' ')}
-                            </div>
-                        </div>
-                    </div>
-                    <a href="/case/detail/${caseItem.case_id}/" target="_blank"
-                        class="flex items-center text-gray-500 hover:text-law-blue text-xs absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition">
-                        <i class="fas fa-external-link-alt text-sm"></i>
-                        <span class="ml-1">전문 보기</span>
-                    </a>
-                `;
+					<div>
+						<div class="flex space-x-1">
+							<div class="w-1/2 text-sm font-medium text-gray-800 truncate">${caseItem.case_num}</div>
+							<div class="w-1/2 text-sm font-medium text-gray-800 truncate">${caseItem.case_name}</div>
+						</div>
+						<div class="mt-1">
+							<div class="text-xs text-gray-500 leading-snug w-1/2 break-words overflow-hidden line-clamp-2">
+								${caseItem.keywords.map((kw) => `<span>#${kw}</span>`).join(' ')}
+							</div>
+						</div>
+					</div>
+					<a href="/case/detail/${caseItem.case_id}/" target="_blank"
+						class="flex items-center text-gray-500 hover:text-law-blue text-xs absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition">
+						<i class="fas fa-external-link-alt text-sm"></i>
+						<span class="ml-1">전문 보기</span>
+					</a>
+				`;
+				div.addEventListener('click', function (e) {
+					if (e.target.closest('a')) return;
+					const isSelected = div.classList.contains('bg-blue-50');
+					if (isSelected) {
+						div.classList.remove('bg-blue-50', 'border-blue-500', 'shadow');
+						div.classList.add('border-gray-200');
+						selectedCases.delete(caseIdStr);
+					} else {
+						if (selectedCases.size >= 2) return;
+						div.classList.add('bg-blue-50', 'border-blue-500', 'shadow');
+						div.classList.remove('border-gray-200');
+						selectedCases.add(caseIdStr);
+					}
+					updateSelectedCasesSummary();
+				});
 				caseListDiv.appendChild(div);
 			});
 
-			// 선택 이벤트 등 필요한 로직 여기에 추가 (선택된 판례 반영, summary 갱신 등)
+			// 페이지네이션 UI 추가
+			const paginationDiv = renderCasePagination(totalCount);
+			paginationDiv.querySelector('.case-prev-btn').addEventListener('click', () => {
+				if (currentPage > 1) updateCaseSidebarWithPaging(caseIdsAll, currentPage - 1);
+			});
+			paginationDiv.querySelector('.case-next-btn').addEventListener('click', () => {
+				const totalPages = Math.ceil(caseIdsAll.length / itemsPerPage);
+				if (currentPage < totalPages)
+					updateCaseSidebarWithPaging(caseIdsAll, currentPage + 1);
+			});
+			caseListDiv.appendChild(paginationDiv);
+
+			updateSelectedCasesSummary();
 		} catch (err) {
 			caseListDiv.innerHTML = `<div class="text-red-400 text-center py-10">목록 오류: ${err.message}</div>`;
 		}

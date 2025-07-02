@@ -1,4 +1,4 @@
-/* 스크롤바 숨기기 */
+/* 스크롤바 숨기기  */
 .hide-scrollbar {
 	-ms-overflow-style: none;
 	scrollbar-width: none;
@@ -6,6 +6,59 @@
 .hide-scrollbar::-webkit-scrollbar {
 	display: none;
 }
+/* ============================= */
+/*        판례 카드 영역         */
+/* ============================= */
+.case-list-container {
+	width: 100%;
+	padding: 0 10px; /* 좌우 넉넉한 여백 */
+	box-sizing: border-box;
+}
+
+.case-item {
+	width: 100%;
+	min-width: 0;
+	margin-bottom: 10px;
+	background: #fff;
+	box-sizing: border-box;
+	transition: background 0.2s, box-shadow 0.2s, border 0.2s;
+	overflow: hidden;
+	border-radius: 10px;
+	padding: 14px 18px;
+	cursor: pointer;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	margin: 0;
+	border: 1.5px solid #e5e7eb; /* 기본 border-gray-200 */
+}
+
+.case-item.bg-blue-50 {
+	background: #e0f2fe !important; /* Tailwind bg-blue-50 */
+}
+.case-item.border-blue-500 {
+	border-color: #3b82f6 !important; /* Tailwind border-blue-500 */
+}
+.case-item.shadow {
+	box-shadow: 0 2px 8px rgba(59, 130, 246, 0.13), 0 0px 0px rgba(0, 0, 0, 0.01);
+}
+.case-item:hover {
+	background: #f0f9ff;
+}
+
+/* 카드 내외부 링크(전문보기) 위치/스타일 */
+.case-item a {
+	position: absolute;
+	bottom: 8px;
+	right: 12px;
+	opacity: 0;
+	transition: opacity 0.15s;
+}
+.case-item:hover a,
+.case-item:focus-within a {
+	opacity: 1;
+}
+/* ============================= */
 
 /* 타이핑 애니메이션 */
 .typing-dots::after {
