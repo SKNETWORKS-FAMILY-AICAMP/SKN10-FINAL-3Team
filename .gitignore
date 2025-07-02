@@ -1,0 +1,17 @@
+# 가상환경 및 환경 변수
+.venv/
+.env
+
+# 데이터베이스 디렉토리
+database/
+
+# 마이그레이션 파일
+**/migrations/*.pyc
+**/migrations/*.py
+**/migrations/__pycache__/
+**/migrations/*initial.py
+
+# __pycache__ 및 .pyc 파일
+__pycache__/
+*.pyc
+*.pyo
