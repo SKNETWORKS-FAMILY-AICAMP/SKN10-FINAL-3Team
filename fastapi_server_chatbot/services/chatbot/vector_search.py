@@ -25,7 +25,7 @@ except Exception as e:
     faiss_index = None
     metadata = []
 
-def search_similar_cases(query: str, similarity_threshold: float = 1.1) -> list:
+def search_similar_cases(query: str) -> list:
     """OpenAI 임베딩 기반 FAISS 유사 판례 검색 (유사도 임계값 기준 필터링)"""
     try:
         if faiss_index is None or not metadata:
@@ -33,7 +33,6 @@ def search_similar_cases(query: str, similarity_threshold: float = 1.1) -> list:
             return []
         
         print(f"DEBUG: 검색 쿼리: {query}")
-        print(f"DEBUG: 유사도 임계값: {similarity_threshold}")
         
         # 임베딩 생성
         try:
@@ -66,9 +65,9 @@ def search_similar_cases(query: str, similarity_threshold: float = 1.1) -> list:
         print(f"DEBUG: OpenAI 결과: {test}")
 
         if test == 1:
-            similarity_threshold = scores[0][0]+0.2
+            similarity_threshold = scores[0][0]+0.3
         else:
-            similarity_threshold = 1.1
+            similarity_threshold = 0.7
 
         for i, idx in enumerate(indices[0]):
             if 0 <= idx < len(metadata):
