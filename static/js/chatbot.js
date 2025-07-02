@@ -1,3 +1,16 @@
+// 자동 토큰 재발급 + 자동 재요청 함수
+async function fetchWithAutoRefresh(url, options, retry = true) {
+	let res = await fetch(url, { ...options, credentials: 'include' });
+
+	if ((res.status === 401 || res.status === 403) && retry) {
+		// 토큰 재발급 시도
+		await fetch('/api/refresh/', { method: 'POST', credentials: 'include' });
+		// 재요청(딱 1번만)
+		return fetchWithAutoRefresh(url, options, false);
+	}
+	return res;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
 	marked.setOptions({
 		breaks: false,
@@ -123,6 +136,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	async function updateCaseSidebarWithPaging(caseIds, gotoPage = 1) {
 		if (!caseListDiv) return;
+
+		// 검색 결과/목록이 바뀔 때는 선택된 판례 초기화(비움)
+		selectedCases.clear();
+		updateSelectedCasesSummary();
+
 		caseIdsAll = caseIds;
 		currentPage = gotoPage;
 		const totalCount = caseIdsAll.length;
@@ -133,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		caseListDiv.innerHTML = '<div class="text-gray-400 text-center py-10">불러오는 중...</div>';
 		try {
-			const res = await fetch('/api/case/list/', {
+			const res = await fetchWithAutoRefresh('/api/case/list/', {
 				method: 'POST',
 				credentials: 'include',
 				headers: {
