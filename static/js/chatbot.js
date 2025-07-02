@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	const selectedCasesSummary = document.getElementById('selected-cases-summary');
 	const caseListDiv = document.querySelector('.case-list-container');
 	let selectedCases = new Set();
+	const sendBtn = form ? form.querySelector('button[type="submit"]') : null;
 
 	// --- 페이지네이션용 전역 변수 ---
 	let caseIdsAll = []; // 전체 case_ids
@@ -72,6 +73,16 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	async function sendToServer(query) {
+		// ---- 요청 전: 입력창/버튼 비활성화 ----
+		if (inputBox) {
+			inputBox.disabled = true;
+			inputBox.classList.add('cursor-not-allowed');
+		}
+		if (sendBtn) {
+			sendBtn.disabled = true;
+			sendBtn.classList.add('cursor-not-allowed');
+		}
+
 		const botContent = addBotLoading();
 		try {
 			let data = { query };
@@ -99,6 +110,17 @@ document.addEventListener('DOMContentLoaded', () => {
 			}
 		} catch (err) {
 			botContent.innerText = '⚠️ 응답 오류: ' + err.message;
+		} finally {
+			// ---- 응답/에러 후: 입력창/버튼 다시 활성화 ----
+			if (inputBox) {
+				inputBox.disabled = false;
+				inputBox.classList.remove('cursor-not-allowed');
+			}
+			if (sendBtn) {
+				sendBtn.disabled = false;
+				sendBtn.classList.remove('cursor-not-allowed');
+			}
+			if (inputBox) inputBox.focus();
 		}
 	}
 
@@ -120,7 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	function renderCasePagination(totalCount) {
 		const totalPages = Math.ceil(totalCount / itemsPerPage);
 		const paginationDiv = document.createElement('div');
-		paginationDiv.className = 'flex justify-between items-center mt-2 px-2';
+		paginationDiv.className = 'flex justify-between items-center mt-2 px-2 w-full';
 
 		paginationDiv.innerHTML = `
 			<button class="case-prev-btn text-sm px-2 py-1 rounded border ${
@@ -220,7 +242,11 @@ document.addEventListener('DOMContentLoaded', () => {
 				if (currentPage < totalPages)
 					updateCaseSidebarWithPaging(caseIdsAll, currentPage + 1);
 			});
-			caseListDiv.appendChild(paginationDiv);
+			const paginationContainer = document.getElementById('case-pagination');
+			if (paginationContainer) {
+				paginationContainer.innerHTML = '';
+				paginationContainer.appendChild(paginationDiv);
+			}
 
 			updateSelectedCasesSummary();
 		} catch (err) {
