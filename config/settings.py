@@ -12,10 +12,34 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-from dotenv import load_dotenv
-import os
+import os, boto3
 
-load_dotenv()
+# AWS Parameter Store에서 환경 변수 로드하는 함수
+def load_aws_parameters():
+    client = boto3.client('ssm', region_name='ap-northeast-2')
+
+    response = client.get_parameters_by_path(
+        Path='/FINALPROJ/PARAMETERS/',
+        Recursive=True,
+        WithDecryption=True
+    )
+
+    for param in response['Parameters']:
+        key = param['Name'].split('/')[-1]
+        value = param['Value']
+        os.environ[key] = value
+
+        # 디버그 출력: 값 일부만 출력
+        if len(value) > 8:
+            print(f"🔑 Loaded: {key} = {value[:4]}... (len={len(value)})")
+        else:
+            print(f"🔑 Loaded: {key} = {value}")
+
+    print(f"All loaded keys: {', '.join([p['Name'].split('/')[-1] for p in response['Parameters']])}")
+
+# AWS Parameter Store에서 환경 변수 로드
+load_aws_parameters()
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
