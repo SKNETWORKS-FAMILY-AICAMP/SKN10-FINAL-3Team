@@ -67,7 +67,7 @@ def search_similar_cases(query: str) -> list:
         if test == 1:
             similarity_threshold = scores[0][0]+0.3
         else:
-            similarity_threshold = 0.7
+            similarity_threshold = 1.0
 
         for i, idx in enumerate(indices[0]):
             if 0 <= idx < len(metadata):
