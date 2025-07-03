@@ -4,7 +4,7 @@ on:
   push:
     paths:
       - 'fastapi_server_recommend/**'
-      - '.github/workflows/ci-cd-server-recommend.yml'
+      - '.github/workflows/ci-cd-server-recommend.yaml'
     branches: [ feature-FastAPI ]
 
 jobs:

@@ -4,7 +4,7 @@ on:
   push:
     paths:
       - 'fastapi_server_chatbot/**'
-      - '.github/workflows/ci-cd-server-chatbot.yml'
+      - '.github/workflows/ci-cd-server-chatbot.yaml'
     branches: [ feature-FastAPI ]
 
 jobs:
