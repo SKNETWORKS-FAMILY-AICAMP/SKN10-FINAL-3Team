@@ -3,7 +3,7 @@ name: CI/CD fastapi_server_recommend
 on:
   push:
     paths:
-      - 'fastapi_server_recommend/**'
+      - 'fastapi_server/fastapi_server_recommend/**'
       - '.github/workflows/ci-cd-server-recommend.yaml'
     branches: [ feature-FastAPI ]
 
@@ -24,15 +24,15 @@ jobs:
       with:
         push: true
         tags: ${{ RUNPOD.DOCKER_USERNAME }}/fastapi_server_recommend:latest
-        context: ./fastapi_server_recommend
-        file: ./fastapi_server_recommend/Dockerfile
+        context: ./fastapi_server/fastapi_server_recommend
+        file: ./fastapi_server/fastapi_server_recommend/Dockerfile
 
     - name: Run Tests on Runpod Recommend server
       uses: runpod/runpod-test-runner@v1
       with:
         image-tag: ${{ RUNPOD.DOCKER_USERNAME }}/fastapi_server_recommend:latest
         runpod-api-key: ${{ RUNPOD.RUNPOD_API_KEY }}
-        test-filename: fastapi_server_recommend/tests.json
+        test-filename: fastapi_server/fastapi_server_recommend/tests.json
 
     - name: Deploy to Runpod Recommend server
       run: |

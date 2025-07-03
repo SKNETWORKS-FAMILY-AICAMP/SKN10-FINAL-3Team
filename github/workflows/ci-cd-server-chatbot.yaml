@@ -3,7 +3,7 @@ name: CI/CD fastapi_server_chatbot
 on:
   push:
     paths:
-      - 'fastapi_server_chatbot/**'
+      - 'fastapi_server/fastapi_server_chatbot/**'
       - '.github/workflows/ci-cd-server-chatbot.yaml'
     branches: [ feature-FastAPI ]
 
@@ -24,15 +24,15 @@ jobs:
       with:
         push: true
         tags: ${{ RUNPOD.DOCKER_USERNAME }}/fastapi_server_chatbot:latest
-        context: ./fastapi_server_chatbot
-        file: ./fastapi_server_chatbot/Dockerfile
+        context: ./fastapi_server/fastapi_server_chatbot
+        file: ./fastapi_server/fastapi_server_chatbot/Dockerfile
 
     - name: Run Tests on Runpod Chatbot server
       uses: runpod/runpod-test-runner@v1
       with:
         image-tag: ${{ RUNPOD.DOCKER_USERNAME }}/fastapi_server_chatbot:latest
         runpod-api-key: ${{ RUNPOD.RUNPOD_API_KEY }}
-        test-filename: fastapi_server_chatbot/tests.json
+        test-filename: fastapi_server/fastapi_server_chatbot/tests.json
 
     - name: Deploy to Runpod Chatbot server
       run: |
