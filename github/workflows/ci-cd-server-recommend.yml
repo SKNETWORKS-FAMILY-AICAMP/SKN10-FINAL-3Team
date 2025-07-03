@@ -21,11 +21,12 @@ jobs:
         
     - name: Recommend server Build Docker image
       uses: docker/build-push-action@v4
+      run: docker build -t ${{ secrets.DOCKER_USERNAME }}/fastapi_server_recommend:latest -f ./fastapi_server_recommend/Dockerfile .
       with:
-        context: ./fastapi_server_recommend
-        file: ./fastapi_server_recommend/Dockerfile
         push: true
         tags: ${{ secrets.DOCKER_USERNAME }}/fastapi_server_recommend:latest
+        context: ./fastapi_server_recommend
+        file: ./fastapi_server_recommend/Dockerfile
 
     - name: Run Tests on Runpod Recommend server
       uses: runpod/runpod-test-runner@v1

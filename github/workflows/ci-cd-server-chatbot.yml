@@ -21,11 +21,12 @@ jobs:
         
     - name: Chatbot server Build Docker image
       uses: docker/build-push-action@v4
+      run: docker build -t ${{ secrets.DOCKER_USERNAME }}/fastapi_server_chatbot:latest -f ./fastapi_server_chatbot/Dockerfile .
       with:
-        context: ./fastapi_server_chatbot
-        file: ./fastapi_server_chatbot/Dockerfile
         push: true
         tags: ${{ secrets.DOCKER_USERNAME }}/fastapi_server_chatbot:latest
+        context: ./fastapi_server_chatbot
+        file: ./fastapi_server_chatbot/Dockerfile
 
     - name: Run Tests on Runpod Chatbot server
       uses: runpod/runpod-test-runner@v1
