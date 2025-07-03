@@ -95,15 +95,15 @@ async def vector_search(query: str, threshold: float = 0.6, k: int = 20):
     results_with_score = vector_db.similarity_search_with_score(
         prepro_query, k=k
     )
-
     results_sorted = sorted(results_with_score, key=lambda x: x[1])
 
     top_event_ids = []
-    for doc, score in results_sorted:
-        if score > threshold:
+    for doc, distance in results_sorted:
+        similarity = 1 / (1 + distance)  # 0~1 사이 유사도 score
+        if similarity < threshold:
             continue
         event_num = doc.metadata.get("event_num")
-        top_event_ids.append({event_num: float(score)})
+        top_event_ids.append({event_num: float(similarity)})
 
     print("\n[VectorSearch] top_event_ids:", top_event_ids)
     return top_event_ids
