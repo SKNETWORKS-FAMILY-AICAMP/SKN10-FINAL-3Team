@@ -1,0 +1,41 @@
+name: CI/CD fastapi_server_recommend
+
+on:
+  push:
+    paths:
+      - 'fastapi_server_recommend/**'
+      - '.github/workflows/ci-cd-server-recommend.yml'
+    branches: [ feature-FastAPI ]
+
+jobs:
+  build-test-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        
+    - name: Recommend server Build Docker image
+      uses: docker/build-push-action@v4
+      with:
+        context: ./fastapi_server_recommend
+        file: ./Dockerfile
+        push: true
+        tags: ${{ secrets.DOCKER_USERNAME }}/fastapi_server_recommend:latest
+
+    - name: Run Tests on Runpod Recommend server
+      uses: runpod/runpod-test-runner@v1
+      with:
+        image-tag: ${{ secrets.DOCKER_USERNAME }}/fastapi_server_recommend:latest
+        runpod-api-key: ${{ secrets.RUNPOD_API_KEY }}
+        test-filename: fastapi_server_recommend/tests.json
+
+    - name: Deploy to Runpod Recommend server
+      run: |
+        curl 'https://rest.runpod.io/v1/pods/${{ secrets.RECOMMEND_ROD_ID }}/reset' \
+              --request POST \
+              --header 'Authorization: Bearer ${{ secrets.RUNPOD_API_KEY }}'
