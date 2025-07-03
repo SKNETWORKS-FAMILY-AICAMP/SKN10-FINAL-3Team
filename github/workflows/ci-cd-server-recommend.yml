@@ -23,7 +23,7 @@ jobs:
       uses: docker/build-push-action@v4
       with:
         context: ./fastapi_server_recommend
-        file: ./Dockerfile
+        file: ./fastapi_server_recommend/Dockerfile
         push: true
         tags: ${{ secrets.DOCKER_USERNAME }}/fastapi_server_recommend:latest
 

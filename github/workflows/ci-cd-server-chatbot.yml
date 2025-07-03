@@ -23,7 +23,7 @@ jobs:
       uses: docker/build-push-action@v4
       with:
         context: ./fastapi_server_chatbot
-        file: ./Dockerfile
+        file: ./fastapi_server_chatbot/Dockerfile
         push: true
         tags: ${{ secrets.DOCKER_USERNAME }}/fastapi_server_chatbot:latest
 
