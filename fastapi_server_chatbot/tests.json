@@ -1,0 +1,12 @@
+{
+  "test_cases": {
+    "case_management": [
+      {
+        "name": "서버 테스트",
+        "endpoint": "/",
+        "method": "GET",
+        "expected_status": 200
+      }
+    ]
+  }
+}

@@ -21,7 +21,6 @@ jobs:
         
     - name: Chatbot server Build Docker image
       uses: docker/build-push-action@v4
-      run: docker build -t ${{ RUNPOD.DOCKER_USERNAME }}/fastapi_server_chatbot:latest -f ./fastapi_server_chatbot/Dockerfile .
       with:
         push: true
         tags: ${{ RUNPOD.DOCKER_USERNAME }}/fastapi_server_chatbot:latest
